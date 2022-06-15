@@ -1,0 +1,52 @@
+[package]
+name = "favorites"
+version = "0.1.0"
+authors = ["xuguangyuansh <xuguangyuansh@126.com>"]
+edition = "2021"
+resolver = "2"
+
+[profile.release]
+panic = 'abort'
+opt-level = 's'
+# codegen-units = 1
+# lto = true                # 开启，对编译速度影响较大
+
+[[test]]
+name = "tests"
+# path = "tests/lib.rs"
+
+
+[dependencies]
+actix-web = "3"             # actix-web main
+futures = "0.3"
+tokio = { version = "1.4", features = ["full"] }
+#bytes = "0.5.6"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.8"          # load config.yaml
+#serde_qs = "0.7.0"
+serde_json = "1.0"
+validator = "0"             # actix-web req param validate
+validator_derive = "0"
+log4rs = "1.0.0"            # log4rs for log
+log = "0.4"
+sqlx = { version = "0.5", features = [ "postgres", "runtime-async-std-rustls" ] }
+#sqlx = { version = "0.4.0", default-features = false, features = ["runtime-tokio-rustls", "postgres", "macros", "chrono"] }
+rbson = "2.0"
+rbatis = { version = "^3", default-features = false, features = ["postgres","runtime-async-std-rustls"] }
+once_cell = "1"
+chrono = { version = "0.4", features = ["serde"] }
+jsonwebtoken = "7.2"        # json web token
+rust-crypto = "^0.2"
+bcrypt = "0.9"
+# lettre = "0.10.0-rc.4"      # e-mail
+lettre = { version = "0.10.0-rc.4", default-features = false, features = ["smtp-transport", "pool", "rustls-tls", "hostname", "builder"] }
+rand = "0.8"                # Random
+reqwest = { version = "0.11",default-features = false, features = ["json","rustls-tls"] }
+crc = "2.1"
+regex = "1.5"
+
+lazy_static = "1"
+
+#uuid = { version = "0.8", features = ["serde", "v4"] }
+#aura = { path = 'src/aura' }   # AURA 框架孵化
+#snowflake = { git = "https://gitee.com/Aura-Co/snowflake", tag = "0.1.5" }

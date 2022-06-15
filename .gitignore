@@ -1,0 +1,7 @@
+/**/dist
+/**/target
+/**/node_modules
+/**/.DS_Store
+/**/.vscode
+/**/.idea
+
