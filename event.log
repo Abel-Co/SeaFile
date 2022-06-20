@@ -1,0 +1,160 @@
+
+# See: https://support.google.com/youtube/answer/6308288?hl=zh-Hans
+Premium 会员服务和设备限制
+如果您是 YouTube Premium 会员或 YouTube Music Premium 会员，则最多可同时在 10 台设备上使用付费会员服务所提供的离线功能。在您使用的设备数量达到此上限后，如果您试图在一台新设备上下载视频，那么这 10 台设备中最先使用离线功能的设备将失去使用离线功能的权限。您在一年中最多可替换四台设备。
+
+在第四次替换设备后，系统将会提示“抱歉，该视频无法离线观看”。这意味着您可用于下载视频的设备的数量已达到上限。在此上限重置之前，您无法在任何新的设备上下载视频。但您仍然可以在之前用过的所有设备上使用 YouTube Premium 下载视频。
+
+
+# See: https://greasyfork.org/zh-CN/scripts/381176-youtube%E6%92%AD%E6%94%BE%E8%A7%86%E9%A2%91%E5%80%8D%E9%80%9F%E8%87%AA%E5%AE%9A%E4%B9%89-%E5%8F%AF%E8%AE%B0%E5%BF%86
+YouTube播放视频倍速自定义，可记忆
+
+
+
+
+
+
+
+18600041735
+
+
+
+
+
+20 12月前
+21  2月份
+21  4月份
+21  6月份
+
+
+
+qemu-img convert -O qcow2 -c /dev/mapper/pve-vm--101--disk--0 101-iKuai.qcow2
+qemu-img convert -O qcow2 -c /dev/mapper/pve-vm--102--disk--0 102-OpenWrt.qcow2
+qemu-img convert -O qcow2 -c /dev/mapper/pve-vm--103--disk--0 103-SmartNET.qcow2
+qemu-img convert -O qcow2 -c /dev/mapper/pve-vm--105--disk--0 105-SmartDNS.qcow2
+qemu-img convert -O qcow2 -c /dev/mapper/pve-vm--111--disk--0 111-CentOS-7.110.qcow2
+qemu-img convert -O qcow2 -c /dev/mapper/pve-vm--110--disk--0 110-CentOS-7.110.qcow2
+
+
+
+/etc/pve/qemu-server
+
+
+
+
+
+
+
+./base/drone-runner/templates/pvc.yaml:#  name: {{ include "app.fullname" . }}-cephfs-pvc  # pvc 本身已是固定在 特定 ns 的.
+./base/grafana/templates/pvc.yaml:  name: grafana-cephfs-pvc
+./base/drone/values.yaml:  type: cephfs   # block - cephfs
+./base/gitea/values.yaml:  type: cephfs   # block - cephfs
+
+
+
+docker run --name vector \
+  -d \
+  -p 8383:8383 \
+  timberio/vector:latest-alpine
+
+
+
+use actix::*;
+use actix_web::*;
+use std::path::Path;
+use model::db::ConnDsl;
+
+pub struct State {
+    pub db: Addr<Syn, ConnDsl>
+}
+
+pub fn home(_req: HttpRequest<State>) -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open(Path::new("public/index.html"))?)
+}
+
+pub fn path(_req: HttpRequest<State>) -> Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open(Path::new("public/index.html"))?)
+}
+
+./Rust-webapp-starter/src/api/index.rs:    Ok(fs::NamedFile::open(Path::new("public/index.html"))?)
+
+
+
+changed: Event { kind: Create(Folder), paths: ["/mount/.deleted/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Name(From)), paths: ["/mount/abc/abc.txt"], attr:tracker: Some(37892), attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Remove(Folder), paths: ["/mount/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Name(From)), paths: ["/mount/ddd"], attr:tracker: Some(37893), attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Name(To)), paths: ["/mount/.deleted/ddd"], attr:tracker: Some(37893), attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Name(Both)), paths: ["/mount/ddd", "/mount/.deleted/ddd"], attr:tracker: Some(37893), attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Create(Folder), paths: ["/mount/GC-TITAN-RIDGE-NVM-N"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Create(File), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/DESIGNARE-Z390-NVM33-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Create(File), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-TITAN-RIDGE-NVM23-Elias64Fr.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Create(File), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/GC-Titan-Ridge-V2.0-Mod-NVM50-CaseySJ.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Create(File), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Data(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N/TitanRidgeMacOSFirmware-NVM23.bin"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/GC-TITAN-RIDGE-NVM-N"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+
+changed: Event { kind: Create(File), paths: ["/mount/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Modify(Metadata(Any)), paths: ["/mount/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/mount/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+
+changed: Event { kind: Modify(Data(Any)), paths: ["/home/grafana/.ash_history"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/home/grafana/.ash_history"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Create(File), paths: ["/home/grafana/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/home/grafana/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+
+changed: Event { kind: Create(File), paths: ["/var/lib/grafana/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+changed: Event { kind: Access(Close(Write)), paths: ["/var/lib/grafana/abc"], attr:tracker: None, attr:flag: None, attr:info: None, attr:source: None }
+
+docker pull linuxserver/jellyfin:latest
+mkdir -p /srv/jellyfin/{config,cache}
+docker run -d -v /srv/jellyfin/config:/config -v /srv/jellyfin/cache:/cache -v /media:/media --net=host linuxserver/jellyfin:latest
+
+
+
+-------------------------------------------------------------
+大功告成，请访问: http://43.155.72.162:6080/
+File Browser 用户名:ccaa
+File Browser 密码:admin
+Aria2 RPC 密钥: 123456
+帮助文档: https://dwz.ovh/ccaa （必看）
+-------------------------------------------------------------
+
+
