@@ -1,0 +1,14 @@
+server:
+  port: 8080
+postgres:
+  dsn: postgres://favorites_rw:agYx0DzkYsRASuQT@postgresql:5432/favorites
+  min: 3
+  max: 10
+jwt:
+  key: 0xa06f853898a9dd4f32441a56879c52878f96c42730ed31c50e00
+white_list:
+  /login:
+    - POST
+  /activate: [ GET ]
+  /category/barn: [ GET ]
+  /userdocs/barn: [ GET ]
