@@ -4,7 +4,7 @@ import importToCDN from 'vite-plugin-cdn-import'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
-  let viteConfig = { plugins: [vue()] }
+  let viteConfig = { plugins: [vue()], build: { outDir: '../dist' } }
   if (command === 'build') {  // 情景配置
     const env = loadEnv(mode, process.cwd(), '')
     viteConfig.base = '/'   // env.BASE    // github.io/<REPO>/

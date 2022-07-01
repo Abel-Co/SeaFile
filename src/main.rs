@@ -32,17 +32,18 @@
 // // mod utils;
 // mod router;
 
-use actix_web::{App, http, HttpServer, middleware};
+use actix_web::{App, http, HttpServer, middleware, web};
 
 use sea::{boot, module};
+use sea::module::file;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     boot::start().await;
     HttpServer::new(move || App::new()
         .wrap(middleware::Logger::default())
-        .wrap(middleware::Compress::new(http::ContentEncoding::Br))
-        .wrap(boot::middleware::Auth)
+        // .wrap(middleware::Compress::new(http::ContentEncoding::Br))
+        // .wrap(boot::middleware::Auth)
         .service(module::handler::api_routes())
     ).bind(boot::global().addr())?.run().await
 }
