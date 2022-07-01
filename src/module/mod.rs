@@ -10,13 +10,6 @@ pub mod handler {
 
     pub fn api_routes() -> impl HttpServiceFactory {
         web::scope("")
-            // .service(auth::api::login)
-            // .service(auth::api::activate)
-            // .service(user::api::list)
-            // .service(user::api::show)
-            // .service(user::api::update)
-            // .service(user::api::delete)
             // .service(user::api::update_user_info)
-            .service(Files::new("/", "dist/").index_file("index.html"))
     }
 }

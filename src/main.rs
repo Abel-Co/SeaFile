@@ -32,6 +32,7 @@
 // // mod utils;
 // mod router;
 
+use actix_files::Files;
 use actix_web::{App, http, HttpServer, middleware, web};
 
 use sea::{boot, module};
@@ -41,10 +42,12 @@ use sea::module::file;
 async fn main() -> std::io::Result<()> {
     boot::start().await;
     HttpServer::new(move || App::new()
+        .wrap(middleware::Compress::default())
         .wrap(middleware::Logger::default())
-        // .wrap(middleware::Compress::new(http::ContentEncoding::Br))
         // .wrap(boot::middleware::Auth)
         .service(module::handler::api_routes())
+        // .service(Files::new("/statics", "dist/").show_files_listing())
+        .default_service(Files::new("/", "dist/").index_file("index.html"))
     ).bind(boot::global().addr())?.run().await
 }
 
