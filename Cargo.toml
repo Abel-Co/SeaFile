@@ -40,8 +40,6 @@ chrono = { version = "0.4", features = ["serde"] }
 jsonwebtoken = "7.2"        # json web token
 rust-crypto = "^0.2"
 bcrypt = "0.9"
-# lettre = "0.10.0-rc.4"      # e-mail
-lettre = { version = "0.10.0-rc.4", default-features = false, features = ["smtp-transport", "pool", "rustls-tls", "hostname", "builder"] }
 rand = "0.8"                # Random
 reqwest = { version = "0.11",default-features = false, features = ["json","rustls-tls"] }
 crc = "2.1"

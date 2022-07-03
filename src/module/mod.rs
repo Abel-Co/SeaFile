@@ -6,10 +6,10 @@ pub mod handler {
     use actix_web::dev::HttpServiceFactory;
     use actix_web::web;
 
-    use crate::module::{file};
+    use crate::module::file;
 
     pub fn api_routes() -> impl HttpServiceFactory {
         web::scope("")
-            // .service(user::api::update_user_info)
+            .service(file::api::download)
     }
 }

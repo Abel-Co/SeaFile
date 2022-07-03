@@ -46,7 +46,6 @@ async fn main() -> std::io::Result<()> {
         .wrap(middleware::Logger::default())
         // .wrap(boot::middleware::Auth)
         .service(module::handler::api_routes())
-        // .service(Files::new("/statics", "dist/").show_files_listing())
         .default_service(Files::new("/", "dist/").index_file("index.html"))
     ).bind(boot::global().addr())?.run().await
 }
