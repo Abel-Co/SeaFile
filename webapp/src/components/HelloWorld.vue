@@ -5,10 +5,17 @@ defineProps({
   msg: String
 })
 
+let q = ref("Hello World！")
+function search() {
+  console.log(q.value)
+}
+
 const count = ref(0)
 </script>
 
 <template>
+  <h1><input v-model="q" @keydown.enter="search" @focus="" /></h1>
+  <button class="search" type="button" @click="search">搜索</button>
   <h1>{{ msg }}</h1>
 
   <p>
@@ -36,5 +43,14 @@ const count = ref(0)
 <style scoped>
 a {
   color: #42b983;
+}
+
+input {
+  width: 500px;
+  height: 22px;
+}
+
+.search {
+  /*margin-left: 10px;*/
 }
 </style>
