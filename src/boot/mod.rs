@@ -5,6 +5,7 @@ use log4rs::config::RawConfig;
 use once_cell::sync::OnceCell;
 
 use crate::boot::conf::Conf;
+use crate::module::filesystem;
 
 pub mod c;
 pub mod conf;
@@ -69,4 +70,7 @@ pub async fn start() {
     // boot::c::init_sqlx().await;
     // boot::c::init_rbatis().await;
     // boot::c::init_rbatis_old().await;
+    tokio::spawn(async {
+        filesystem::async_watch("/Users/Abel/Downloads").await
+    });
 }

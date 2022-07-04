@@ -1,7 +1,6 @@
 // #![allow(warnings)]
 
-// // #[macro_use] extern crate diesel;
-// // #[macro_use] extern crate serde_derive;
+// #[macro_use] extern crate serde_derive;
 // extern crate serde;
 // extern crate serde_json;
 // extern crate futures;
@@ -25,25 +24,14 @@
 // use crate::model::db::init;
 // // use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
-// // mod api;
-// // mod handler;
-// // mod model;
-// // mod share;
-// // mod utils;
-// mod router;
-
 use actix_files::Files;
-use actix_web::{App, http, HttpServer, middleware, web};
+use actix_web::{App, HttpServer, middleware};
 
 use sea::{boot, module};
-use sea::module::file;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     boot::start().await;
-    tokio::spawn(async move {
-        log::info!("Hello World !")
-    });
     HttpServer::new(move || App::new()
         .wrap(middleware::Compress::default())
         .wrap(middleware::Logger::default())
@@ -61,23 +49,3 @@ async fn main() -> std::io::Result<()> {
 // 5. 增加 入口日志 中间件                                OK
 // 6. 私有内容，整体封装入 boot                           Over
 // 7. 描述 config.yaml 的位置，易于修改                   Over
-
-// fn main() {
-//     ::std::env::set_var("RUST_LOG", "rustlang-cn=info");
-//     ::std::env::set_var("RUST_BACKTRACE", "1");
-//     env_logger::init();
-//     // let sys = System::new("rustlang-cn");
-//     let addr = init();
-
-//     // let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-//     // builder.set_private_key_file("privkey.pem", SslFiletype::PEM).unwrap();
-//     // builder.set_certificate_chain_file("fullchain.pem").unwrap();
-
-//     server::new( move || router::app_state(addr.clone()))
-//          .bind("localhost:8000").unwrap()
-//          .shutdown_timeout(2)
-//          .start();
-
-//     sys.run();
-// }
-

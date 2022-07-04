@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use actix_files::NamedFile;
 use actix_web::{HttpRequest, HttpResponse, Responder, Result};
 use actix_web::{delete, get, post, put};
@@ -16,6 +14,8 @@ pub async fn download() -> Result<impl Responder> {
             parameters: vec![DispositionParam::Filename("Cargo.mp4".to_string())],
         }))
 }
+
+
 
 // /**
 //  * 用户接口: 查

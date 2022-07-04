@@ -9,15 +9,12 @@ extern crate rbatis;
 extern crate regex;
 #[macro_use]
 extern crate validator_derive;
+// #[macro_use]
+// extern crate serde_derive;
+// extern crate serde;
+// extern crate serde_json;
 
 #[macro_use]
 pub mod boot;
 pub mod module;
-// pub mod util;
-// pub mod config;
-// pub mod controller;
-// pub mod dao;
-// pub mod domain;
-// pub mod error;
-// pub mod middleware;
-// pub mod service;
+

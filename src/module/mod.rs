@@ -1,8 +1,8 @@
 pub mod utils;
 pub mod file;
+pub mod filesystem;
 
 pub mod handler {
-    use actix_files::Files;
     use actix_web::dev::HttpServiceFactory;
     use actix_web::web;
 
