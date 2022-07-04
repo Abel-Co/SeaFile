@@ -13,8 +13,7 @@ pub mod middleware;
 pub fn app_env() -> &'static Arc<String> {
     static ENV: OnceCell<Arc<String>> = OnceCell::new();
     ENV.get_or_init(|| {
-        // 不unwrap_or，这里必须要供给个标识
-        Arc::new(env::var("APP_ENV").unwrap())
+        Arc::new(env::var("APP_ENV").unwrap())  // 不unwrap_or，这里必须要供给个标识
     })
 }
 
