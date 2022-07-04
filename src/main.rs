@@ -41,6 +41,9 @@ use sea::module::file;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     boot::start().await;
+    tokio::spawn(async move {
+        log::info!("Hello World !")
+    });
     HttpServer::new(move || App::new()
         .wrap(middleware::Compress::default())
         .wrap(middleware::Logger::default())
