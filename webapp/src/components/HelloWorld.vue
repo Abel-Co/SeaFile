@@ -1,62 +1,56 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 defineProps({
   msg: String
 })
 
-let q = ref("Hello World！")
+const input = ref(null)
+onMounted(() => {
+  input.value.focus()
+})
 
 function search() {
   console.log(q.value)
 }
 
+function show(obj) {
+  console.log(obj)
+}
+
+const list = ref([
+  { id: 1001, file_name: '计算机基础', file_size: '96K' },
+  { id: 1002, file_name: '数据结构', file_size: '100K' },
+  { id: 1003, file_name: 'C语言程序设计', file_size: '116K' }
+])
+
+let q = ref("Hello World！")
 const count = ref(0)
 </script>
 
 <template>
-  <h1><input v-model="q" @keydown.enter="search" @focus=""/></h1>
-  <button class="search" type="button" @click="search">搜索</button>
+<!--  <h1></h1>-->
+  <input v-model="q" @keydown.enter="search" ref="input" />
+  <button class="search-btn" type="button" @click="search">搜 索</button>
   <h1>{{ msg }}</h1>
 
   <ul class="table">
     <li class="thead">
       <ul class="tr clearfix">
-        <li>课程代码</li>
-        <li>课程名称</li>
+        <li>文件</li>
+        <li>体积</li>
         <li>操作</li>
       </ul>
     </li>
 
     <li class="tbody">
-      <ul class="tr clearfix">
-        <li>0001.1</li>
-        <li>计算机基础</li>
-        <li><div>删除</div></li>
-      </ul>
-      <ul class="tr clearfix">
-        <li>0001.2</li>
-        <li>数据结构</li>
-        <li><div>删除</div></li>
-      </ul>
-      <ul class="tr clearfix">
-        <li>0001.3</li>
-        <li>C语言程序设计</li>
-        <li><div>删除</div></li>
+      <ul class="tr clearfix" v-for="item in list">
+        <li><a @click="show(item)">{{item.file_name}}</a></li>
+        <li>{{item.file_size}}</li>
+        <li><div>下载</div><div>删除</div></li>
       </ul>
     </li>
   </ul>
-
-
-<!--  <ul>
-    <li>名称</li>
-    <li>体积</li>
-  </ul>
-
-  <ul>
-    <li>Cargo.toml</li>
-    <li>10KB</li>
-  </ul>-->
 
   <p>
     <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Documentation</a>
@@ -77,7 +71,9 @@ a {
 }
 
 input {
-  width: 500px;
+  display: block;
+  margin: 10px auto;
+  width: 550px;
   height: 22px;
 }
 
@@ -87,7 +83,7 @@ ul{
 }
 /* 表格基本样式规范 */
 .table{
-  width: 800px;
+  width: 1000px;
   margin: 0 auto;
   background-color: powderblue;
 }
@@ -118,7 +114,11 @@ ul{
   /* line-height属性仅适合单行文本，对于多行文本使用span包裹对其盒模型进行调整 */
   line-height: 40px;
 }
+.table .tbody .tr:not(:first-child){
+  border-top: 1px solid lightgray;
+}
 .table .tbody .tr li:last-child>div{
+  margin-left: 2px;
   display: inline-block;
   width: 60px;
   height: 30px;
@@ -171,28 +171,40 @@ ul{
   flex: 1;
 }
 
-
-
-/*ul {
-  display: inline;
-  white-space: nowrap;
-}
-
-ul li:first-child {
-  border-left: 1px solid lightgray;
-}
-
-ul li {
-  padding: 10px 20px;
-  display: inline-block;
-  !*background: pink;*!
-  white-space: nowrap;
-  border-top: 1px solid lightgray;
-  border-right: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
-}*/
-
-.search {
+.search-btn {
+  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+  background-color: #f8f9fa;
+  border: 1px solid #dadce0;
+  color: #202124;
+  font-family: arial,sans-serif;
+  font-size: 15px;
+  line-height: 27px;
+  border-radius: 4px;
+  padding: 0 16px;
+  height: 34px;
+  min-width: 80px;
+  text-align: center;
+  cursor: pointer;
   /*margin-left: 10px;*/
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
