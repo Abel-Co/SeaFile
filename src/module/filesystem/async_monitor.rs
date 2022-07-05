@@ -1,16 +1,18 @@
+use std::fmt::format;
 use std::path::Path;
 
-use event::EventKind;
 use futures::{
     channel::mpsc::{channel, Receiver},
     SinkExt, StreamExt,
 };
-use notify::{Event, event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::event::CreateKind;
+use notify::EventKind::{Create, Modify, Remove};
 
 use crate::module::file;
 
 fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
-    let (mut tx, rx) = channel(1);
+    let (mut tx, rx) = channel(1<<16); // 65536*2
     // Automatically select the best implementation for your platform.
     // You can also access each implementation directly e.g. INotifyWatcher.
     let watcher = RecommendedWatcher::new(move |res| {
@@ -27,19 +29,22 @@ pub async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
     while let Some(res) = rx.next().await {
         match res {
             Ok(event) => {
+                log::info!("{:?}", event);
                 match event.kind {
-                    EventKind::Create(file) => file::bs::create(1, event.paths[0].to_str().unwrap()).await,
-                    EventKind::Remove(file) => file::bs::delete(1, event.paths[0].to_str().unwrap()).await,
-                    EventKind::Modify(file) => file::bs::update(1, event.paths[0].to_str().unwrap()).await,
+                    Create(kind) => file::bs::create(kind, event.paths[0].to_str().unwrap()).await,
+                    Remove(kind) => file::bs::delete(kind, event.paths[0].to_str().unwrap()).await,
+                    Modify(kind) => file::bs::update(kind, event.paths[0].to_str().unwrap()).await,
                     _ => ()
                 }
             }
-            Err(e) => println!("watch error: {:?}", e),
+            Err(e) => log::error!("watch error: {:?}", e),
         }
     }
     Ok(())
 }
 
+
+// -----------------------------------------------------------------
 fn main() {
     let path = "/var/lib/grafana";
     println!("watching {}", path);

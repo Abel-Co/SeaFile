@@ -2400,6 +2400,7 @@ dependencies = [
  "tokio",
  "validator",
  "validator_derive",
+ "walkdir",
 ]
 
 [[package]]
