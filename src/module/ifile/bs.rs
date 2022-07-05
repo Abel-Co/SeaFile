@@ -6,33 +6,29 @@ use std::path::Path;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use walkdir::WalkDir;
 
+use crate::module::ifile;
+use crate::module::ifile::Files;
+
 pub async fn create(kind: CreateKind, path: &str) {
-    match kind {
-        // CreateKind::File => ,
-        // CreateKind::Folder => ,
-        _ => ()
-    }
+    ifile::dao::save(Files::new(format!("{:?}", kind), path)).await;
 }
 
 pub async fn update(kind: ModifyKind, path: &str) {
+    let ifile = Files::new(format!("{:?}", kind), path);
     match kind {
         ModifyKind::Name(any) => {
             if Path::new(path).exists() {
-                // create db record
+                ifile::dao::delete(format!("{:?}", kind).as_str(), path);
             } else {
-                // delete db record
+                ifile::dao::save(Files::new(format!("{:?}", kind), path)).await;
             }
-        },
+        }
         _ => ()
     }
 }
 
 pub async fn delete(kind: RemoveKind, path: &str) {
-    match kind {
-        // RemoveKind::File => ,
-        // RemoveKind::Folder => ,
-        _ => ()
-    }
+    ifile::dao::delete(format!("{:?}", kind).as_str(), path).await;
 }
 
 pub async fn read(path: &str) -> String {

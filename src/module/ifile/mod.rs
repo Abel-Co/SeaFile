@@ -3,30 +3,34 @@ use std::path::Path;
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
 use serde::{Deserialize, Serialize};
+use crate::module::utils::crc_utils;
 
 pub mod api;
 pub mod bs;
+pub mod dao;
 
 #[derive(CRUDTable, Debug, Default, Validate, Serialize, Deserialize)]
-pub struct FileInfo {
+pub struct Files {
     pub id: i64,
-    pub file_name: String,
-    pub file_size: u64,
-    pub file_type: u8,
-    pub file_path: String,
+    pub crc : i64,
+    pub size: u64,
+    pub name: String,
+    pub path: String,
+    pub kind: String,
     pub update_at: Option<TimestampZ>,
 }
 
-impl FileInfo {
-    pub fn new(file: u8, path: &str) -> Self {
-        let path = Path::new(path);
-        FileInfo {
+impl Files {
+    pub fn new(kind: String, path: &str) -> Self {
+        let file = Path::new(path);
+        Files {
             id: new_snowflake_id(),
-            file_name: format!("{}", path.file_name().unwrap().to_str().unwrap()),
-            file_type: file,
-            file_path: format!("{}", path.parent().unwrap().to_str().unwrap()),
-            file_size: 0,
+            name: format!("{}", file.file_name().unwrap().to_str().unwrap()),
+            path: format!("{}", file.parent().unwrap().to_str().unwrap()),
+            kind,
+            crc: crc_utils::crc_i64(path),
             update_at: Some(TimestampZ::now()),
+            ..Default::default()
         }
     }
 }
