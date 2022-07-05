@@ -64,13 +64,13 @@ pub fn global() -> &'static Arc<Conf> {
 }
 
 pub async fn start() {
-    let config_path = global().config_path.clone().unwrap();
+    // let config_path = global().config_path.clone().unwrap();
     log4rs::init_raw_config(raw_config("info")).unwrap();
     // log4rs::init_file(config_path + "log4rs.yaml", Default::default()).unwrap();
     // boot::c::init_sqlx().await;
     c::init_rbatis().await;
     // boot::c::init_rbatis_old().await;
     tokio::spawn(async {
-        filesystem::async_watch(global().watch_path.unwrap()).await
+        filesystem::async_watch(global().watch_path.as_ref().unwrap()).await
     });
 }
