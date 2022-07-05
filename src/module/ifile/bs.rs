@@ -18,9 +18,9 @@ pub async fn update(kind: ModifyKind, path: &str) {
     match kind {
         ModifyKind::Name(any) => {
             if Path::new(path).exists() {
-                ifile::dao::delete(format!("{:?}", kind).as_str(), path);
-            } else {
                 ifile::dao::save(Files::new(format!("{:?}", kind), path)).await;
+            } else {
+                ifile::dao::delete(format!("{:?}", kind).as_str(), path);
             }
         }
         _ => ()

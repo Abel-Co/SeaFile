@@ -9,9 +9,10 @@ pub async fn save(files: Files) -> u64 {
     rb_resp.unwrap().rows_affected
 }
 
-pub async fn update(id: i64, mut ifile: Files) -> u64 {
-    ifile.id = id;
-    0
+pub async fn update(id: i64, ifile: Files) -> u64 {
+    RB.update_by_wrapper(&ifile, RB.new_wrapper()
+        .eq("id", id), &[Skip::Column("id"), Skip::Value(Bson::Null)]
+    ).await.unwrap()
 }
 
 pub async fn delete(kind: &str, path: &str) -> u64 {
