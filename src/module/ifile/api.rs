@@ -6,7 +6,7 @@ use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionT
 #[get("/download")]
 pub async fn download() -> Result<impl Responder> {
     let file = NamedFile::open("Cargo.toml")?;
-    // let file = NamedFile::open("/Users/Abel/Downloads/知否知否应是绿肥红瘦.The.Story.of.Ming.Lan.2018.E15.1080p.WEB-DL.x264.AAC-HotWEB.mp4")?;
+    // let ifile = NamedFile::open("/Users/Abel/Downloads/知否知否应是绿肥红瘦.The.Story.of.Ming.Lan.2018.E15.1080p.WEB-DL.x264.AAC-HotWEB.mp4")?;
     Ok(file
         .use_last_modified(true)
         .set_content_disposition(ContentDisposition {

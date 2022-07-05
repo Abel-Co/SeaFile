@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::path::Path;
 
 use futures::{
@@ -6,10 +5,9 @@ use futures::{
     SinkExt, StreamExt,
 };
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
-use notify::event::CreateKind;
 use notify::EventKind::{Create, Modify, Remove};
 
-use crate::module::file;
+use crate::module::ifile;
 
 fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
     let (mut tx, rx) = channel(1<<16); // 65536*2
@@ -31,9 +29,9 @@ pub async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
             Ok(event) => {
                 log::info!("{:?}", event);
                 match event.kind {
-                    Create(kind) => file::bs::create(kind, event.paths[0].to_str().unwrap()).await,
-                    Remove(kind) => file::bs::delete(kind, event.paths[0].to_str().unwrap()).await,
-                    Modify(kind) => file::bs::update(kind, event.paths[0].to_str().unwrap()).await,
+                    Create(kind) => ifile::bs::create(kind, event.paths[0].to_str().unwrap()).await,
+                    Remove(kind) => ifile::bs::delete(kind, event.paths[0].to_str().unwrap()).await,
+                    Modify(kind) => ifile::bs::update(kind, event.paths[0].to_str().unwrap()).await,
                     _ => ()
                 }
             }

@@ -1,9 +1,8 @@
-use std::{fs};
-use std::any::Any;
-use std::fs::{File, FileType};
+use std::fs;
+use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use actix_web::delete;
+
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use walkdir::WalkDir;
 
