@@ -68,9 +68,9 @@ pub async fn start() {
     log4rs::init_raw_config(raw_config("info")).unwrap();
     // log4rs::init_file(config_path + "log4rs.yaml", Default::default()).unwrap();
     // boot::c::init_sqlx().await;
-    // boot::c::init_rbatis().await;
+    c::init_rbatis().await;
     // boot::c::init_rbatis_old().await;
     tokio::spawn(async {
-        filesystem::async_watch("/Users/Abel/Downloads").await
+        filesystem::async_watch(global().watch_path.unwrap()).await
     });
 }
