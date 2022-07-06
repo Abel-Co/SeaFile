@@ -5,8 +5,6 @@ use actix_web::dev::ServiceRequest;
 use once_cell::sync::OnceCell;
 use rbatis::core::db::DBPoolOptions;
 use rbatis::rbatis::Rbatis;
-use sqlx::{Pool, Postgres};
-use sqlx::postgres::PgPoolOptions;
 
 use regex::Regex;
 
@@ -53,33 +51,6 @@ pub async fn init_rbatis_old() {
 
 pub fn rb() -> &'static Rbatis {
     RB_OLD.get().unwrap()
-}
-
-// Sqlx pg_pool, old plan
-pub static POSTGRES_POOL: OnceCell<Pool<Postgres>> = OnceCell::new();
-
-pub async fn init_sqlx() {
-    if let Some(db) = &crate::boot::global().postgres {
-        let pool = PgPoolOptions::new()
-            .min_connections(db.min)
-            .max_connections(db.max)
-            .connect_lazy(&db.dsn).unwrap();
-        assert!(POSTGRES_POOL.set(pool).is_ok());
-        log::info!("sqlx::datasource {}   {} ~ {}", desensitive(&db.dsn), db.min, db.max)
-    } else if let Some(db) = &crate::boot::global().mysql {
-        // FIXME
-        let pool = PgPoolOptions::new()
-            .min_connections(db.min)
-            .max_connections(db.max)
-            .connect_lazy(&db.dsn).unwrap();
-        assert!(POSTGRES_POOL.set(pool).is_ok());
-        log::info!("sqlx::datasource {}   {} ~ {}", desensitive(&db.dsn), db.min, db.max)
-    }
-}
-
-#[allow(dead_code)]
-pub fn sqlx_pool() -> &'static Pool<Postgres> {
-    POSTGRES_POOL.get().unwrap()
 }
 
 /// 是否白名单请求

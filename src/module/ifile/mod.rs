@@ -4,6 +4,8 @@ use std::path::Path;
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
 use serde::{Deserialize, Serialize};
+use validator::Validate;
+
 use crate::module::utils::crc_utils;
 
 pub mod api;
@@ -13,7 +15,7 @@ pub mod dao;
 #[derive(CRUDTable, Debug, Default, Validate, Serialize, Deserialize)]
 pub struct Files {
     pub id: i64,
-    pub crc : i64,
+    pub crc: i64,
     pub size: u64,
     pub name: String,
     pub path: String,
