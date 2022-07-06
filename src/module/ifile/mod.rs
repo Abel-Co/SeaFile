@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::Path;
 
 use rbatis::snowflake::new_snowflake_id;
@@ -17,7 +18,8 @@ pub struct Files {
     pub name: String,
     pub path: String,
     pub kind: String,
-    pub update_at: Option<TimestampZ>,
+    pub parent: String,
+    pub updated_at: Option<TimestampZ>,
 }
 
 impl Files {
@@ -25,11 +27,13 @@ impl Files {
         let file = Path::new(path);
         Files {
             id: new_snowflake_id(),
+            path: path.to_string(),
             name: format!("{}", file.file_name().unwrap().to_str().unwrap()),
-            path: format!("{}", file.parent().unwrap().to_str().unwrap()),
+            parent: format!("{}", file.parent().unwrap().to_str().unwrap()),
+            size: match fs::metadata(path) { Ok(meta) => meta.len(), Err(_) => 0 },
             kind,
             crc: crc_utils::crc_i64(path),
-            update_at: Some(TimestampZ::now()),
+            updated_at: Some(TimestampZ::now()),
             ..Default::default()
         }
     }

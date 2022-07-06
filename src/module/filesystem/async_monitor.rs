@@ -29,9 +29,9 @@ pub async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
             Ok(event) => {
                 log::info!("{:?}", event);
                 match event.kind {
-                    Create(kind) => ifile::bs::create(kind, event.paths[0].to_str().unwrap()).await,
-                    Remove(kind) => ifile::bs::delete(kind, event.paths[0].to_str().unwrap()).await,
+                    Create(kind) => ifile::bs::save_or_update(kind, event.paths[0].to_str().unwrap()).await,
                     Modify(kind) => ifile::bs::update(kind, event.paths[0].to_str().unwrap()).await,
+                    Remove(kind) => ifile::bs::delete(kind, event.paths[0].to_str().unwrap()).await,
                     _ => ()
                 }
             }
