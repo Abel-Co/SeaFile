@@ -5,6 +5,9 @@ authors = ["xuguangyuansh <xuguangyuansh@126.com>"]
 edition = "2021"
 resolver = "2"
 
+[profile.dev]
+split-debuginfo = "unpacked"
+
 [profile.release]
 panic = 'abort'
 opt-level = 's'
@@ -52,6 +55,3 @@ lazy_static = "1"
 #uuid = { version = "0.8", features = ["serde", "v4"] }
 #aura = { path = 'src/aura' }   # AURA 框架孵化
 #snowflake = { git = "https://gitee.com/Aura-Co/snowflake", tag = "0.1.5" }
-
-[build-dependencies]
-static-files = "0.2"
