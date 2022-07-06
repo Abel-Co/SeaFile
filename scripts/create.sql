@@ -20,7 +20,7 @@ create table files
     path       varchar(500)              not null,
     crc        bigint      default 0     not null,
     times      bigint      default 0     not null,
-    parent     varchar(500)              not null,
+    parent     bigint      default 0     not null,
     created_at timestamptz default now() not null,
     updated_at timestamptz default now() not null
 );

@@ -10,6 +10,12 @@ pub async fn get(path: &str) -> Option<Files> {
     ).await.unwrap()
 }
 
+pub async fn list(parent: i64) -> Vec<Files> {
+    RB.fetch_list_by_wrapper(
+        RB.new_wrapper().eq("parent", parent).order_bys(&[("kind", false), ("path", true)])
+    ).await.unwrap()
+}
+
 pub async fn save(files: Files) -> u64 {
     let rb_resp = RB.save(&files, &[Skip::Value(Bson::Null)]).await;
     rb_resp.unwrap().rows_affected
