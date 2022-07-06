@@ -5,3 +5,7 @@ postgres:
   min: 3
   max: 10
 watch_path: /Users/Abel/Downloads
+white_list:
+  /login:
+    - POST
+  /activate: [ GET ]

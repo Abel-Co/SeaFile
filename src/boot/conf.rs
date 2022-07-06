@@ -9,7 +9,6 @@ pub struct Conf {
     pub postgres: Option<Postgres>,
     pub mysql: Option<Mysql>,
     pub watch_path: Option<String>,
-    pub jwt: Jwt,
     pub white_list: HashMap<String, Vec<String>>,
 }
 
