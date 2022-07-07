@@ -27,7 +27,7 @@
 use actix_files::Files;
 use actix_web::{App, HttpServer, middleware};
 
-use sea::{boot, module};
+use SeaFile::{boot, module};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

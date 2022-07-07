@@ -1,0 +1,13 @@
+FROM dperson/samba
+
+WORKDIR /root
+
+ADD app.tar.gz ./
+
+ARG APP_ENV
+
+ENV APP_ENV=$APP_ENV
+
+ENTRYPOINT ["./SeaFile"]
+
+EXPOSE 8080
