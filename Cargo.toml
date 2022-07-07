@@ -12,7 +12,7 @@ opt-level = 's'
 # lto = true                # 开启，对编译速度影响较大
 
 [profile.dev]
-split-debuginfo = "unpacked"
+split-debuginfo = "unpacked"# 加快开发阶段的增量编译
 
 [[test]]
 name = "tests"

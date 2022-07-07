@@ -1,3 +1,4 @@
+use std::path;
 use rbatis::crud::{CRUD, Skip};
 use rbson::Bson;
 use crate::boot::c::RB;
@@ -30,5 +31,11 @@ pub async fn update(id: i64, ifile: Files) -> u64 {
 pub async fn delete(path: &str) -> u64 {
     RB.remove_by_wrapper::<Files>(
         RB.new_wrapper().eq("crc", crc_i64(path)).eq("path", path)
+    ).await.unwrap()
+}
+
+pub async fn delete_all(path: &str) -> u64 {
+    RB.remove_by_wrapper(
+        RB.new_wrapper().like("path", format!("{}{}{}", path, path::MAIN_SEPARATOR, "%"))
     ).await.unwrap()
 }

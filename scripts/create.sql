@@ -28,6 +28,7 @@ create trigger user_timestamp before update on files for each row execute proced
 create index idx_name on files (name);
 create index idx_kind on files (kind);
 create index idx_size on files (size);
+create index idx_path on files (path);
 create index idx_crc on files (crc);
 create index idx_times on files (times);
 create index idx_parent on files (parent);

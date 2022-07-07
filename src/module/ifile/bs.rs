@@ -27,6 +27,7 @@ pub async fn update(kind: ModifyKind, path: &str) {
 }
 
 pub async fn delete(kind: RemoveKind, path: &str) {
+    ifile::dao::delete_all(path).await;
     ifile::dao::delete(path).await;
 }
 
