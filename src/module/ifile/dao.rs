@@ -35,7 +35,7 @@ pub async fn delete(path: &str) -> u64 {
 }
 
 pub async fn delete_all(path: &str) -> u64 {
-    RB.remove_by_wrapper(
+    RB.remove_by_wrapper::<Files>(
         RB.new_wrapper().like("path", format!("{}{}{}", path, path::MAIN_SEPARATOR, "%"))
     ).await.unwrap()
 }
