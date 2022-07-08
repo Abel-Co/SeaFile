@@ -2,19 +2,11 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import HelloWorld from './components/HelloWorld.vue'
-import { ref } from "vue"
-
-let msg = ref('Hello Vue 3 + Vite')
-
-function change(param) {
-  msg = param
-  console.log(param)
-}
 </script>
 
 <template>
   <img class="logo" alt="Vue logo" src="./assets/logo.svg"/>
-  <HelloWorld :msg="msg" @change="change"/>
+  <HelloWorld />
 </template>
 
 <style>
@@ -31,5 +23,4 @@ function change(param) {
   width: 40%;
   margin: 10px;
 }
-
 </style>
