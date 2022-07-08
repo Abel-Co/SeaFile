@@ -24,7 +24,7 @@ cargo build --release
 ## 镜像
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里为直接获得共享目录能力，使用了 samba alpine 镜像，如不需要该功能，转而去使用 scratch、alpine 也是一样的。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以将 nextcloud 也集成进来，只要让它们的工作目录相同，就可以统一操作和维护索引（单指 SeaFile 端索引），并共享 nextcloud 的 App 端了。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以将 nextcloud 也集成进来，只要让它们的工作目录相同，就可以统一操作和维护索引（单指 SeaFile 索引），并共享 nextcloud 的 App 端了。
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;env、repo 根据实际情况填写：
 

@@ -1,48 +1,15 @@
-<script setup>
-import { onMounted, ref } from 'vue'
-
-defineProps({
-  msg: String
-})
-
-const input = ref(null)
-onMounted(() => {
-  input.value.focus()
-})
-
-function search() {
-  console.log(q.value)
-}
-
-function show(obj) {
-  console.log(obj)
-}
-
-const list = ref([
-  { id: 1001, file_name: '计算机基础', file_size: '96K' },
-  { id: 1002, file_name: '数据结构', file_size: '100K' },
-  { id: 1003, file_name: 'C语言程序设计', file_size: '116K' }
-])
-
-let q = ref("Hello World！")
-const count = ref(0)
-</script>
-
 <template>
 <!--  <h1></h1>-->
-  <input v-model="q" @keydown.enter="search" ref="input" />
+  <input v-model="q" @keydown.enter="search" ref="input" v-focus />
   <button class="search-btn" type="button" @click="search">搜 索</button>
   <h1>{{ msg }}</h1>
 
   <ul class="table">
     <li class="thead">
       <ul class="tr clearfix">
-        <li>文件</li>
-        <li>体积</li>
-        <li>操作</li>
+        <li>文件</li><li>体积</li><li>操作</li>
       </ul>
     </li>
-
     <li class="tbody">
       <ul class="tr clearfix" v-for="item in list">
         <li><a @click="show(item)">{{item.file_name}}</a></li>
@@ -65,6 +32,31 @@ const count = ref(0)
   </p>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+
+defineProps({
+  msg: String
+})
+
+function search() {
+  console.log(q.value)
+}
+
+function show(obj) {
+  console.log(obj)
+}
+
+const list = ref([
+  { id: 1001, file_name: '计算机基础', file_size: '96K' },
+  { id: 1002, file_name: '数据结构', file_size: '100K' },
+  { id: 1003, file_name: 'C语言程序设计', file_size: '116K' }
+])
+
+let q = ref("Hello World！")
+const count = ref(0)
+</script>
+
 <style scoped>
 a {
   color: #42b983;
@@ -72,9 +64,9 @@ a {
 
 input {
   display: block;
-  margin: 10px auto;
-  width: 550px;
-  height: 22px;
+  margin: 20px auto;
+  width: 600px;
+  height: 30px;
 }
 
 ul{
