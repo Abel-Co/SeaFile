@@ -2,7 +2,7 @@
 <!--  <h1></h1>-->
   <input v-model="q" @keydown.enter="search" ref="input" v-focus />
   <button class="search-btn" type="button" @click="search">搜 索</button>
-  <h1>{{ msg }}</h1>
+  <h1><a href="#" target="_blank" @click.prevent="show(this.msg)">{{ msg }}</a></h1>
 
   <ul class="table">
     <li class="thead">
@@ -39,8 +39,10 @@ defineProps({
   msg: String
 })
 
+const input = ref(null)
 function search() {
   console.log(q.value)
+  input.value.focus()
 }
 
 function show(obj) {
