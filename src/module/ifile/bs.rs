@@ -9,6 +9,20 @@ use walkdir::WalkDir;
 use crate::module::ifile;
 use crate::module::ifile::Files;
 
+pub async fn search(name: &str) -> Vec<Files> {
+    ifile::dao::search(name).await
+}
+
+pub async fn list(parent: i64) -> Vec<Files> {
+    ifile::dao::list(parent).await
+}
+
+pub async fn show(path: &str) -> String {
+    let mut buffer = String::new();
+    File::open(path).unwrap().read_to_string(&mut buffer);
+    buffer
+}
+
 pub async fn save_or_update(kind: CreateKind, path: &str) {
     match ifile::dao::get(path).await {
         Some(_file) => ifile::dao::update(_file.id, Files::new(format!("{:?}", kind), path)).await,
@@ -29,12 +43,6 @@ pub async fn update(kind: ModifyKind, path: &str) {
 pub async fn delete(kind: RemoveKind, path: &str) {
     ifile::dao::delete_all(path).await;
     ifile::dao::delete(path).await;
-}
-
-pub async fn read(path: &str) -> String {
-    let mut buffer = String::new();
-    File::open(path).unwrap().read_to_string(&mut buffer);
-    buffer
 }
 
 pub async fn delete_file(path: &str) {

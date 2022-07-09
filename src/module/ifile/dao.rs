@@ -11,9 +11,17 @@ pub async fn get(path: &str) -> Option<Files> {
     ).await.unwrap()
 }
 
+pub async fn search(name: &str) -> Vec<Files> {
+    RB.fetch_list_by_wrapper(
+        RB.new_wrapper().like("name", name)
+            .order_bys(&[("kind", false), ("path", true)])
+    ).await.unwrap()
+}
+
 pub async fn list(parent: i64) -> Vec<Files> {
     RB.fetch_list_by_wrapper(
-        RB.new_wrapper().eq("parent", parent).order_bys(&[("kind", false), ("path", true)])
+        RB.new_wrapper().eq("parent", parent)
+            .order_bys(&[("kind", false), ("path", true)])
     ).await.unwrap()
 }
 

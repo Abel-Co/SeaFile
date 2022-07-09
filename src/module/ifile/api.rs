@@ -1,7 +1,29 @@
 use actix_files::NamedFile;
-use actix_web::{HttpRequest, HttpResponse, Responder, Result};
+use actix_web::{HttpResponse, Responder, Result};
+#[allow(unused)]
 use actix_web::{delete, get, post, put};
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
+use actix_web_lab::extract::Path;
+
+use crate::module::ifile;
+
+#[get("/search/{name}")]
+pub async fn search(Path(name): Path<String>) -> impl Responder {
+    let files = ifile::dao::search(&name).await;
+    HttpResponse::Ok().json(files)
+}
+
+#[get("/list/{parent}")]
+pub async fn list(Path(parent): Path<i64>) -> impl Responder {
+    let files = ifile::dao::list(parent).await;
+    HttpResponse::Ok().json(files)
+}
+
+#[get("/show/{id}/{name}")]
+pub async fn show(Path((id, name)): Path<(i64, String)>) -> Result<impl Responder> {
+    log::info!("{}, {}", id, name);
+    Ok(HttpResponse::Ok())
+}
 
 #[get("/download")]
 pub async fn download() -> Result<impl Responder> {
@@ -14,7 +36,6 @@ pub async fn download() -> Result<impl Responder> {
             parameters: vec![DispositionParam::Filename("Cargo.mp4".to_string())],
         }))
 }
-
 
 
 // /**
