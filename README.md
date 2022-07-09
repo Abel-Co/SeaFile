@@ -24,8 +24,6 @@ cargo build --release
 ## 镜像
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里为直接获得共享目录能力，使用了 samba alpine 镜像，如不需要该功能，转而去使用 scratch、alpine 也是一样的。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以将 nextcloud 也集成进来，只要让它们的工作目录相同，就可以统一操作和维护索引（单指 SeaFile 索引），并共享 nextcloud 的 App 端了。
-
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;env、repo 根据实际情况填写：
 
 ```shell
@@ -37,6 +35,11 @@ mkdir .docker && cp app.tar.gz .dockerfile .docker/ && cd .docker/
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端支持，当前，筛选并集成了 nextcloud，需保证 SeaFile、NextCloud 工作目录相同 。
+- 从 nextcloud 中上传的，只能在 nextcloud 端浏览、使用。
+- 从 smb、nfs、ftp、scp、nextcloud 等上传的，都可在 SeaFile pc 页面平台中 检索、使用。 
+
+
 ## 挂载smb
 ### macOS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Command + k，输入服务地址，并根据随后提示，输入账号、密码。
@@ -45,10 +48,16 @@ docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;右键，此电脑，添加一个网络位置，`\\192.168.3.120\share`。（或，开始，运行，输入地址）（结尾的 share，请根据实际情况输入）。
 ![img.png](docs/assets/win-smb.png)
 
-## 未来
-| 功能  |
-|:---:|
-| 多用户 |
+## 迭代计划
+|  序号   |                   功能                   | 进展  |
+|:---:|:--------------------------------------:|:---:|
+| 1| 大范围的在线预览功能（txt、pdf、md、html、java、js、rs） | 规划中 |
+| 2|      在线文档功能（markdown、onlyoffice）       | ... |
+| 3|               图片轮播功能（相册）             | ... |
+| 4|                 视频播放功能                 | ... |
+| 5|                 多用户功能                  | ... |
+
+
 
 
 ---

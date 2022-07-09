@@ -48,6 +48,9 @@ const input = ref(null)
 function search() {
   qh.value = q.value
   // async fetch
+  const files = async () => {
+    const result = await get(`/search/{q.value}`)
+  }
   q.value = ''
   input.value.focus()
 }
