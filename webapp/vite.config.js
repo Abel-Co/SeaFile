@@ -24,6 +24,10 @@ export default defineConfig(({ command, mode }) => {
     viteConfig.server = {
       open: '/',          // 开发服启动时打开浏览器
       strictPort: false,  // false: 端口被占用则尝试下一个可用端口
+      proxy: {
+        '/search': 'http://172.17.16.165:8080',
+        '/list': 'http://172.17.16.165:8080',
+      }
     }
   }
   return viteConfig

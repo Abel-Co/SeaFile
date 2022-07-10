@@ -1,25 +1,30 @@
 <template>
   <!--  <h1></h1>-->
-  <input v-model="q" @keydown.enter="search" ref="input" v-focus />
+  <input v-model="q" @keydown.enter="search" ref="input" v-focus/>
   <button class="search-btn" type="button" @click="search">搜 索</button>
-  <h1><a href="#" target="_blank" @click.prevent="show">{{ qh }}</a></h1>
+  <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
 
   <ul class="table">
     <li class="thead">
       <ul class="tr clearfix">
-        <li>文件</li>
-        <li>体积</li>
-        <li>操作</li>
+        <li>名字</li>
+        <li>路径</li>
+        <li>大小</li>
+        <li>修改时间</li>
       </ul>
     </li>
     <li class="tbody">
       <ul class="tr clearfix" v-for="item in list">
-        <li><a @click="show(item)">{{ item.file_name }}</a></li>
-        <li>{{ item.file_size }}</li>
         <li>
-          <div>下载</div>
+          <img src="http://localhost:3000/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;" />
+          <a href="#" @click.prevent="browse(item)">{{ item.name }}</a>
           <div>删除</div>
+          <div>下载</div>
         </li>
+        <li>{{ item.path }}</li>
+        <li>{{ item.size }}</li>
+        <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
+        <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
       </ul>
     </li>
   </ul>
@@ -38,33 +43,53 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
+import { get } from '../utils/request'
 
 const q = ref(null)
 const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
+const list = reactive([
+  { id: 1001, name: '计算机基础', path: '/Users/Abel/Downloads/EFI', size: '96K', updated_at: new Date() },
+  { id: 1002, name: '数据结构', path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents', size: '100K', updated_at: new Date() },
+  { id: 1003, name: 'C语言程序设计', path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents/PlugIns/AirPortBrcmNIC_Injector.kext', size: '116K', updated_at: new Date() }
+])
 
 function search() {
   qh.value = q.value
-  // async fetch
-  const files = async () => {
-    const result = await get(`/search/{q.value}`)
+  const search = async () => {
+    list.length = 0
+    if (!q.value) return
+    get(`/search/${q.value}`).then((resp) => {
+      list.push(...resp.data)
+    })
   }
+  search()
   q.value = ''
   input.value.focus()
 }
 
-function show() {
+function browse(item) {
+  if (item.kind === 'Folder') {
+    const browser = async () => {
+      list.length = 0
+      get(`/list/${item.parent}`).then((resp) => {
+        list.push(...resp.data)
+      })
+    }
+    browser()
+  } else if (item.kind === 'File') {
+
+  }
+  // q.value = qh.value
+  // input.value.focus()
+}
+
+function reuse() {
   q.value = qh.value
   input.value.focus()
 }
-
-const list = ref([
-  { id: 1001, file_name: '计算机基础', file_size: '96K' },
-  { id: 1002, file_name: '数据结构', file_size: '100K' },
-  { id: 1003, file_name: 'C语言程序设计', file_size: '116K' }
-])
 </script>
 
 <style scoped>
@@ -87,50 +112,75 @@ ul {
 
 /* 表格基本样式规范 */
 .table {
-  width: 1000px;
+  width: 1200px;
   margin: 0 auto;
   background-color: powderblue;
 }
 
-/* 所有单元格浮动*/
-.table .tr > li {
-  float: left;
-  text-align: center;
+.table .tr {
+  display: flex;
 }
 
-/* 清除浮动带来的影响 */
-.clearfix::after {
-  content: '';
-  display: block;
-  clear: both;
+.table .tr li {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* 行--设置行高 */
 .table .thead .tr {
   background-color: #008080;
   color: #fff;
-  font-size: 16px;
-  height: 35px;
-  line-height: 35px;
+  font-size: 15px;
+  height: 36px;
+  line-height: 39px;
 }
 
 .table .tbody .tr {
   background-color: #fff;
   color: #333;
   font-size: 14px;
-  height: 40px;
-  /* line-height属性仅适合单行文本，对于多行文本使用span包裹对其盒模型进行调整 */
-  line-height: 40px;
+  height: 36px;
+  line-height: 38px;
 }
 
 .table .tbody .tr:not(:first-child) {
-  border-top: 1px solid lightgray;
+  border-top: 1px solid rgb(246 247 249);
 }
 
-.table .tbody .tr li:last-child > div {
+/* 列--设计列宽 */
+.table .thead li:first-child, .table .tbody li:first-child {
+  flex: 2;
+  text-align: left;
+  padding-left: 22px;
+}
+
+.table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
+  flex: 1.6;
+  text-align: left;
+  padding-left: 8px;
+}
+
+.table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
+  flex: .3;
+  padding-left: 20px;
+}
+
+.table .thead li:last-child, .table .tbody li:last-child {
+  flex: .9;
+}
+
+.table .tbody .tr:hover {
+  background-color: rgb(248 249 250);
+}
+
+.table .tbody .tr li:first-child > div {
+  float: right;
+  margin-top: 5px;
   margin-left: 2px;
+  margin-right: 10px;
   display: inline-block;
-  width: 60px;
+  /*width: 60px;*/
   height: 30px;
   background-color: #008c8c;
   color: #fff;
@@ -138,61 +188,6 @@ ul {
   line-height: 30px;
   cursor: pointer;
 }
-
-/* 列--设计列宽 */
-.table .thead li:first-child {
-  width: 100px;
-}
-
-.table .tbody li:first-child {
-  width: 100px;
-}
-
-.table .thead li:nth-child(2) {
-  width: 120px;
-}
-
-.table .tbody li:nth-child(2) {
-  width: 120px;
-}
-
-.table .thead li:last-child {
-  width: 160px;
-}
-
-.table .tbody li:last-child {
-  width: 160px;
-}
-
-
-.table .tr {
-  display: flex;
-}
-
-.table .thead li:first-child {
-  flex: 1;
-}
-
-.table .tbody li:first-child {
-  flex: 1;
-}
-
-.table .thead li:nth-child(2) {
-  flex: 1.2;
-}
-
-.table .tbody li:nth-child(2) {
-  flex: 1.2;
-}
-
-.table .thead li:last-child {
-  flex: 1;
-}
-
-.table .tbody li:last-child {
-  flex: 1;
-}
-
 .search-btn {
   box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
   background-color: #f8f9fa;

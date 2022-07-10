@@ -1,5 +1,31 @@
 import axios from "axios"
 
+const CancelToken = axios.CancelToken
+
+export const get = (url, params = {}, options = {}) => {
+  return foxy(axios.get, url, params, options)
+}
+
+export const post = (url, params = {}, options = {}) => {
+  return foxy(axios.post, url, params, options)
+}
+
+export const put = (url, params = {}, options = {}) => {
+  return foxy(axios.put, url, params, options)
+}
+
+export const del = (url, params = {}, options = {}) => {
+  return foxy(axios.delete, url, params, options)
+}
+
+function foxy(f, url, params, options) {
+  const source = CancelToken.source()
+  let request = f(url, {
+    params, ...options, cancelToken: source.token
+  })
+  request.cancel = source.cancel
+  return request
+}
 
 
 // axios.defaults.transformRequest = [function (data) {
