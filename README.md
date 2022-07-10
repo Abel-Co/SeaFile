@@ -36,9 +36,9 @@ mkdir .docker && cp app.tar.gz .dockerfile .docker/ && cd .docker/
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端支持，当前，筛选并集成了 nextcloud，需保证 SeaFile、NextCloud 工作目录相同 。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端App，当前，筛选并集成了 nextcloud，使用中需确保 SeaFile、NextCloud、smb 等全部服务的工作目录相同 。
 - 从 nextcloud 中上传的，只能在 nextcloud 端浏览、使用。
-- 从 smb、nfs、ftp、scp、nextcloud 等上传的，都可在 SeaFile pc 页面平台中 检索、使用。 
+- 从 smb、nfs、ftp、scp、nextcloud 等上传的，全部可在 SeaFile PC 页面中 检索、使用。 
 
 
 ## 挂载smb

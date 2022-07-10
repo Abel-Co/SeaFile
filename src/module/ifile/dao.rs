@@ -5,7 +5,11 @@ use crate::boot::c::RB;
 use crate::module::ifile::Files;
 use crate::module::utils::crc_utils::crc_i64;
 
-pub async fn get(path: &str) -> Option<Files> {
+pub async fn get(id: i64) -> Option<Files> {
+    RB.fetch_by_column("id", id).await.unwrap()
+}
+
+pub async fn check(path: &str) -> Option<Files> {
     RB.fetch_by_wrapper(
         RB.new_wrapper().eq("crc", crc_i64(path)).eq("path", path)
     ).await.unwrap()

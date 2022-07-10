@@ -9,6 +9,10 @@ use walkdir::WalkDir;
 use crate::module::ifile;
 use crate::module::ifile::Files;
 
+pub async fn get(id: i64) -> Option<Files> {
+    ifile::dao::get(id).await
+}
+
 pub async fn search(name: &str) -> Vec<Files> {
     ifile::dao::search(name).await
 }
@@ -24,7 +28,7 @@ pub async fn show(path: &str) -> String {
 }
 
 pub async fn save_or_update(kind: CreateKind, path: &str) {
-    match ifile::dao::get(path).await {
+    match ifile::dao::check(path).await {
         Some(_file) => ifile::dao::update(_file.id, Files::new(format!("{:?}", kind), path)).await,
         None => ifile::dao::save(Files::new(format!("{:?}", kind), path)).await
     };

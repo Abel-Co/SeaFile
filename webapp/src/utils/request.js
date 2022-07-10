@@ -1,6 +1,11 @@
 import axios from "axios"
+import JSONBigInt from 'json-bigint'
 
 const CancelToken = axios.CancelToken
+
+axios.defaults.transformResponse = [data => {
+  return JSONBigInt.parse(data)
+}]
 
 export const get = (url, params = {}, options = {}) => {
   return foxy(axios.get, url, params, options)

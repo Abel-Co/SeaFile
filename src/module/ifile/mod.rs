@@ -29,7 +29,7 @@ impl Files {
         let _file = Path::new(path);
         let parent_path = _file.parent().unwrap().to_str().unwrap();
         let parent_id = futures::executor::block_on(async {
-            match dao::get(parent_path).await {
+            match dao::check(parent_path).await {
                 Some(p_file) => p_file.id,
                 None => 0
             }

@@ -16,8 +16,8 @@
     <li class="tbody">
       <ul class="tr clearfix" v-for="item in list">
         <li>
-          <img src="http://localhost:3000/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;" />
-          <a href="#" @click.prevent="browse(item)">{{ item.name }}</a>
+          <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
+          <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
           <div>删除</div>
           <div>下载</div>
         </li>
@@ -52,8 +52,20 @@ const count = ref(0)
 const input = ref(null)
 const list = reactive([
   { id: 1001, name: '计算机基础', path: '/Users/Abel/Downloads/EFI', size: '96K', updated_at: new Date() },
-  { id: 1002, name: '数据结构', path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents', size: '100K', updated_at: new Date() },
-  { id: 1003, name: 'C语言程序设计', path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents/PlugIns/AirPortBrcmNIC_Injector.kext', size: '116K', updated_at: new Date() }
+  {
+    id: 1002,
+    name: '数据结构',
+    path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents',
+    size: '100K',
+    updated_at: new Date()
+  },
+  {
+    id: 1003,
+    name: 'C语言程序设计',
+    path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents/PlugIns/AirPortBrcmNIC_Injector.kext',
+    size: '116K',
+    updated_at: new Date()
+  }
 ])
 
 function search() {
@@ -70,20 +82,19 @@ function search() {
   input.value.focus()
 }
 
-function browse(item) {
+function show(item) {
   if (item.kind === 'Folder') {
-    const browser = async () => {
+    const browse = async () => {
       list.length = 0
       get(`/list/${item.parent}`).then((resp) => {
         list.push(...resp.data)
       })
     }
-    browser()
+    browse()
   } else if (item.kind === 'File') {
-
+    // ${location.href}
+    window.open(`http://172.17.16.165:8080/show/${item.id}/${item.name}`, 'new')
   }
-  // q.value = qh.value
-  // input.value.focus()
 }
 
 function reuse() {
@@ -188,6 +199,7 @@ ul {
   line-height: 30px;
   cursor: pointer;
 }
+
 .search-btn {
   box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
   background-color: #f8f9fa;

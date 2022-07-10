@@ -1,5 +1,5 @@
 use actix_files::NamedFile;
-use actix_web::{HttpResponse, Responder, Result};
+use actix_web::{error, HttpResponse, Responder, Result};
 #[allow(unused)]
 use actix_web::{delete, get, post, put};
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
@@ -9,32 +9,39 @@ use crate::module::ifile;
 
 #[get("/search/{name}")]
 pub async fn search(Path(name): Path<String>) -> impl Responder {
-    let files = ifile::dao::search(&name).await;
+    let files = ifile::bs::search(&name).await;
     HttpResponse::Ok().json(files)
 }
 
 #[get("/list/{parent}")]
 pub async fn list(Path(parent): Path<i64>) -> impl Responder {
-    let files = ifile::dao::list(parent).await;
+    let files = ifile::bs::list(parent).await;
     HttpResponse::Ok().json(files)
 }
 
 #[get("/show/{id}/{name}")]
-pub async fn show(Path((id, name)): Path<(i64, String)>) -> Result<impl Responder> {
+pub async fn show(Path((id, name)): Path<(i64, String)>) -> impl Responder {
     log::info!("{}, {}", id, name);
-    Ok(HttpResponse::Ok())
+    match ifile::bs::get(id).await {
+        Some(_file) => NamedFile::open_async(_file.path).await,
+        None => NamedFile::open_async("").await
+    }
 }
 
-#[get("/download")]
-pub async fn download() -> Result<impl Responder> {
-    let file = NamedFile::open("Cargo.toml")?;
-    // let ifile = NamedFile::open("/Users/Abel/Downloads/知否知否应是绿肥红瘦.The.Story.of.Ming.Lan.2018.E15.1080p.WEB-DL.x264.AAC-HotWEB.mp4")?;
-    Ok(file
-        .use_last_modified(true)
-        .set_content_disposition(ContentDisposition {
-            disposition: DispositionType::Attachment,
-            parameters: vec![DispositionParam::Filename("Cargo.mp4".to_string())],
-        }))
+#[get("/download/{id}/{name}")]
+pub async fn download(Path((id, name)): Path<(i64, String)>) -> Result<impl Responder> {
+    match ifile::bs::get(id).await {
+        Some(_file) => {
+            let file = NamedFile::open(_file.path)?;
+            Ok(file
+                .use_last_modified(true)
+                .set_content_disposition(ContentDisposition {
+                    disposition: DispositionType::Attachment,
+                    parameters: vec![DispositionParam::Filename(_file.name)],
+                }))
+        }
+        None => Err(error::ErrorBadRequest("资源不存在！"))
+    }
 }
 
 
