@@ -117,6 +117,10 @@ function reuse() {
   q.value = qh.value
   input.value.focus()
 }
+
+window.onfocus = () => {
+  input.value.focus()
+}
 </script>
 
 <style scoped>

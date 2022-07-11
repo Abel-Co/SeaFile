@@ -10,15 +10,25 @@ use crate::module::ifile;
 use crate::module::ifile::Files;
 
 pub async fn get(id: i64) -> Option<Files> {
-    ifile::dao::get(id).await
+    match ifile::dao::get(id).await {
+        Some(_file) => {
+            // rx.send(vec![_file])
+            Some(_file)
+        }
+        None => None
+    }
 }
 
 pub async fn search(name: &str) -> Vec<Files> {
-    ifile::dao::search(name).await
+    let _files = ifile::dao::search(name).await;
+    // rx.send(_files)
+    _files
 }
 
 pub async fn list(parent: i64) -> Vec<Files> {
-    ifile::dao::list(parent).await
+    let _files = ifile::dao::list(parent).await;
+    // rx.send(_files)
+    _files
 }
 
 pub async fn show(id: i64) -> String {
@@ -27,7 +37,7 @@ pub async fn show(id: i64) -> String {
             let mut buffer = String::new();
             File::open(_file.path).unwrap().read_to_string(&mut buffer);
             buffer
-        },
+        }
         None => "".to_string()
     }
 }
@@ -45,13 +55,13 @@ pub async fn update(kind: ModifyKind, path: &str) {
         let kind = if _file.is_file() { CreateKind::File } else if _file.is_dir() { CreateKind::Folder } else { CreateKind::Other };
         save_or_update(kind, path).await;
     } else {
-        ifile::dao::delete(path).await;
+        ifile::dao::delete_by_path(path).await;
     }
 }
 
 pub async fn delete(kind: RemoveKind, path: &str) {
-    ifile::dao::delete_all(path).await;
-    ifile::dao::delete(path).await;
+    ifile::dao::delete_children(path).await;
+    ifile::dao::delete_by_path(path).await;
 }
 
 pub async fn delete_file(path: &str) {
