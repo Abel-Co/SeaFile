@@ -21,10 +21,15 @@ pub async fn list(parent: i64) -> Vec<Files> {
     ifile::dao::list(parent).await
 }
 
-pub async fn show(path: &str) -> String {
-    let mut buffer = String::new();
-    File::open(path).unwrap().read_to_string(&mut buffer);
-    buffer
+pub async fn show(id: i64) -> String {
+    match ifile::dao::get(id).await {
+        Some(_file) => {
+            let mut buffer = String::new();
+            File::open(_file.path).unwrap().read_to_string(&mut buffer);
+            buffer
+        },
+        None => "".to_string()
+    }
 }
 
 pub async fn save_or_update(kind: CreateKind, path: &str) {

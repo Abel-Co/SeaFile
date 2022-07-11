@@ -13,6 +13,7 @@ pub mod handler {
             .service(ifile::api::search)
             .service(ifile::api::list)
             .service(ifile::api::show)
+            .service(ifile::api::visit)
             .service(ifile::api::download)
     }
 }

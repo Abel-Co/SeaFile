@@ -1,219 +1,82 @@
 <template>
-  <!--  <h1></h1>-->
-  <input v-model="q" @keydown.enter="search" ref="input" v-focus/>
-  <button class="search-btn" type="button" @click="search">搜 索</button>
-  <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
-
-  <ul class="table">
-    <li class="thead">
-      <ul class="tr clearfix">
-        <li>名字</li>
-        <li>路径</li>
-        <li>大小</li>
-        <li>修改时间</li>
-      </ul>
-    </li>
-    <li class="tbody">
-      <ul class="tr clearfix" v-for="item in list">
-        <li>
-          <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
-          <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-          <div>删除</div>
-          <div>下载</div>
-        </li>
-        <li>{{ item.path }}</li>
-        <li>{{ item.size }}</li>
-        <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
-        <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
-      </ul>
-    </li>
-  </ul>
-
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Documentation</a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
-  </p>
-
-  <button type="button" @click="count++">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
+  <h1>{{item.path}}</h1>
+  <div id="vditor" />
 </template>
 
-<script setup>
-import { reactive, ref } from 'vue'
-import { get } from '../utils/request'
+<script setup lang="ts">
+import {onMounted, onUpdated, reactive, ref} from 'vue';
+import {get} from '../utils/request';
+import Vditor from 'vditor';
+import 'vditor/dist/index.css';
 
-const q = ref(null)
-const qh = ref(null)
-const count = ref(0)
-const input = ref(null)
-const list = reactive([
-  { id: 1001, name: '计算机基础', path: '/Users/Abel/Downloads/EFI', size: '96K', updated_at: new Date() },
-  {
-    id: 1002,
-    name: '数据结构',
-    path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents',
-    size: '100K',
-    updated_at: new Date()
-  },
-  {
-    id: 1003,
-    name: 'C语言程序设计',
-    path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents/PlugIns/AirPortBrcmNIC_Injector.kext',
-    size: '116K',
-    updated_at: new Date()
-  }
-])
+const vditor = ref<Vditor | null>(null);
+const item = reactive(window.opener.item)
 
-function search() {
-  qh.value = q.value
-  const search = async () => {
-    list.length = 0
-    if (!q.value) return
-    get(`/search/${q.value}`).then((resp) => {
-      list.push(...resp.data)
-    })
-  }
-  search()
-  q.value = ''
-  input.value.focus()
-}
+onMounted(() => {
+  vditor.value = new Vditor('vditor', {
+    mode: 'wysiwyg',
+    after: () => {
+      (async () => {
+        get(`/show/${item.id}/${item.name}`).then((resp) => {
+          vditor.value!.setValue(resp.data);
+          vditor.value.disabled()
+        })
+      })()
+      document.getElementById('vditor').removeAttribute("style");
+      document.getElementsByClassName("vditor-toolbar")[0].removeAttribute("style");
+      document.getElementsByClassName("vditor-reset")[0].removeAttribute("style");
+      document.getElementsByClassName("vditor-reset")[2].removeAttribute("style");
+      document.getElementsByClassName("vditor-reset")[3].removeAttribute("style");
 
-function show(item) {
-  if (item.kind === 'Folder') {
-    const browse = async () => {
-      list.length = 0
-      get(`/list/${item.parent}`).then((resp) => {
-        list.push(...resp.data)
-      })
-    }
-    browse()
-  } else if (item.kind === 'File') {
-    // ${location.href}
-    window.open(`http://172.17.16.165:8080/show/${item.id}/${item.name}`, '_blank')
-  }
-}
+      // 临时
+      document.getElementsByClassName("vditor-reset")[0].style = "opacity:1;";
+    },
+  });
+});
+onUpdated(()=>{
 
-function reuse() {
-  q.value = qh.value
-  input.value.focus()
-}
+})
 </script>
 
-<style scoped>
-a {
-  color: #42b983;
-}
-
-input {
-  display: block;
+<style>
+h1 {
+  width: 60%;
   margin: 20px auto;
-  width: 600px;
-  height: 30px;
-  font-size: 16px;
+  min-width: 1240px;
 }
-
-ul {
-  list-style: none;
-  padding: 0;
+#vditor {
+  box-shadow: 0 0 20px rgb(208 208 208);
+  min-width: 1240px;
+  width: 60%;
+  margin: auto;
+  height: 100vh;
+  border-radius: 6px 6px 6px 6px;
 }
-
-/* 表格基本样式规范 */
-.table {
-  width: 1200px;
-  margin: 0 auto;
-  background-color: powderblue;
+.vditor-toolbar {
+  line-height: 2;
+  border-radius: 6px 6px 0 0;
+  padding-left: 170px;
 }
-
-.table .tr {
-  display: flex;
+.vditor-content pre.vditor-reset:focus  {
+  background-color: white;
 }
-
-.table .tr li {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.vditor-wysiwyg .vditor-reset {
+  border-radius: 0 0 6px 6px;
+  padding: 10px 170px;
 }
-
-/* 行--设置行高 */
-.table .thead .tr {
-  background-color: #008080;
-  color: #fff;
-  font-size: 15px;
-  height: 36px;
-  line-height: 39px;
+.vditor-ir .vditor-reset {
+  border-radius: 0 0 6px 6px;
+  padding: 10px 170px;
 }
-
-.table .tbody .tr {
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
-  height: 36px;
-  line-height: 38px;
+.vditor-sv .vditor-reset {
+  border-radius: 0 0 6px 6px;
+  padding: 10px 170px;
 }
-
-.table .tbody .tr:not(:first-child) {
-  border-top: 1px solid rgb(246 247 249);
+.vditor-toolbar .vditor-toolbar__item button svg {
+  height: 22px;
+  width: 22px;
 }
-
-/* 列--设计列宽 */
-.table .thead li:first-child, .table .tbody li:first-child {
-  flex: 2;
-  text-align: left;
-  padding-left: 22px;
-}
-
-.table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
-  flex: 1.6;
-  text-align: left;
-  padding-left: 8px;
-}
-
-.table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
-  flex: .3;
-  padding-left: 20px;
-}
-
-.table .thead li:last-child, .table .tbody li:last-child {
-  flex: .9;
-}
-
-.table .tbody .tr:hover {
-  background-color: rgb(248 249 250);
-}
-
-.table .tbody .tr li:first-child > div {
-  float: right;
-  margin-top: 5px;
-  margin-left: 2px;
-  margin-right: 10px;
-  display: inline-block;
-  /*width: 60px;*/
-  height: 30px;
-  background-color: #008c8c;
-  color: #fff;
-  font-size: 12px;
-  line-height: 30px;
-  cursor: pointer;
-}
-
-.search-btn {
-  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
-  background-color: #f8f9fa;
-  border: 1px solid #dadce0;
-  color: #202124;
-  font-family: arial, sans-serif;
-  font-size: 15px;
-  line-height: 27px;
-  border-radius: 4px;
-  padding: 0 16px;
-  height: 34px;
-  min-width: 80px;
-  text-align: center;
-  cursor: pointer;
-  /*margin-left: 10px;*/
+.vditor-toolbar__item .vditor-tooltipped {
+  width: auto;
 }
 </style>

@@ -21,7 +21,12 @@ pub async fn list(Path(parent): Path<i64>) -> impl Responder {
 
 #[get("/show/{id}/{name}")]
 pub async fn show(Path((id, name)): Path<(i64, String)>) -> impl Responder {
-    log::info!("{}, {}", id, name);
+    let content = ifile::bs::show(id).await;
+    HttpResponse::Ok().json(content)
+}
+
+#[get("/visit/{id}/{name}")]
+pub async fn visit(Path((id, name)): Path<(i64, String)>) -> impl Responder {
     match ifile::bs::get(id).await {
         Some(_file) => NamedFile::open_async(_file.path).await,
         None => NamedFile::open_async("").await

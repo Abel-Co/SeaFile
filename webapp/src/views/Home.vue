@@ -1,45 +1,47 @@
 <template>
   <!--  <h1></h1>-->
-  <input v-model="q" @keydown.enter="search" ref="input" v-focus/>
-  <button class="search-btn" type="button" @click="search">搜 索</button>
-  <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
+  <div class="wrapper">
+    <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
+    <input v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    <button class="search-btn" type="button" @click="search">搜 索</button>
+    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
+    <ul class="table">
+      <li class="thead">
+        <ul class="tr clearfix">
+          <li>名字</li>
+          <li>路径</li>
+          <li>大小</li>
+          <li>修改时间</li>
+        </ul>
+      </li>
+      <li class="tbody">
+        <ul class="tr clearfix" v-for="item in list">
+          <li>
+            <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
+            <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
+            <div>删除</div>
+            <div>下载</div>
+          </li>
+          <li>{{ item.path }}</li>
+          <li>{{ item.size }}</li>
+          <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
+          <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
+        </ul>
+      </li>
+    </ul>
 
-  <ul class="table">
-    <li class="thead">
-      <ul class="tr clearfix">
-        <li>名字</li>
-        <li>路径</li>
-        <li>大小</li>
-        <li>修改时间</li>
-      </ul>
-    </li>
-    <li class="tbody">
-      <ul class="tr clearfix" v-for="item in list">
-        <li>
-          <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
-          <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-          <div>删除</div>
-          <div>下载</div>
-        </li>
-        <li>{{ item.path }}</li>
-        <li>{{ item.size }}</li>
-        <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
-        <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
-      </ul>
-    </li>
-  </ul>
+    <p>
+      <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Documentation</a>
+      |
+      <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
+    </p>
 
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Documentation</a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
-  </p>
-
-  <button type="button" @click="count++">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
+    <button type="button" @click="count++">count is: {{ count }}</button>
+    <p>
+      Edit
+      <code>components/HelloWorld.vue</code> to test hot module replacement.
+    </p>
+  </div>
 </template>
 
 <script setup>
@@ -84,16 +86,30 @@ function search() {
 
 function show(item) {
   if (item.kind === 'Folder') {
-    const browse = async () => {
+    (async () => {
       list.length = 0
       get(`/list/${item.parent}`).then((resp) => {
         list.push(...resp.data)
       })
-    }
-    browse()
+    })()
   } else if (item.kind === 'File') {
-    // ${location.href}
-    window.open(`http://172.17.16.165:8080/show/${item.id}/${item.name}`, '_blank')
+    window["item"] = item
+    let fileExtension = item.name.split('.').pop().toLowerCase()
+    switch (fileExtension) {
+      case 'txt':
+      case 'md':
+        window.open(`#/show?${item.id}`, '_blank')
+        break
+      case 'mp4':
+      case 'mkv':
+        window.open(`#/play`, '_blank')
+        break
+      case 'htm':
+      case 'html':
+      default:
+        window.open(`${location.protocol}//${location.host}/visit/${item.id}/${item.name}`, '_blank')
+        break
+    }
   }
 }
 
@@ -104,6 +120,16 @@ function reuse() {
 </script>
 
 <style scoped>
+.wrapper {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.logo {
+  width: 40%;
+  margin: 10px;
+}
+
 a {
   color: #42b983;
 }
@@ -167,7 +193,7 @@ ul {
 }
 
 .table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
-  flex: 1.6;
+  flex: 1.5;
   text-align: left;
   padding-left: 8px;
 }
@@ -178,7 +204,7 @@ ul {
 }
 
 .table .thead li:last-child, .table .tbody li:last-child {
-  flex: .9;
+  flex: .8;
 }
 
 .table .tbody .tr:hover {

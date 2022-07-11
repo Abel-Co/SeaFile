@@ -8,7 +8,7 @@ const routes = [{
 }, {
   path: '/edit', name: 'Edit', component: () => import('../views/Show.vue')
 }, {
-  path: '/play', name: 'Play', component: () => import('../views/Show.vue')
+  path: '/play', name: 'Play', component: () => import('../views/Play.vue')
 }]
 
 export default createRouter({
