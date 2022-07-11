@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { videoPlay } from 'vue3-video-play'
 import "vue3-video-play/dist/style.css"
 
@@ -47,5 +47,15 @@ const openVedio = (url, title) => {
 
 defineExpose({
   openVedio,
+})
+onMounted(() => {
+  let interval = setInterval(function () {
+    let dom = document.getElementsByClassName("d-icon iconfont icon-volume-mute")
+    if (dom?.length > 0) {
+      clearInterval(interval)
+      dom[0].click()
+    }
+    console.log('hello wold', interval)
+  }, 150)
 })
 </script>

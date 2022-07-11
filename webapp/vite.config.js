@@ -29,6 +29,7 @@ export default defineConfig(({ command, mode }) => {
         '/list': 'http://172.17.16.165:8080',
         '/show': 'http://172.17.16.165:8080',
         '/visit': 'http://172.17.16.165:8080',
+        '/download': 'http://172.17.16.165:8080',
       }
     }
   }

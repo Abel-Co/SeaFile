@@ -28,7 +28,14 @@ pub async fn show(Path((id, name)): Path<(i64, String)>) -> impl Responder {
 #[get("/visit/{id}/{name}")]
 pub async fn visit(Path((id, name)): Path<(i64, String)>) -> impl Responder {
     match ifile::bs::get(id).await {
-        Some(_file) => NamedFile::open_async(_file.path).await,
+        // Some(_file) => NamedFile::open_async(_file.path).await,  // txt、html 匀可，唯 pdf 仍下载
+        Some(_file) => {
+            let file = NamedFile::open_async(_file.path).await?;
+            Ok(file.set_content_disposition(ContentDisposition{
+                disposition: DispositionType::Inline,
+                parameters: vec![DispositionParam::Filename(_file.name)]
+            }))
+        },
         None => NamedFile::open_async("").await
     }
 }
@@ -37,7 +44,7 @@ pub async fn visit(Path((id, name)): Path<(i64, String)>) -> impl Responder {
 pub async fn download(Path((id, name)): Path<(i64, String)>) -> Result<impl Responder> {
     match ifile::bs::get(id).await {
         Some(_file) => {
-            let file = NamedFile::open(_file.path)?;
+            let file = NamedFile::open_async(_file.path).await?;
             Ok(file
                 .use_last_modified(true)
                 .set_content_disposition(ContentDisposition {
