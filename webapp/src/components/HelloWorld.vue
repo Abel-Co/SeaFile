@@ -93,7 +93,7 @@ function show(item) {
     browse()
   } else if (item.kind === 'File') {
     // ${location.href}
-    window.open(`http://172.17.16.165:8080/show/${item.id}/${item.name}`, 'new')
+    window.open(`http://172.17.16.165:8080/show/${item.id}/${item.name}`, '_blank')
   }
 }
 
