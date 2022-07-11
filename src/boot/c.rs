@@ -40,10 +40,12 @@ pub static RB_OLD: OnceCell<Arc<Rbatis>> = OnceCell::new();
 pub async fn init_rbatis_old() {
     if let Some(db) = &crate::boot::global().postgres {
         let rbatis = Rbatis::new();
-        let mut opt = DBPoolOptions::new();
-        opt.max_connections = db.max;
-        opt.min_connections = db.min;
-        rbatis.link_opt(&db.dsn, opt).await.unwrap();
+        let db_pool_options = DBPoolOptions {
+            max_connections: db.max,
+            min_connections: db.min,
+            ..Default::default()
+        };
+        rbatis.link_opt(&db.dsn, db_pool_options).await.unwrap();
         assert!(RB_OLD.set(Arc::new(rbatis)).is_ok());
         log::info!("rbatis_old::datasource {}   {} ~ {}", desensitive(&db.dsn), db.min, db.max)
     }
