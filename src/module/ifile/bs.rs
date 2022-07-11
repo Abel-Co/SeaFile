@@ -60,7 +60,7 @@ pub async fn update(kind: ModifyKind, path: &str) {
 }
 
 pub async fn delete(kind: RemoveKind, path: &str) {
-    ifile::dao::delete_children(path).await;
+    // ifile::dao::delete_children(path).await; // macOS Finder 下 “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
     ifile::dao::delete_by_path(path).await;
 }
 

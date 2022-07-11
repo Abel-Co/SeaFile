@@ -52,6 +52,7 @@ pub async fn delete_by_path(path: &str) -> u64 {
     ).await.unwrap()
 }
 
+// macOS Finder 下 “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
 pub async fn delete_children(path: &str) -> u64 {
     RB.remove_by_wrapper::<Files>(
         RB.new_wrapper().like("path", format!("{}{}{}", path, path::MAIN_SEPARATOR, "%"))
