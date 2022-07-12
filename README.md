@@ -8,10 +8,11 @@
 - 使用原生共享目录，直接操作文件。
 - 用户界面，立即可搜索。
 - 检索的是DB，而非磁盘目录，性能更好。
+- 每次搜索、浏览，会对索引进行异步巡视校准。 （当文件被其他途径删除，而未感知到系统事件时，索引便残留了，且可被检索到，此时再次检索，会获得校准后的结果）
 
  ## 环境
-- CentOS、Alpine 等（ext4、xfs）
-- macOS（APFS）
+- CentOS、Alpine 等（ext4、xfs）（Linux 为未来的主要支持环境）
+- macOS（APFS）（Finder下操作部分感知不到变更，命令行没问题）
 - Windows（待测试，理论上没问题）
 - Internet（是的，界面服务使用了CDN资源，这意味着，作为发起请求的客户机，需要接入互联网，而非只需要内网。如确实希望剔除对公网的依赖，需要从源码自行编译，并移除CDN相关配置）
 
@@ -28,10 +29,10 @@ cargo build --release
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;env、repo 根据实际情况填写：
 
 ```shell
-cp target/release/SeaFile .
-strip SeaFile && upx -9 SeaFile
+cp target/release/sea_file .
+strip sea_file && upx -9 sea_file
 cp profiles/$env/* ./
-tar zcvf app.tar.gz favorites config.yaml
+tar zcvf app.tar.gz sea_file config.yaml
 mkdir .docker && cp app.tar.gz .dockerfile .docker/ && cd .docker/
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
@@ -50,14 +51,16 @@ docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ![img.png](docs/assets/win-smb.png)
 
 ## 迭代计划
-|  序号   |                   功能                   | 进展  |
-|:---:|:--------------------------------------:|:---:|
-| 1| 大范围的在线预览功能（txt、pdf、md、html、java、js、rs） | 规划中 |
-| 2|      在线文档功能（markdown、onlyoffice）       | ... |
-| 3|               图片轮播功能（相册）             | ... |
-| 4|                 视频播放功能                 | ... |
-| 5|                 多用户功能                  | ... |
+| 序号 |                        功能                        | 进展 |
+|:---:|:--------------------------------------------------:|:---:|
+|  1  | 大范围的在线预览功能（txt、pdf、md、html、java、js、rs） | 开发中 |
+|  2  |           在线文档功能（markdown、onlyoffice）        | ... |
+|  3  |                  图片轮播功能（相册）                 | ... |
+|  4  |                     视频播放功能                     | ... |
+|  5  |                      多用户功能                      | ... |
+|  6  |                单一来源的索引维护并行化                | ... |
 
+- 来源：FS事件、巡视校准
 
 
 
