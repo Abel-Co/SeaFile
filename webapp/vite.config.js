@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import importToCDN from 'vite-plugin-cdn-import'
+import viteCompression from 'vite-plugin-compression';
+
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -19,7 +21,11 @@ export default defineConfig(({ command, mode }) => {
         },
         { name: 'axios', var: 'axios', path: 'https://cdn.jsdelivr.net/npm/axios@0.27.2/dist/axios.min.js' },
       ]
-    }))
+    })/*, viteCompression({
+      ext: ".br",
+      algorithm: "brotliCompress",
+      deleteOriginFile: true
+    })*/)
   } else if (command === 'serve') {
     viteConfig.server = {
       open: '/',          // 开发服启动时打开浏览器
