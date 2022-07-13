@@ -1,0 +1,160 @@
+kind: pipeline
+type: docker
+name: drone pipeline
+
+# clone:
+#   disable: true
+
+trigger:
+  branch: [apr, test01, dev01, abc01]
+  event: [push, pull_request, tag, promote, custom, deployment]
+  # status: [ failure, changed, success ]
+  # environment: stating production
+
+steps:
+  - name: restore
+    image: synchrofood/drone-volume-cache
+    pull: if-not-exists
+    volumes:
+    - name: cache
+      path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./target
+        - ./node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+  - name: 编译前端
+    image: registry.cn-beijing.aliyuncs.com/wcik/node:alpine-auraco
+    commands:
+      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
+      - cd webapp && yarn install && yarn build
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+  - name: 编译后端
+    image: rust:alpine
+    # volumes:
+    #   - name: cache
+    #     path: /drone/src/target
+    commands:
+      - echo https://mirrors.aliyun.com/alpine/latest-stable/main > /etc/apk/repositories
+      - echo https://mirrors.aliyun.com/alpine/latest-stable/community >> /etc/apk/repositories
+      - apk add musl-dev openssl-dev upx
+      - mkdir -p target/.cargo
+      - ln -s /drone/src/target/.cargo /root/.cargo
+      - export CARGO_HOME=~/.cargo
+      - echo '[source.crates-io]' > ~/.cargo/config
+      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
+      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
+      - cargo build --release
+      - cp target/release/sea_file .
+      - strip sea_file && upx -9 sea_file
+      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
+      - cp profiles/$env/* ./
+      - tar zcvf app.tar.gz dist sea_file config.yaml
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+#  - name: 构建镜像
+#    image: registry.cn-beijing.aliyuncs.com/wcik/docker:alpine-auraco
+#    volumes:
+#      - name: docker
+#        path: /var/run
+#    commands:
+#      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
+#      - repo=registry.cn-beijing.aliyuncs.com/wcik/sea_file:${DRONE_BRANCH##feature/}
+#      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
+#      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
+#      - docker push $repo
+#      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
+#    when:
+#      branch: [apr, test01, dev01]
+#      # event: push
+#  - name: 发布应用
+#    image: registry.cn-beijing.aliyuncs.com/wcik/drone-helm3:3.7.2
+#    settings:
+#      mode: upgrade
+#      release: sea_file
+#      chart: alihelm/sea_file
+#      namespace: ${DRONE_BRANCH##feature/}
+#      kube_api_server:
+#        from_secret: kube_api_server
+#      kube_token:
+#        from_secret: kube_token
+#      timeout: "3m20s"
+#      wait_for_upgrade: true
+#      skip_tls_verify: true
+#    when:
+#      branch: [apr, test01, dev01]
+#      # event: push
+  # - name: 发布应用
+  #   image: pelotech/drone-helm3
+  #   environment:
+  #     helm_secret:
+  #       from_secret: helm_secret
+  #   settings:
+  #     mode: upgrade
+  #     add_repos: "alihelm=https://Ni73Mg:$helm_secret@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik"
+  #     release: sea_file
+  #     chart: alihelm/sea_file
+  #     namespace: ${DRONE_BRANCH##feature/}
+  #     kube_api_server:
+  #       from_secret: kube_api_server
+  #     kube_token:
+  #       from_secret: kube_token
+  #     timeout: "3m20s"
+  #     wait_for_upgrade: true
+  #     skip_tls_verify: true
+  - name: rebuild
+    image: synchrofood/drone-volume-cache
+    pull: if-not-exists
+    volumes:
+    - name: cache
+      path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./target
+        - ./node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+  - name: clean
+    image: alpine
+    pull: if-not-exists
+    commands:
+      - exit 0
+
+volumes:
+  - name: cache
+    host: 
+      path: /tmp/cache
+      # path: /tmp/cache/Aura.Co/sea_file/target
+  - name: docker
+    host:
+      path: /var/run
+
+image_pull_secrets:
+  - dockerconfig
+
+# ---
+# kind: secret
+# name: helm_secret
+# get:
+#  path: alihelm
+#  name: helm_secret
+
+---
+kind: secret
+name: kube_api_server
+get:
+  path: kubernetes
+  name: kube_api_server
+
+---
+kind: secret
+name: kube_token
+get:
+  path: kubernetes
+  name: kube_token
