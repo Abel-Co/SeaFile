@@ -77,3 +77,6 @@ docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 #### 下载
 - https://actix.rs/docs/static-files/
 - https://github.com/actix/examples/blob/master/basics/basics/src/main.rs
+
+#### chrome（待测试）
+- --autoplay-policy=no-user-gesture-required

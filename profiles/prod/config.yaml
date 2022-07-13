@@ -1,16 +1,11 @@
 server:
   port: 8080
-  env: prod
 postgres:
-  dsn: postgres://favorites_rw:agYx0DzkYsRASuQT@182.92.107.221:30432/favorites
-#  dsn: postgres://postgres:postgres@192.168.24.251:5432/postgres
+  dsn: postgres://postgres:postgres@172.17.16.110:5432/postgres
   min: 3
   max: 10
-jwt:
-  key: 0xa06f853898a9dd4f32441a56879c52878f96c42730ed31c50e00
+watch_path: /Users/Abel/Downloads
 white_list:
   /login:
     - POST
   /activate: [ GET ]
-  /category/case: [ GET ]
-  /userdocs/case: [ GET ]

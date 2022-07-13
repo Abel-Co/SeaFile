@@ -57,21 +57,21 @@ steps:
     when:
       branch: [apr, test01, dev01]
       # event: push
-#  - name: 构建镜像
-#    image: registry.cn-beijing.aliyuncs.com/wcik/docker:alpine-auraco
-#    volumes:
-#      - name: docker
-#        path: /var/run
-#    commands:
-#      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
-#      - repo=registry.cn-beijing.aliyuncs.com/wcik/sea_file:${DRONE_BRANCH##feature/}
-#      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
-#      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
-#      - docker push $repo
-#      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
-#    when:
-#      branch: [apr, test01, dev01]
-#      # event: push
+  - name: 构建镜像
+    image: registry.cn-beijing.aliyuncs.com/wcik/docker:alpine-auraco
+    volumes:
+      - name: docker
+        path: /var/run
+    commands:
+      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
+      - repo=registry.cn-beijing.aliyuncs.com/wcik/sea_file:${DRONE_BRANCH##feature/}
+      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
+      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
+      - docker push $repo
+      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
 #  - name: 发布应用
 #    image: registry.cn-beijing.aliyuncs.com/wcik/drone-helm3:3.7.2
 #    settings:
