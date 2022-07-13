@@ -93,21 +93,17 @@ function show(item) {
       })
     })()
   } else if (item.kind === 'File') {
-    window["item"] = item
+    // window["item"] = item
     let fileExtension = item.name.split('.').pop().toLowerCase()
-    switch (fileExtension) {
-      case 'txt':
-      case 'md':
-        window.open(`#/show?${item.id}`, '_blank')
+    switch (true) {
+      case /txt|md/.test(fileExtension):
+        window.open(`#/show?${item.id}=${item.name}`, '_blank');
         break
-      case 'mp4':
-      case 'mkv':
-        window.open(`#/play`, '_blank')
+      case /mp4|mkv/.test(fileExtension):
+        window.open(`#/play?${item.id}=${item.name}`, '_blank');
         break
-      case 'htm':
-      case 'html':
       default:
-        window.open(`${location.protocol}//${location.host}/visit/${item.id}/${item.name}`, '_blank')
+        window.open(`${location.origin}/visit/${item.id}/${item.name}`, '_blank')
         break
     }
   }

@@ -10,7 +10,9 @@ import Vditor from 'vditor';
 import 'vditor/dist/index.css';
 
 const vditor = ref<Vditor | null>(null);
-const item = reactive(window.opener.item)
+// const item = reactive(window.opener.item)  // 不利于基于url直接访问资源
+const param = location.href.split('?').pop().split('=')
+const item = reactive({id: param[0], name: param[1]})
 
 onMounted(() => {
   vditor.value = new Vditor('vditor', {

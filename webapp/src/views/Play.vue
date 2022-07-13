@@ -13,13 +13,15 @@ import { videoPlay } from 'vue3-video-play'
 import "vue3-video-play/dist/style.css"
 
 const VideoPlay = videoPlay
-const item = window.opener.item
+// const item = reactive(window.opener.item)  // 不利于基于url直接访问资源
+const param = location.href.split('?').pop().split('=')
+const item = reactive({id: param[0], name: param[1]})
 const options = reactive({
   width: "80%",     // 播放器高度
   height: "80%",    // 播放器高度
   color: "#409eff", // 主题色
   title: item.name, // 视频名称
-  src: `${location.protocol}//${location.host}/visit/${item.id}/${item.name}`, // 视频源
+  src: `${location.origin}/visit/${item.id}/${item.name}`, // 视频源
   muted: false,     // 静音
   webFullScreen: true,
   speedRate: ["0.75", "1.0", "1.25", "1.5", "2.0"],   // 播放倍速
@@ -49,7 +51,7 @@ defineExpose({
   openVedio,
 })
 onMounted(() => {
-  let interval = setInterval(function () {
+  let interval = setInterval(() => {
     let dom = document.getElementsByClassName("d-icon iconfont icon-volume-mute")
     if (dom?.length > 0) {
       clearInterval(interval)
