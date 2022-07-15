@@ -68,7 +68,7 @@ pub async fn delete_file(path: &str) {
     fs::remove_dir_all(path);
 }
 
-pub async fn index(path: &'static str) {
+pub async fn index(path: String) {
     tokio::spawn(async move {
         for entry in WalkDir::new(path) {
             let entry = entry.unwrap();
