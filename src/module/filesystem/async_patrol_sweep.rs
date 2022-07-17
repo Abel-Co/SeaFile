@@ -1,60 +1,19 @@
-use std::path::Path;
-
 use futures::{
-    channel::mpsc::{channel, Receiver},
+    channel::mpsc::channel,
     SinkExt, StreamExt,
 };
-use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
-use notify::EventKind::{Create, Modify, Remove};
 
-use crate::module::ifile;
+use crate::module::ifile::Files;
 
-fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
-    let (mut tx, rx) = channel(1<<16); // 65536*2
-    // Automatically select the best implementation for your platform.
-    // You can also access each implementation directly e.g. INotifyWatcher.
-    let watcher = RecommendedWatcher::new(move |res| {
-        futures::executor::block_on(async {
-            tx.send(res).await.unwrap();
-        })
-    })?;
-    Ok((watcher, rx))
+pub async fn async_patrol(_files: Vec<Files>) {
+    tokio::sync::mpsc::channel()
+    let (mut tx, rx) = channel(1 << 16); // 65536*2
+    tx.send(_files).await.unwrap();
 }
 
-pub async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
-
-    // if !Path::new(_file.path.as_str()).exists() {
-    //     let _ = ifile::dao::delete(vec![_file.id]).await;
-    // }
-    //
-    let (mut watcher, mut rx) = async_watcher()?;
-    watcher.watch(path.as_ref(), RecursiveMode::Recursive)?;
-    while let Some(res) = rx.next().await {
-        match res {
-            Ok(event) => {
-                log::info!("{:?}", event);
-                match event.kind {
-                    Create(kind) => ifile::bs::save_or_update(kind, event.paths[0].to_str().unwrap()).await,
-                    Modify(kind) => ifile::bs::update(kind, event.paths[0].to_str().unwrap()).await,
-                    Remove(kind) => ifile::bs::delete(kind, event.paths[0].to_str().unwrap()).await,
-                    _ => ()
-                }
-            }
-            Err(e) => log::error!("watch error: {:?}", e),
-        }
+pub async fn async_watch() {
+    let (mut tx, mut rx) = channel::<Files>(1 << 16); // 65536*2
+    while let Some(event) = rx.next().await {
+        log::info!("{:?}", event)
     }
-    Ok(())
-}
-
-
-// -----------------------------------------------------------------
-fn main() {
-    let path = "/var/lib/grafana";
-    println!("watching {}", path);
-
-    futures::executor::block_on(async {
-        if let Err(e) = async_watch(path).await {
-            println!("error: {:?}", e)
-        }
-    });
 }
