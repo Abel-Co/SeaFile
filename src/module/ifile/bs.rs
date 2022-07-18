@@ -13,7 +13,7 @@ use crate::module::ifile::Files;
 pub async fn get(id: i64) -> Option<Files> {
     match ifile::dao::get(id).await {
         Some(_file) => {
-            filesystem::async_patrol(&vec![_file.clone()]);
+            filesystem::async_patrol(&vec![_file.clone()]).await;
             Some(_file)
         }
         None => None
@@ -28,7 +28,7 @@ pub async fn search(name: &str) -> Vec<Files> {
 
 pub async fn list(parent: i64) -> Vec<Files> {
     let _files = ifile::dao::list(parent).await;
-    filesystem::async_patrol(&_files);
+    filesystem::async_patrol(&_files).await;
     _files
 }
 
