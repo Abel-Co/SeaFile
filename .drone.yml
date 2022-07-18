@@ -43,8 +43,8 @@ steps:
     #   - name: cache
     #     path: /drone/src/target
     commands:
-      - echo https://mirrors.aliyun.com/alpine/latest-stable/main > /etc/apk/repositories
-      - echo https://mirrors.aliyun.com/alpine/latest-stable/community >> /etc/apk/repositories
+#      - echo https://mirrors.aliyun.com/alpine/latest-stable/main > /etc/apk/repositories
+#      - echo https://mirrors.aliyun.com/alpine/latest-stable/community >> /etc/apk/repositories
       - apk add musl-dev openssl-dev upx
       - mkdir -p target/.cargo
       - ln -s /drone/src/target/.cargo /root/.cargo
