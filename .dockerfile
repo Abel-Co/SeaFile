@@ -8,6 +8,6 @@ ARG APP_ENV
 
 ENV APP_ENV=$APP_ENV
 
-ENTRYPOINT ["./sea_file"]
+EXPOSE 8080 137/udp 138/udp 139 445
 
-EXPOSE 8080
+ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/samba.sh", "&&", "./sea_file"]

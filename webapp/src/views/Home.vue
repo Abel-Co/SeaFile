@@ -52,23 +52,7 @@ const q = ref(null)
 const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
-const list = reactive([
-  { id: 1001, name: '计算机基础', path: '/Users/Abel/Downloads/EFI', size: '96K', updated_at: new Date() },
-  {
-    id: 1002,
-    name: '数据结构',
-    path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents',
-    size: '100K',
-    updated_at: new Date()
-  },
-  {
-    id: 1003,
-    name: 'C语言程序设计',
-    path: '/Users/Abel/Downloads/EFI/OC/Kexts/AirportBrcmFixup.kext/Contents/PlugIns/AirPortBrcmNIC_Injector.kext',
-    size: '116K',
-    updated_at: new Date()
-  }
-])
+const list = reactive([])
 
 function search() {
   qh.value = q.value

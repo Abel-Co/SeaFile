@@ -4,7 +4,7 @@ postgres:
   dsn: postgres://postgres:postgres@172.17.16.110:5432/postgres
   min: 3
   max: 10
-watch_path: /Users/Abel/Downloads
+watch_path: /mount
 white_list:
   /login:
     - POST
