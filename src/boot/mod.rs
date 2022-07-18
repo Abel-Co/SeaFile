@@ -72,4 +72,5 @@ pub async fn start() {
     tokio::spawn(async {
         filesystem::async_watch(global().watch_path.as_ref().unwrap()).await
     });
+    filesystem::async_patrol_watch().await
 }
