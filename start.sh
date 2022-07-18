@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-echo $0
-echo $1
-echo $2
-echo $3
+#$0：start.sh
+#$1：-u
+#$2："user;123456"
+#$3：-s
+#$4："share;/mount/;yes;no;no;all;user;user"
 
-nohup /sbin/tini -- /usr/bin/samba.sh -u "user;123456" -s "Samba;/mount/;yes;no;no;all;user;user" &
+nohup /sbin/tini -- /usr/bin/samba.sh -u $2 -s $4 &
+
 ./sea_file
+
