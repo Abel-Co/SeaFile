@@ -12,7 +12,7 @@ pub mod api;
 pub mod bs;
 pub mod dao;
 
-#[derive(CRUDTable, Debug, Default, Validate, Serialize, Deserialize)]
+#[derive(CRUDTable, Clone, Debug, Default, Validate, Serialize, Deserialize)]
 pub struct Files {
     pub id: i64,
     pub crc: i64,

@@ -19,8 +19,8 @@
           <li>
             <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
             <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-            <div>删除</div>
-            <div>下载</div>
+<!--            <div>删除</div>
+            <div>下载</div>-->
           </li>
           <li>{{ item.path }}</li>
           <li>{{ item.size }}</li>

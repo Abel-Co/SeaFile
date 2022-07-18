@@ -6,13 +6,15 @@ use std::path::Path;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use walkdir::WalkDir;
 
+use crate::module::filesystem::async_patrol_sweep;
 use crate::module::ifile;
 use crate::module::ifile::Files;
 
 pub async fn get(id: i64) -> Option<Files> {
     match ifile::dao::get(id).await {
         Some(_file) => {
-            // rx.send(vec![_file])
+            // tx.send(vec![_file])
+            async_patrol_sweep::async_patrol(&vec![_file.clone()]);
             Some(_file)
         }
         None => None
@@ -21,13 +23,18 @@ pub async fn get(id: i64) -> Option<Files> {
 
 pub async fn search(name: &str) -> Vec<Files> {
     let _files = ifile::dao::search(name).await;
-    // rx.send(_files)
+    let files = _files.clone();
+    // tx.send(_files)
+    tokio::spawn(async move {
+        async_patrol_sweep::async_patrol(&files).await;
+    });
     _files
 }
 
 pub async fn list(parent: i64) -> Vec<Files> {
     let _files = ifile::dao::list(parent).await;
-    // rx.send(_files)
+    // tx.send(_files)
+    async_patrol_sweep::async_patrol(&_files);
     _files
 }
 
