@@ -13,7 +13,7 @@ pub async fn async_patrol(_files: &Vec<Files>) {
 }
 
 pub async fn async_patrol_watch() {
-    ONCE.set(async_channel::bounded(1 << 16));
+    ONCE.set(async_channel::bounded(1 << 16));  // 65536*2
     tokio::spawn(async move {
         while let Ok(files) = ONCE.get().unwrap().1.recv().await {
             for _file in files {
