@@ -10,4 +10,4 @@ ENV APP_ENV=$APP_ENV
 
 EXPOSE 8080 137/udp 138/udp 139 445
 
-ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/samba.sh", "&&", "./sea_file"]
+ENTRYPOINT ["start.sh"]

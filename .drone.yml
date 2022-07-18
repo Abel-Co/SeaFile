@@ -53,7 +53,7 @@ steps:
       - strip sea_file && upx -9 sea_file
       - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
       - cp profiles/$env/* ./
-      - tar zcvf app.tar.gz dist sea_file config.yaml
+      - tar zcvf app.tar.gz dist sea_file config.yaml start.sh
     when:
       branch: [apr, test01, dev01]
       # event: push
