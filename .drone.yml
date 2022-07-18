@@ -72,6 +72,9 @@ steps:
     when:
       branch: [apr, test01, dev01]
       # event: push
+    depends_on:
+      - 编译前端
+      - 编译后端
 #  - name: 发布应用
 #    image: registry.cn-beijing.aliyuncs.com/wcik/drone-helm3:3.7.2
 #    settings:
