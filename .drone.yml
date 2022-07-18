@@ -22,9 +22,11 @@ steps:
       restore: true
       mount:
         - ./target
-        - ./node_modules
+        - ./webapp/node_modules
     when:
       branch: [ apr, test01, dev01 ]
+    depends_on:
+      - clone
   - name: 编译前端
     image: registry.cn-beijing.aliyuncs.com/wcik/node:alpine-auraco
     commands:
@@ -124,7 +126,7 @@ steps:
       rebuild: true
       mount:
         - ./target
-        - ./node_modules
+        - ./webapp/node_modules
     when:
       branch: [ apr, test01, dev01 ]
     depends_on:
