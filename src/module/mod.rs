@@ -10,6 +10,7 @@ pub mod handler {
 
     pub fn api_routes() -> impl HttpServiceFactory {
         web::scope("")
+            .service(ifile::api::index)
             .service(ifile::api::search)
             .service(ifile::api::list)
             .service(ifile::api::show)

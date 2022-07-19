@@ -7,6 +7,12 @@ use actix_web_lab::extract::Path;
 
 use crate::module::ifile;
 
+#[get("/index/{id}/{name}")]
+pub async fn index(Path((id, name)): Path<(i64, String)>) -> impl Responder {
+    ifile::bs::index(id).await;
+    HttpResponse::Ok().json("Ok")
+}
+
 #[get("/search/{name}")]
 pub async fn search(Path(name): Path<String>) -> impl Responder {
     let files = ifile::bs::search(&name).await;

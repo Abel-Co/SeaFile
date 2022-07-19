@@ -69,19 +69,21 @@ pub async fn delete_file(path: &str) {
     fs::remove_dir_all(path);
 }
 
-pub async fn index(path: String) {
-    tokio::spawn(async move {
-        for entry in WalkDir::new(path) {
-            let entry = entry.unwrap();
-            let file_type = entry.file_type();
-            log::info!("{:?}", entry.path().display());
-            if file_type.is_file() {
-                save_or_update(CreateKind::File, entry.path().to_str().unwrap());
-            } else if file_type.is_dir() {
-                save_or_update(CreateKind::Folder, entry.path().to_str().unwrap());
-            } else if file_type.is_symlink() {
-                save_or_update(CreateKind::File, entry.path().to_str().unwrap());
+pub async fn index(id: i64) {
+    if let Some(_file) = ifile::dao::get(id).await {
+        tokio::spawn(async move {
+            for entry in WalkDir::new(_file.path) {
+                let entry = entry.unwrap();
+                let file_type = entry.file_type();
+                log::info!("{:?}", entry.path().display());
+                if file_type.is_file() {
+                    save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                } else if file_type.is_dir() {
+                    save_or_update(CreateKind::Folder, entry.path().to_str().unwrap()).await;
+                } else if file_type.is_symlink() {
+                    save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                }
             }
-        }
-    });
+        });
+    }
 }
