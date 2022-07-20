@@ -72,6 +72,7 @@ pub async fn delete_file(path: &str) {
 pub async fn index(id: i64) {
     if let Some(_file) = ifile::dao::get(id).await {
         tokio::spawn(async move {
+            let _ = ifile::dao::delete_children(_file.path.as_str()).await;
             for entry in WalkDir::new(_file.path) {
                 let entry = entry.unwrap();
                 let file_type = entry.file_type();
