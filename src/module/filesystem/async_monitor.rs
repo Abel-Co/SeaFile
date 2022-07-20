@@ -41,15 +41,3 @@ pub async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
     Ok(())
 }
 
-
-// -----------------------------------------------------------------
-fn main() {
-    let path = "/var/lib/grafana";
-    println!("watching {}", path);
-
-    futures::executor::block_on(async {
-        if let Err(e) = async_watch(path).await {
-            println!("error: {:?}", e)
-        }
-    });
-}

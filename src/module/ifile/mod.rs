@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::Path;
+use futures::executor::block_on;
 
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
@@ -28,17 +29,12 @@ impl Files {
     pub fn new(kind: String, path: &str) -> Self {
         let _file = Path::new(path);
         let parent_path = _file.parent().unwrap().to_str().unwrap();
-        let parent_id = futures::executor::block_on(async {
-            match dao::check(parent_path).await {
-                Some(p_file) => p_file.id,
-                None => 0
-            }
-        });
+        let parent_id = async { dao::check(parent_path).await.map_or_else(0, |p_file| p_file.id) };
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
             name: format!("{}", _file.file_name().unwrap().to_str().unwrap()),
-            parent: parent_id,
+            parent: block_on(parent_id),
             size: match fs::metadata(path) { Ok(meta) => meta.len(), Err(_) => 0 },
             kind,
             crc: crc_utils::crc_i64(path),

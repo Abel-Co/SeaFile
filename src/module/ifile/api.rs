@@ -7,8 +7,8 @@ use actix_web_lab::extract::Path;
 
 use crate::module::ifile;
 
-#[get("/index/{id}/{name}")]
-pub async fn index(Path((id, name)): Path<(i64, String)>) -> impl Responder {
+#[get("/index/{id}/{_name}")]
+pub async fn index(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     ifile::bs::index(id).await;
     HttpResponse::Ok().json("Ok")
 }
@@ -25,14 +25,14 @@ pub async fn list(Path(parent): Path<i64>) -> impl Responder {
     HttpResponse::Ok().json(files)
 }
 
-#[get("/show/{id}/{name}")]
-pub async fn show(Path((id, name)): Path<(i64, String)>) -> impl Responder {
+#[get("/show/{id}/{_name}")]
+pub async fn show(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     let content = ifile::bs::show(id).await;
     HttpResponse::Ok().json(content)
 }
 
-#[get("/visit/{id}/{name}")]
-pub async fn visit(Path((id, name)): Path<(i64, String)>) -> impl Responder {
+#[get("/visit/{id}/{_name}")]
+pub async fn visit(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     match ifile::bs::get(id).await {
         // Some(_file) => NamedFile::open_async(_file.path).await,  // txt、html 匀可，唯 pdf 仍下载
         Some(_file) => {
@@ -46,8 +46,8 @@ pub async fn visit(Path((id, name)): Path<(i64, String)>) -> impl Responder {
     }
 }
 
-#[get("/download/{id}/{name}")]
-pub async fn download(Path((id, name)): Path<(i64, String)>) -> Result<impl Responder> {
+#[get("/download/{id}/{_name}")]
+pub async fn download(Path((id, _name)): Path<(i64, String)>) -> Result<impl Responder> {
     match ifile::bs::get(id).await {
         Some(_file) => {
             let file = NamedFile::open_async(_file.path).await?;

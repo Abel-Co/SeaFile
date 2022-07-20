@@ -1,29 +1,3 @@
-// #![allow(warnings)]
-
-// #[macro_use] extern crate serde_derive;
-// extern crate serde;
-// extern crate serde_json;
-// extern crate futures;
-// // extern crate num_cpus;
-// extern crate actix_web;
-// // extern crate env_logger;
-// // extern crate dotenv;
-// extern crate chrono;
-// extern crate bcrypt;
-// extern crate regex;
-// // extern crate http;
-// // extern crate postgres;
-// // extern crate timeago;
-// // extern crate pulldown_cmark;
-// // extern crate openssl;
-// extern crate jsonwebtoken as jwt;
-// // extern crate md5;
-// // extern crate ring;
-
-// use actix_web::{server,actix::System};
-// use crate::model::db::init;
-// // use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
-
 use actix_files::Files;
 use actix_web::{App, HttpServer, middleware};
 

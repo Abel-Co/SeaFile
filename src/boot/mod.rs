@@ -5,7 +5,7 @@ use log4rs::config::RawConfig;
 use once_cell::sync::OnceCell;
 
 use crate::boot::conf::Conf;
-use crate::module::filesystem;
+use crate::module::{filesystem, init};
 
 pub mod c;
 pub mod conf;
@@ -69,6 +69,9 @@ pub async fn start() {
     // log4rs::init_file(config_path + "log4rs.yaml", Default::default()).unwrap();
     c::init_rbatis().await;
     // boot::c::init_rbatis_old().await;
+
+    init::decide_to_init().await;
+
     tokio::spawn(async {
         filesystem::async_watch(global().watch_path.as_ref().unwrap()).await
     });

@@ -16,8 +16,8 @@ pub fn get_rand_code(len: usize) -> String {
 pub fn main() {
     let begin = std::time::SystemTime::now();
     let rand = rand::thread_rng().gen::<u32>();
-    for i in 0..1000 {
-        let rand = rand::thread_rng().gen::<u32>();
+    for _i in 0..1000 {
+        log::info!("rand: {:?}", rand::thread_rng().gen::<u32>())
     }
     let duration = begin.elapsed().unwrap().as_millis();
     println!("duration: {:?}, rand: {:?}", duration, rand); // duration: 0, rand: 1752657391

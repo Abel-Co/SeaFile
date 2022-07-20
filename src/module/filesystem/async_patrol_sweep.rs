@@ -9,11 +9,11 @@ use crate::module::ifile::Files;
 static ONCE: OnceCell<(Sender<Vec<Files>>, Receiver<Vec<Files>>)> = OnceCell::new();
 
 pub async fn async_patrol(_files: &Vec<Files>) {
-    ONCE.get().unwrap().0.send(_files.to_vec()).await;
+    let _ = ONCE.get().unwrap().0.send(_files.to_vec()).await;
 }
 
 pub async fn async_patrol_watch() {
-    ONCE.set(async_channel::bounded(1 << 16));  // 65536*2
+    let _ = ONCE.set(async_channel::bounded(1 << 16));  // 65536*2
     tokio::spawn(async move {
         while let Ok(files) = ONCE.get().unwrap().1.recv().await {
             for _file in files {

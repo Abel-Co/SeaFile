@@ -36,7 +36,7 @@ pub async fn show(id: i64) -> String {
     match ifile::dao::get(id).await {
         Some(_file) => {
             let mut buffer = String::new();
-            File::open(_file.path).unwrap().read_to_string(&mut buffer);
+            let _ = File::open(_file.path).unwrap().read_to_string(&mut buffer);
             buffer
         }
         None => "".to_string()
@@ -50,7 +50,7 @@ pub async fn save_or_update(kind: CreateKind, path: &str) {
     };
 }
 
-pub async fn update(kind: ModifyKind, path: &str) {
+pub async fn update(_kind: ModifyKind, path: &str) {
     let _file = Path::new(path);
     if _file.exists() {
         let kind = if _file.is_file() { CreateKind::File } else if _file.is_dir() { CreateKind::Folder } else { CreateKind::Other };
@@ -60,13 +60,13 @@ pub async fn update(kind: ModifyKind, path: &str) {
     }
 }
 
-pub async fn delete(kind: RemoveKind, path: &str) {
+pub async fn delete(_kind: RemoveKind, path: &str) {
     // ifile::dao::delete_children(path).await; // macOS Finder 下 “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
     ifile::dao::delete_by_path(path).await;
 }
 
 pub async fn delete_file(path: &str) {
-    fs::remove_dir_all(path);
+    fs::remove_dir_all(path).expect("删除失败");
 }
 
 pub async fn index(id: i64) {
