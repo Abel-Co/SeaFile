@@ -69,22 +69,30 @@ pub async fn delete_file(path: &str) {
     fs::remove_dir_all(path).expect("删除失败");
 }
 
-pub async fn index(id: i64) {
-    if let Some(_file) = ifile::dao::get(id).await {
-        tokio::spawn(async move {
-            let _ = ifile::dao::delete_children(_file.path.as_str()).await;
-            for entry in WalkDir::new(_file.path) {
-                let entry = entry.unwrap();
-                let file_type = entry.file_type();
-                log::info!("{:?}", entry.path().display());
-                if file_type.is_file() {
-                    save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
-                } else if file_type.is_dir() {
-                    save_or_update(CreateKind::Folder, entry.path().to_str().unwrap()).await;
-                } else if file_type.is_symlink() {
+pub async fn index(path: &str) {
+    let path = String::from(path);
+    tokio::spawn(async move {
+        let _ = ifile::dao::delete_children(path.as_str()).await;
+        for entry in WalkDir::new(path) {
+            let entry = entry.unwrap();
+            match entry.file_type() {
+                file_type if file_type.is_file() => {
                     save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
                 }
+                file_type if file_type.is_dir() => {
+                    save_or_update(CreateKind::Folder, entry.path().to_str().unwrap()).await;
+                }
+                file_type if file_type.is_symlink() => {
+                    save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                }
+                _ => {}
             }
-        });
+        }
+    });
+}
+
+pub async fn reindex(id: i64) {
+    if let Some(_file) = ifile::dao::get(id).await {
+        index(_file.path.as_str()).await
     }
 }

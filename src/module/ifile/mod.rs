@@ -29,13 +29,12 @@ impl Files {
     pub fn new(kind: String, path: &str) -> Self {
         let _file = Path::new(path);
         let parent_path = _file.parent().unwrap().to_str().unwrap();
-        let parent_id = async { dao::check(parent_path).await.map_or_else(0, |p_file| p_file.id) };
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
             name: format!("{}", _file.file_name().unwrap().to_str().unwrap()),
-            parent: block_on(parent_id),
-            size: match fs::metadata(path) { Ok(meta) => meta.len(), Err(_) => 0 },
+            parent: block_on(async { dao::check(parent_path).await.map_or(0, |p_file| p_file.id) }),
+            size: fs::metadata(path).map_or(0, |meta| meta.len()),
             kind,
             crc: crc_utils::crc_i64(path),
             updated_at: Some(TimestampZ::now()),

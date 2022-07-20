@@ -19,8 +19,8 @@
           <li>
             <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
             <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-<!--            <div>删除</div>
-            <div>下载</div>-->
+            <!--            <div>删除</div>
+                        <div>下载</div>-->
           </li>
           <li>{{ item.path }}</li>
           <li>{{ item.size }}</li>
@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { get } from '../utils/request'
 
 const q = ref(null)
@@ -53,15 +53,19 @@ const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
 const list = reactive([])
+const root_id = ref(0)
 
 function search() {
   qh.value = q.value
   const search = async () => {
     list.length = 0
-    if (!q.value) return
-    get(`/search/${q.value}`).then((resp) => {
-      list.push(...resp.data)
-    })
+    if (q.value) {
+      get(`/search/${q.value}`).then((resp) => {
+        list.push(...resp.data)
+      })
+    } else {
+      show({ kind: 'Folder', id: 0 })
+    }
   }
   search()
   q.value = ''
@@ -72,7 +76,11 @@ function show(item) {
   if (item.kind === 'Folder') {
     (async () => {
       list.length = 0
-      get(`/list/${item.parent}`).then((resp) => {
+      get(`/list/${item.id}`).then((resp) => {
+        if (item.id === 0) root_id.value = resp.data.id
+        // if (root_id.value !== resp.data.id) {
+        //   list.push(Object.assign({}, item, {id: item.parent ?? 0, name: ' . . /', kind: 'Folder'}))
+        // }
         list.push(...resp.data)
       })
     })()
@@ -81,10 +89,10 @@ function show(item) {
     let fileExtension = item.name.split('.').pop().toLowerCase()
     switch (true) {
       case /txt|md/.test(fileExtension):
-        window.open(`#/show?${item.id}=${item.name}`, '_blank');
+        window.open(`#/show?${item.id}=${item.name}`, '_blank')
         break
       case /mp4|mkv/.test(fileExtension):
-        window.open(`#/play?${item.id}=${item.name}`, '_blank');
+        window.open(`#/play?${item.id}=${item.name}`, '_blank')
         break
       default:
         window.open(`${location.origin}/visit/${item.id}/${item.name}`, '_blank')
@@ -92,6 +100,10 @@ function show(item) {
     }
   }
 }
+
+onMounted(() => {
+  show({ kind: 'Folder', id: 0 })
+})
 
 function reuse() {
   q.value = qh.value

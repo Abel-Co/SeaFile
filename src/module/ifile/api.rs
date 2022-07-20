@@ -9,7 +9,7 @@ use crate::module::ifile;
 
 #[get("/index/{id}/{_name}")]
 pub async fn index(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
-    ifile::bs::index(id).await;
+    ifile::bs::reindex(id).await;
     HttpResponse::Ok().json("Ok")
 }
 
