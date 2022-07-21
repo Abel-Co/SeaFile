@@ -33,8 +33,8 @@ cargo build --release
 cp target/release/sea_file .
 strip sea_file && upx -9 sea_file
 cp profiles/$env/* ./
-tar zcvf app.tar.gz sea_file config.yaml
-mkdir .docker && cp app.tar.gz .dockerfile .docker/ && cd .docker/
+tar zcvf app.tar.gz dist sea_file config.yaml start.sh
+mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
 
