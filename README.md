@@ -72,7 +72,7 @@ docker run \
 	--name sea_file \
 	-p 8080:8080 -p 139:139 -p 445:445 \
 	-v /data/samba:/mount \
-	-e DATABASE_DSN=postgres://postgres:postgres@192.168.1.110:5432/postgres \
+	-e DATABASE_DSN=postgres://postgres:postgres@192.168.3.120:5432/postgres \
 	abelco/sea_file \
 	-u "user;123456" \
 	-s "Samba;/mount/;yes;no;no;all;user;user"
