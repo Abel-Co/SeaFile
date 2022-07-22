@@ -66,15 +66,14 @@ docker run \
 docker run --restart=unless-stopped -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres -d postgres:12-alpine
 # 2.部署 sea_file
 docker run \
-    -d -ti \
-    --name samba \
-    -p 8080:8080 \
-    -p 139:139 -p 445:445 \
-    -v /data/samba:/mount \
-    -e DATABASE_DSN=postgres://postgres:postgres@192.168.1.110:5432/postgres \
-    registry.cn-beijing.aliyuncs.com/wcik/sea_file:dev01 \
-    -u "user;123456" \
-    -s "Samba;/mount/;yes;no;no;all;user;user"
+	-d -ti \
+	--name sea_file \
+	-p 8080:8080 -p 139:139 -p 445:445 \
+	-v /data/samba:/mount \
+	-e DATABASE_DSN=postgres://postgres:postgres@192.168.1.110:5432/postgres \
+	registry.cn-beijing.aliyuncs.com/wcik/sea_file:dev01 \
+	-u "user;123456" \
+	-s "Samba;/mount/;yes;no;no;all;user;user"
 ```
 
 ## 挂载smb
