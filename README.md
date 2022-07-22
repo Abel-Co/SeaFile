@@ -22,6 +22,8 @@
 cd webapp
 yarn install && yarn build && cd ..
 cargo build --release
+cp profiles/$env/config.yaml ./
+tar zcvf app.tar.gz dist sea_file config.yaml start.sh scripts
 ```
 
 ## 镜像
@@ -33,15 +35,47 @@ cargo build --release
 cp target/release/sea_file .
 strip sea_file && upx -9 sea_file
 cp profiles/$env/* ./
-tar zcvf app.tar.gz dist sea_file config.yaml start.sh
+tar zcvf app.tar.gz dist sea_file config.yaml start.sh scripts
 mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端App，当前，筛选并集成了 nextcloud，使用中需确保 SeaFile、NextCloud、smb 等全部服务的工作目录相同 。
-- 从 nextcloud 中上传的，只能在 nextcloud 端浏览、使用。
-- 从 smb、nfs、ftp、scp、nextcloud 等上传的，全部可在 SeaFile PC 页面中 检索、使用。 
+## 部署
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端 App，因此可以选择与 nextcloud 搭配使用。由于 nextcloud 的安装目录需要是空的，所以原理上需要先安装 nextcloud，再安装 SeaFile。同时，使用中需确保 SeaFile、NextCloud、smb 等全部服务的工作目录相同 。
+
+- 从 nextcloud 上传的，只能在 nextcloud 浏览、使用。
+- 从 smb、nfs、ftp、scp、nextcloud 等上传的，可在 SeaFile PC 页面中 检索、使用。
+
+#### 安装 Nextcloud
+
+```shell
+docker run \
+    -d -ti \
+    --name nextcloud \
+    -p 8000:80 \
+    -v /data/nextcloud:/var/www/html \
+    -v /data/samba:/var/www/html/data \
+    nextcloud
+```
+
+#### 安装 SeaFile
+
+```shell
+# 1.部署 postgresql 数据库
+docker run --restart=unless-stopped -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres -d postgres:12-alpine
+# 2.部署 sea_file
+docker run \
+    -d -ti \
+    --name samba \
+    -p 8080:8080 \
+    -p 139:139 -p 445:445 \
+    -v /data/samba:/mount \
+    -e DATABASE_DSN=postgres://postgres:postgres@192.168.1.110:5432/postgres \
+    registry.cn-beijing.aliyuncs.com/wcik/sea_file:dev01 \
+    -u "user;123456" \
+    -s "Samba;/mount/;yes;no;no;all;user;user"
+```
 
 ## 挂载smb
 ### macOS

@@ -4,7 +4,7 @@ use std::sync::Arc;
 use log4rs::config::RawConfig;
 use once_cell::sync::OnceCell;
 
-use crate::boot::conf::Conf;
+use crate::boot::conf::{Conf, Postgres};
 use crate::module::{filesystem, init};
 
 pub mod c;
@@ -43,6 +43,14 @@ pub fn raw_config(level: &str) -> RawConfig {
     ::serde_yaml::from_str::<RawConfig>(log_cfg.as_str()).unwrap()
 }
 
+fn use_env(postgres: Option<Postgres>) -> Option<Postgres> {
+    if let Ok(dsn) = env::var("DATABASE_DSN") {
+        Some(Postgres { dsn, ..postgres.unwrap() })
+    } else {
+        postgres
+    }
+}
+
 pub fn global() -> &'static Arc<Conf> {
     static CONFIG: OnceCell<Arc<Conf>> = OnceCell::new();
     CONFIG.get_or_init(|| {
@@ -51,6 +59,7 @@ pub fn global() -> &'static Arc<Conf> {
         let mut conf: Conf = serde_yaml::from_str(&s).unwrap();
         conf.server.env = Some(app_env().as_str().to_string());
         conf.config_path = Some(config_path);
+        conf.postgres = use_env(conf.postgres);
         Arc::new(conf)
     })
     // https://blog.csdn.net/u010766458/article/details/104579345
