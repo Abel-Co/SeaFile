@@ -22,8 +22,9 @@
 cd webapp
 yarn install && yarn build && cd ..
 cargo build --release
+export env=dev
 cp profiles/$env/config.yaml ./
-tar zcvf app.tar.gz dist sea_file config.yaml start.sh scripts
+tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
 ```
 
 ## 镜像
@@ -35,8 +36,9 @@ tar zcvf app.tar.gz dist sea_file config.yaml start.sh scripts
 cp target/release/sea_file .
 strip sea_file && upx -9 sea_file
 cp profiles/$env/* ./
-tar zcvf app.tar.gz dist sea_file config.yaml start.sh scripts
+tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
 mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
+export repo=sea_file
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
 
@@ -71,7 +73,7 @@ docker run \
 	-p 8080:8080 -p 139:139 -p 445:445 \
 	-v /data/samba:/mount \
 	-e DATABASE_DSN=postgres://postgres:postgres@192.168.1.110:5432/postgres \
-	registry.cn-beijing.aliyuncs.com/wcik/sea_file:dev01 \
+	abelco/sea_file \
 	-u "user;123456" \
 	-s "Samba;/mount/;yes;no;no;all;user;user"
 ```
