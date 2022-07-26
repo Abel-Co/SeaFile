@@ -4,6 +4,8 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;将文件拖入共享目录，之后便可在页面高效检索。服务监控文件系统，自动维护索引，索引基于DB。所说“海量”，要自备超大容量存储，像作者这里用的是ceph；并当检索效率不足时，自行另建高性能数据库。因此，理论上，只要中间件性能足够，就可支持无限量文件检索。
 
+<iframe src="//player.bilibili.com/player.html?aid=898874970&bvid=BV1rN4y177Li&cid=784786592&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+
 ## 优势
 - 使用原生共享目录，直接操作文件。
 - 用户界面，立即可搜索。
