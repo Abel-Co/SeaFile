@@ -1,0 +1,101 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 3543302 */
+  src: url('iconfont.woff2?t=1658863692046') format('woff2'),
+  url('iconfont.woff?t=1658863692046') format('woff'),
+  url('iconfont.ttf?t=1658863692046') format('truetype');
+}
+
+.icon {
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 6px;
+  margin-bottom: -3px;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+.iconfont {
+  font-family: "iconfont", serif !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-socialmarkdown:before {
+  content: "\e89c";
+}
+
+.icon-ds_store:before {
+  content: "\e625";
+}
+
+.icon-dmg:before {
+  content: "\e69b";
+}
+
+.icon-zip-rar:before {
+  content: "\e600";
+}
+
+.icon-picture:before {
+  content: "\e66d";
+}
+
+.icon-TXTs:before {
+  content: "\e668";
+}
+
+.icon-adobepdf:before {
+  content: "\e622";
+}
+
+.icon-PPT:before {
+  content: "\e642";
+}
+
+.icon-chrome:before {
+  content: "\ea09";
+}
+
+.icon-doc:before {
+  content: "\e623";
+}
+
+.icon-xlsx:before {
+  content: "\e679";
+}
+
+.icon-light-component-dataconvert-convertText:before {
+  content: "\e785";
+}
+
+.icon-si-glyph-movie-play:before {
+  content: "\e6e2";
+}
+
+.icon-code:before {
+  content: "\e7a9";
+}
+
+.icon-folder:before {
+  content: "\e666";
+}
+
+.icon-delete:before {
+  content: "\e6b4";
+}
+
+.icon-download:before {
+  content: "\e66c";
+}
+
+.icon-refresh:before {
+  content: "\e6e3";
+}
+
+.icon-refresh:before {
+  content: "\e6e3";
+}
+

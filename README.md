@@ -2,7 +2,7 @@
 
 ![img.png](docs/assets/Logo.svg)
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;将文件拖入共享目录，之后便可在页面高效检索。服务监控文件系统，自动维护索引，索引基于DB。所说“海量”，要自备超大容量存储，像作者这里用的是ceph；并当检索效率不足时，自行另建高性能数据库。因此，理论上，只要中间件性能足够，就可支持无限量文件检索。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;将文件拖入共享目录，之后便可在页面高效检索。服务监控文件系统，自动维护索引，索引基于DB。所说“海量”，要自备超大容量存储，像作者这里用的是ceph；并当检索效率不足时，自行另建高性能数据库。因此，理论上，只要中间件性能足够，就可支持无限量文件检索。
 
 <a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img.png](img.png)</a>
 
@@ -30,9 +30,9 @@ tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
 ```
 
 ## 镜像
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里为直接获得共享目录能力，使用了 samba alpine 镜像，如不需要该功能，转而去使用 scratch、alpine 也是一样的。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;这里为直接获得共享目录能力，使用了 samba alpine 镜像，如不需要该功能，转而去使用 scratch、alpine 也是一样的。
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;env、repo 根据实际情况填写：
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;env、repo 根据实际情况填写：
 
 ```shell
 cp target/release/sea_file .
@@ -46,7 +46,7 @@ docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 
 ## 部署
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端 App，因此可以选择与 nextcloud 搭配使用。由于 nextcloud 的安装目录需要是空的，所以原理上需要先安装 nextcloud，再安装 SeaFile。同时，使用中需确保 SeaFile、NextCloud、smb 等全部服务的工作目录相同 。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;因缺少 iOS、Android 等移动端 App，因此可以选择与 nextcloud 搭配使用。由于 nextcloud 的安装目录需要是空的，所以原理上需要先安装 nextcloud，再安装 SeaFile。同时，使用中需确保 SeaFile、NextCloud、smb 等全部服务的工作目录相同 。
 
 - 从 nextcloud 上传的，只能在 nextcloud 浏览、使用。
 - 从 smb、nfs、ftp、scp、nextcloud 等上传的，可在 SeaFile PC 页面中 检索、使用。
@@ -82,10 +82,10 @@ docker run \
 
 ## 挂载smb
 ### macOS
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Command + k，输入服务地址，并根据随后提示，输入账号、密码。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Command + k，输入服务地址，并根据随后提示，输入账号、密码。
 ![img.png](docs/assets/macos-smb.jpg)
 ### Windows
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;右键，此电脑，添加一个网络位置，`\\192.168.3.120\share`。（或，开始，运行，输入地址）（结尾的 share，请根据实际情况输入）。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;右键，此电脑，添加一个网络位置，`\\192.168.3.120\share`。（或，开始，运行，输入地址）（结尾的 share，请根据实际情况输入）。
 ![img.png](docs/assets/win-smb.png)
 
 ## 迭代计划

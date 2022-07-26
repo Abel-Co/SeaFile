@@ -15,12 +15,15 @@
         </ul>
       </li>
       <li class="tbody">
-        <ul class="tr clearfix" v-for="item in list">
+        <ul class="tr clearfix" v-for="item in list" @mouseenter="item.active = 1" @mouseleave="item.active = 0">
           <li>
-            <img src="/favicon.ico" style="width:20px;margin-top:9px;margin-right:9px;display: block;float: left;"/>
+            <svg class="icon" aria-hidden="true">
+              <use v-bind:xlink:href="icon(item)"></use>
+            </svg>
             <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-            <!--            <div>删除</div>
-                        <div>下载</div>-->
+            <span class="iconfont" @click="remove(item)" v-visible="item.active">&#xe6b4;</span>
+            <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File' && item.active">&#xe66c;</span>
+            <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder' && item.active">&#xe6e3;</span>
           </li>
           <li>{{ item.path }}</li>
           <li>{{ item.size }}</li>
@@ -108,6 +111,45 @@ onMounted(() => {
 function reuse() {
   q.value = qh.value
   input.value.focus()
+}
+
+const icon = (item) => {
+  if (item.kind === 'Folder') {
+    return '#icon-folder'
+  } else {
+    let fileExtension = item.name.split('.').pop().toLowerCase()
+    switch (true) {
+      case /txt/.test(fileExtension):
+        return '#icon-TXTs'
+      case /htm|html/.test(fileExtension):
+        return '#icon-chrome'
+      case /mp4|mkv/.test(fileExtension):
+        return '#icon-si-glyph-movie-play'
+      case /zip|rar|tar|gz|bz2/.test(fileExtension):
+        return '#icon-zip-rar'
+      case /pdf/.test(fileExtension):
+        return '#icon-adobepdf'
+      case /md/.test(fileExtension):
+        return '#icon-socialmarkdown'
+      case /dmg/.test(fileExtension):
+        return '#icon-dmg'
+      case /ds_store/.test(fileExtension):
+        return '#icon-ds_store'
+      case /png|jpg|jpeg/.test(fileExtension):
+        return '#icon-picture'
+      default:
+        break
+    }
+  }
+}
+const remove = (item) => {
+  console.log(item)
+}
+const download = (item) => {
+  console.log(item)
+}
+const refresh = (item) => {
+  console.log(item)
 }
 
 window.onfocus = () => {
@@ -207,18 +249,10 @@ ul {
   background-color: rgb(248 249 250);
 }
 
-.table .tbody .tr li:first-child > div {
+.table .tbody .tr li:first-child > span {
   float: right;
-  margin-top: 5px;
   margin-left: 2px;
-  margin-right: 10px;
-  display: inline-block;
-  /*width: 60px;*/
-  height: 30px;
-  background-color: #008c8c;
-  color: #fff;
-  font-size: 12px;
-  line-height: 30px;
+  margin-right: 5px;
   cursor: pointer;
 }
 
