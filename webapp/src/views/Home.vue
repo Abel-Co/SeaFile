@@ -21,7 +21,7 @@
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
             <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-            <span class="iconfont" @click="remove(item)" v-visible="item.active">&#xe6b4;</span>
+<!--            <span class="iconfont" @click="remove(item)" v-visible="item.active">&#xe6b4;</span>-->
             <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File' && item.active">&#xe66c;</span>
             <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder' && item.active">&#xe6e3;</span>
           </li>
@@ -113,43 +113,39 @@ function reuse() {
   input.value.focus()
 }
 
+const icons = {}
+const icon_template = {
+  'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
+  'zip|rar|tar|gz|bz2': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
+  'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
+  'ds_store': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture'
+}
+for (let key in icon_template) {
+  key.split('|').forEach((ic)=> {
+    icons[ic] = icon_template[key]
+  })
+}
+
 const icon = (item) => {
   if (item.kind === 'Folder') {
     return '#icon-folder'
   } else {
     let fileExtension = item.name.split('.').pop().toLowerCase()
-    switch (true) {
-      case /txt/.test(fileExtension):
-        return '#icon-TXTs'
-      case /htm|html/.test(fileExtension):
-        return '#icon-chrome'
-      case /mp4|mkv/.test(fileExtension):
-        return '#icon-si-glyph-movie-play'
-      case /zip|rar|tar|gz|bz2/.test(fileExtension):
-        return '#icon-zip-rar'
-      case /pdf/.test(fileExtension):
-        return '#icon-adobepdf'
-      case /md/.test(fileExtension):
-        return '#icon-socialmarkdown'
-      case /dmg/.test(fileExtension):
-        return '#icon-dmg'
-      case /ds_store/.test(fileExtension):
-        return '#icon-ds_store'
-      case /png|jpg|jpeg/.test(fileExtension):
-        return '#icon-picture'
-      default:
-        break
-    }
+    return icons[fileExtension]
   }
 }
 const remove = (item) => {
   console.log(item)
 }
 const download = (item) => {
-  console.log(item)
+  window.open(`${location.origin}/download/${item.id}/${item.name}`, '_blank')
 }
 const refresh = (item) => {
-  console.log(item)
+  (async () => {
+    get(`/index/${item.id}/${item.name}`).then((resp) => {
+      alert('操作成功')
+    })
+  })()
 }
 
 window.onfocus = () => {
