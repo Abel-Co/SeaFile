@@ -36,7 +36,7 @@ pub async fn save(files: Files) -> u64 {
 
 pub async fn update(id: i64, ifile: Files) -> u64 {
     RB.update_by_wrapper(&ifile, RB.new_wrapper()
-        .eq("id", id), &[Skip::Column("id"), Skip::Value(Bson::Null)]
+        .eq("id", id), &[Skip::Column("id"), Skip::Value(Bson::Null)],
     ).await.unwrap()
 }
 
@@ -52,9 +52,16 @@ pub async fn delete_by_path(path: &str) -> u64 {
     ).await.unwrap()
 }
 
-// macOS Finder 下 “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
-pub async fn delete_children(path: &str) -> u64 {
-    RB.remove_by_wrapper::<Files>(
-        RB.new_wrapper().like("path", format!("{}{}{}", path, path::MAIN_SEPARATOR, "%"))
+// // macOS Finder 下 “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
+// pub async fn delete_children(path: &str) -> u64 {
+//     RB.remove_by_wrapper::<Files>(
+//         RB.new_wrapper().like("path", format!("{}{}{}", path, path::MAIN_SEPARATOR, "%"))
+//     ).await.unwrap()
+// }
+
+/// 查找后代
+pub async fn find_posterity(path: &str) -> Vec<Files> {
+    RB.fetch_list_by_wrapper(
+        RB.new_wrapper().like_right("path", format!("{}{}", path, path::MAIN_SEPARATOR))
     ).await.unwrap()
 }

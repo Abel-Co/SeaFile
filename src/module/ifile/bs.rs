@@ -72,8 +72,10 @@ pub async fn delete_file(path: &str) {
 pub async fn index(path: &str) {
     let path = String::from(path);
     tokio::spawn(async move {
-        let _ = ifile::dao::delete_children(path.as_str()).await;
-        for entry in WalkDir::new(path) {
+        // // 不能采用删老记录的方案，因为离线保存的，基于url的资源地址将失效。
+        // let _ = ifile::dao::delete_children(path.as_str()).await;
+        // 1.发现数据
+        for entry in WalkDir::new(path.clone()) {
             let entry = entry.unwrap();
             match entry.file_type() {
                 file_type if file_type.is_file() => {
@@ -86,6 +88,12 @@ pub async fn index(path: &str) {
                     save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
                 }
                 _ => {}
+            }
+        }
+        // 2.清理索引
+        for x in ifile::dao::find_posterity(path.as_str()).await {
+            if !Path::new(x.path.as_str()).exists() {
+                let _ = ifile::dao::delete(vec![x.id]).await;
             }
         }
     });
