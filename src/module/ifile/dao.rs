@@ -16,11 +16,20 @@ pub async fn check(path: &str) -> Option<Files> {
 }
 
 pub async fn search(name: &str) -> Vec<Files> {
-    RB.fetch_list_by_wrapper(
+    // ilike
+    let name = &format!("{}{}{}", "%", name, "%");
+    RB.fetch("select * from files where name ilike $1 order by kind desc, path;",
+             vec![Bson::String(name.to_string())]).await.unwrap()
+    // like
+    /*RB.fetch_list_by_wrapper(
         RB.new_wrapper().like("name", name)
             .order_bys(&[("kind", false), ("path", true)])
-    ).await.unwrap()
+    ).await.unwrap()*/
 }
+
+/// name 需在传入前拼装好 % + name + %
+// #[py_sql(RB, "select * from files where name ilike #{name} order by kind desc, path")]
+// pub async fn search_py_sql(name: &str) -> Vec<Files> {}
 
 pub async fn list(parent: i64) -> Vec<Files> {
     RB.fetch_list_by_wrapper(

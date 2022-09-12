@@ -4,7 +4,7 @@ use futures::{
     channel::mpsc::{channel, Receiver},
     SinkExt, StreamExt,
 };
-use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use notify::EventKind::{Create, Modify, Remove};
 
 use crate::module::ifile;
@@ -17,7 +17,7 @@ fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Resul
         futures::executor::block_on(async {
             tx.send(res).await.unwrap();
         })
-    })?;
+    }, Config::default())?;
     Ok((watcher, rx))
 }
 
