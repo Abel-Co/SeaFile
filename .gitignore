@@ -6,3 +6,4 @@
 /**/.docker
 /**/.idea
 /**/*.log
+/**/nohup.out
