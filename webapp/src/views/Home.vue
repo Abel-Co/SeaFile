@@ -5,11 +5,12 @@
     <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
+<!--    <span>选择的值为: {{ checked }}</span>-->
     <ul class="table">
       <li class="thead">
         <ul class="tr clearfix">
           <li>
-            <input type="checkbox">
+            <input type="checkbox" @click="toggleCheckedAll()">
           </li>
           <li>名字</li>
           <li>路径</li>
@@ -20,7 +21,7 @@
       <li class="tbody">
         <ul class="tr clearfix" v-for="item in list" @mouseenter="item.active = 1" @mouseleave="item.active = 0">
           <li>
-            <input type="checkbox" value="item" v-model="checkedRows">
+            <input type="checkbox" :value="item.id" v-model="checked">
           </li>
           <li>
             <svg class="icon" aria-hidden="true">
@@ -31,7 +32,7 @@
             <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File' && item.active">&#xe66c;</span>
             <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder' && item.active">&#xe6e3;</span>
           </li>
-          <li>{{ item.path }}</li>
+          <li :title="item.path">{{ item.path }}</li>
           <li>{{ item.size }}</li>
           <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
           <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
@@ -62,8 +63,18 @@ const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
 const list = reactive([])
-const checkedRows = reactive([])
+const checked = reactive([])
 const root_id = ref(0)
+
+function toggleCheckedAll() {
+  if (this.checked.length !== this.list.length) {
+    this.list.forEach(item => {
+      this.checked.push(item.id)
+    })
+  } else {
+    this.checked.length = 0
+  }
+}
 
 function search() {
   qh.value = q.value
