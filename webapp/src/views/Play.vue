@@ -24,7 +24,7 @@ const options = reactive({
   src: `${location.origin}/visit/${item.id}/${item.name}`, // 视频源
   muted: false,     // 静音
   webFullScreen: true,
-  speedRate: ["0.75", "1.0", "1.25", "1.5", "2.0"],   // 播放倍速
+  speedRate: ["0.5", "0.75", "1.0", "1.25", "1.5", "1.75", "2.0"],   // 播放倍速
   autoPlay: true,   // 自动播放
   loop: false,      // 循环播放
   mirror: false,    // 镜像画面

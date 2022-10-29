@@ -2,12 +2,15 @@
   <!--  <h1></h1>-->
   <div class="wrapper">
     <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
-    <input v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
     <ul class="table">
       <li class="thead">
         <ul class="tr clearfix">
+          <li>
+            <input type="checkbox">
+          </li>
           <li>名字</li>
           <li>路径</li>
           <li>大小</li>
@@ -16,6 +19,9 @@
       </li>
       <li class="tbody">
         <ul class="tr clearfix" v-for="item in list" @mouseenter="item.active = 1" @mouseleave="item.active = 0">
+          <li>
+            <input type="checkbox" value="item" v-model="checkedRows">
+          </li>
           <li>
             <svg class="icon" aria-hidden="true">
               <use v-bind:xlink:href="icon(item)"></use>
@@ -56,6 +62,7 @@ const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
 const list = reactive([])
+const checkedRows = reactive([])
 const root_id = ref(0)
 
 function search() {
@@ -149,7 +156,7 @@ const refresh = (item) => {
 }
 
 window.onfocus = () => {
-  input.value.focus()
+  // input.value.focus()
 }
 </script>
 
@@ -168,7 +175,7 @@ a {
   color: #42b983;
 }
 
-input {
+.search-input {
   display: block;
   margin: 20px auto;
   width: 600px;
@@ -215,37 +222,41 @@ ul {
   line-height: 38px;
 }
 
-.table .tbody .tr:not(:first-child) {
-  border-top: 1px solid rgb(246 247 249);
-}
-
-/* 列--设计列宽 */
-.table .thead li:first-child, .table .tbody li:first-child {
-  flex: 2;
-  text-align: left;
-  padding-left: 22px;
-}
-
-.table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
-  flex: 1.5;
-  text-align: left;
-  padding-left: 8px;
-}
-
-.table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
-  flex: .3;
-  padding-left: 20px;
-}
-
-.table .thead li:last-child, .table .tbody li:last-child {
-  flex: .8;
-}
-
 .table .tbody .tr:hover {
   background-color: rgb(248 249 250);
 }
 
-.table .tbody .tr li:first-child > span {
+.table .tbody .tr:not(:first-child) {
+  border-top: 1px solid rgb(246 247 249);
+}
+
+/*li { border: 1px solid black; }*/
+
+/* 列--设计列宽 */
+.table .thead li:first-child, .table .tbody li:first-child {
+  min-width: 36px;
+}
+
+.table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
+  width: 55%;
+  text-align: left;
+  padding-left: 15px;
+}
+
+.table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
+  width: 16%;
+  padding-left: 11px;
+}
+
+.table .thead li:nth-child(4), .table .tbody li:nth-child(4) {
+  width: 10%;
+}
+
+.table .thead li:last-child, .table .tbody li:last-child {
+  width: 13%;
+}
+
+.table .tbody .tr li:nth-child(2) > span {
   float: right;
   margin-left: 2px;
   margin-right: 5px;
