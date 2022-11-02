@@ -5,12 +5,24 @@
     <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
-<!--    <span>选择的值为: {{ checked }}</span>-->
+    <span>选择的值为: {{ checked }}</span>
+    <div style="width:1200px;height: 20px;margin: 13px auto;">
+      <button class="iconfont" @click="downloadAllChecked()" v-show="checked.length > 0"
+              style="float: left; color:white; padding: 0 15px; border: 0; background-color: #06a7ff; height: 32px;
+              font-family: SFUIText,PingFangSC-Regular,Helvetica Neue,Helvetica,Arial,sans-serif;
+              border-radius: 15px; ">
+        <!--        <svg class="icon" aria-hidden="true">-->
+        <!--          <use :xlink:href="icon({kind:'Folder'})"></use>-->
+        <!--        </svg>-->
+        &#xe66c;
+        下载选中的
+      </button>
+    </div>
     <ul class="table">
       <li class="thead">
         <ul class="tr clearfix">
           <li>
-            <input type="checkbox" @click="toggleCheckedAll()">
+            <input type="checkbox" v-model="checkedAll">
           </li>
           <li>名字</li>
           <li>路径</li>
@@ -19,18 +31,20 @@
         </ul>
       </li>
       <li class="tbody">
-        <ul class="tr clearfix" v-for="item in list" @mouseenter="item.active = 1" @mouseleave="item.active = 0">
+        <ul class="tr clearfix" v-for="item in list" :key="item.id">
           <li>
-            <input type="checkbox" :value="item.id" v-model="checked">
+            <input type="checkbox" :value="item.id" v-model="item.checked" >
           </li>
           <li>
             <svg class="icon" aria-hidden="true">
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
             <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
-<!--            <span class="iconfont" @click="remove(item)" v-visible="item.active">&#xe6b4;</span>-->
-            <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File' && item.active">&#xe66c;</span>
-            <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder' && item.active">&#xe6e3;</span>
+            <span class="iconfont" @click="remove(item)" v-visible="!item.active">&#xe6b4;</span>
+            <span class="iconfont" @click="refresh(item)"
+                  v-visible="item.kind === 'Folder' && !item.active">&#xe6e3;</span>
+            <span class="iconfont" @click="download(item)"
+                  v-visible="item.kind === 'File' && !item.active">&#xe66c;</span>
           </li>
           <li :title="item.path">{{ item.path }}</li>
           <li>{{ item.size }}</li>
@@ -55,26 +69,24 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { get } from '../utils/request'
 
 const q = ref(null)
 const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
-const list = reactive([])
-const checked = reactive([])
 const root_id = ref(0)
-
-function toggleCheckedAll() {
-  if (this.checked.length !== this.list.length) {
-    this.list.forEach(item => {
-      this.checked.push(item.id)
-    })
-  } else {
-    this.checked.length = 0
-  }
-}
+const list = reactive([])
+const checked = computed(() => list.filter(item => item.checked))
+const checkedAll = computed({
+    get () {
+      return checked.value.length === list.length
+    },
+    set (val) {
+      list.forEach(item => item.checked = val)
+    }
+})
 
 function search() {
   qh.value = q.value
@@ -124,11 +136,18 @@ function show(item) {
 
 onMounted(() => {
   show({ kind: 'Folder', id: 0 })
+  // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
 })
 
 function reuse() {
   q.value = qh.value
   input.value.focus()
+}
+
+function downloadAllChecked() {
+  checked.value.forEach(item => {
+    download({ id: item.id.toString(), name: 'batch-download' })
+  })
 }
 
 const icons = {}
@@ -139,7 +158,7 @@ const icon_template = {
   'ds_store': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture'
 }
 for (let key in icon_template) {
-  key.split('|').forEach((ic)=> {
+  key.split('|').forEach((ic) => {
     icons[ic] = icon_template[key]
   })
 }
@@ -208,6 +227,7 @@ ul {
 
 .table .tr {
   display: flex;
+  vertical-align: middle;
 }
 
 .table .tr li {
@@ -251,12 +271,20 @@ ul {
 .table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
   width: 55%;
   text-align: left;
-  padding-left: 15px;
+  padding-left: 12px;
 }
 
 .table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
   width: 16%;
-  padding-left: 11px;
+}
+
+.table .thead li:nth-child(3) {
+  text-align: center;
+}
+
+.table .tbody li:nth-child(3) {
+  text-align: left;
+  text-indent: 1em;
 }
 
 .table .thead li:nth-child(4), .table .tbody li:nth-child(4) {
@@ -264,7 +292,7 @@ ul {
 }
 
 .table .thead li:last-child, .table .tbody li:last-child {
-  width: 13%;
+  width: 14%;
 }
 
 .table .tbody .tr li:nth-child(2) > span {
