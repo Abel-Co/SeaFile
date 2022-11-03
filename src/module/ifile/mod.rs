@@ -1,9 +1,11 @@
-use std::fs;
+use std::cmp::Ordering;
+use std::{cmp, fs};
 use std::path::Path;
-use futures::executor::block_on;
 
+use futures::executor::block_on;
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -13,7 +15,7 @@ pub mod api;
 pub mod bs;
 pub mod dao;
 
-#[derive(CRUDTable, Clone, Debug, Default, Validate, Serialize, Deserialize)]
+#[derive(CRUDTable, Clone, Debug, Default, Validate, Eq, Serialize, Deserialize)]
 pub struct Files {
     pub id: i64,
     pub crc: i64,
@@ -40,5 +42,56 @@ impl Files {
             updated_at: Some(TimestampZ::now()),
             ..Default::default()
         }
+    }
+}
+
+lazy_static! {
+    static ref RE_S: Vec<(Regex, char)> = vec!(
+        (Regex::new(r"\d{1,3}-\d{1,3}").unwrap(), '-'),(Regex::new(r"\d{1,3}\.\d{1,3}").unwrap(), '.')
+    );
+}
+
+impl Ord for Files {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.kind == "Folder" && other.kind != "Folder" {
+            Ordering::Less
+        } else if other.kind == "Folder" && self.kind != "Folder" {
+            Ordering::Greater
+        } else if self.kind == other.kind {
+            let mut ord = Ordering::Equal;
+            for re in RE_S.iter() {
+                if ord == Ordering::Equal {
+                    if let Some(ma) = re.0.find(&self.path) {
+                        if let Some(mb) = re.0.find(&other.path) {
+                            let (va, vb) = (
+                                ma.as_str().split(re.1).collect::<Vec<&str>>(), mb.as_str().split(re.1).collect::<Vec<&str>>());
+                            for i in 0..cmp::min(va.len(), vb.len()) {
+                                if ord == Ordering::Equal {
+                                    ord = va[i].parse::<i32>().unwrap().cmp(&vb[i].parse::<i32>().unwrap());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if ord != Ordering::Equal {
+                return ord;
+            }
+            return self.path.cmp(&other.path);
+        } else {
+            Ordering::Equal
+        }
+    }
+}
+
+impl PartialOrd<Self> for Files {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.path.cmp(&other.path))
+    }
+}
+
+impl PartialEq<Self> for Files {
+    fn eq(&self, other: &Self) -> bool {
+        self.path == other.path
     }
 }

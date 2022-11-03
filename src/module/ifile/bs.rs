@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -21,14 +21,16 @@ pub async fn get(id: i64) -> Option<Files> {
 }
 
 pub async fn search(name: &str) -> Vec<Files> {
-    let _files = ifile::dao::search(name).await;
+    let mut _files = ifile::dao::search(name).await;
     filesystem::async_patrol(&_files).await;
+    _files.sort_by(|a, b| a.cmp(&b));
     _files
 }
 
 pub async fn list(parent: i64) -> Vec<Files> {
-    let _files = ifile::dao::list(parent).await;
+    let mut _files = ifile::dao::list(parent).await;
     filesystem::async_patrol(&_files).await;
+    _files.sort_by(|a, b| a.cmp(&b));
     _files
 }
 
