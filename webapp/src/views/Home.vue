@@ -5,7 +5,7 @@
     <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
-<!--    <span>选择的值为: {{ checked }}</span>-->
+    <!--    <span>选择的值为: {{ checked }}</span>-->
     <div style="width:1200px;height: 20px;margin: 13px auto;">
       <button class="iconfont" @click="downloadAllChecked()" v-show="checked.length > 0"
               style="float: left; color:white; padding: 0 15px; border: 0; background-color: #06a7ff; height: 32px;
@@ -33,13 +33,16 @@
       <li class="tbody">
         <ul class="tr clearfix" v-for="item in list" :key="item.id">
           <li>
-            <input type="checkbox" :value="item.id" v-model="item.checked" >
+            <input type="checkbox" :value="item.id" v-model="item.checked">
           </li>
           <li>
             <svg class="icon" aria-hidden="true">
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
-            <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
+            <span
+                style="width: 27.5%; position: absolute; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+              <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
+            </span>
             <span class="iconfont" @click="remove(item)" v-visible="!item.active">&#xe6b4;</span>
             <span class="iconfont" @click="refresh(item)"
                   v-visible="item.kind === 'Folder' && !item.active">&#xe6e3;</span>
@@ -47,7 +50,7 @@
                   v-visible="item.kind === 'File' && !item.active">&#xe66c;</span>
           </li>
           <li :title="item.path">{{ item.path }}</li>
-          <li>{{ item.size }}</li>
+          <li>{{ byteToText(item.size) }}</li>
           <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
           <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
         </ul>
@@ -80,12 +83,12 @@ const root_id = ref(0)
 const list = reactive([])
 const checked = computed(() => list.filter(item => item.checked))
 const checkedAll = computed({
-    get () {
-      return checked.value.length === list.length
-    },
-    set (val) {
-      list.forEach(item => item.checked = val)
-    }
+  get() {
+    return checked.value.length === list.length
+  },
+  set(val) {
+    list.forEach(item => item.checked = val)
+  }
 })
 
 function search() {
@@ -150,12 +153,32 @@ function downloadAllChecked() {
   })
 }
 
+function byteToText(size) {
+  let gb = Math.floor(size / (1024 * 1024 * 1024))
+  let mb = Math.floor(size / (1024 * 1024))
+  let kb = Math.floor(size / 1024)
+
+  if (gb > 0) {
+    return (size / (1024 * 1024 * 1024)).toFixed(2) + "GB"
+  } else if (mb > 0) {
+    return (size / (1024 * 1024)).toFixed(2) + "MB"
+  } else if (kb > 0) {
+    return (size / 1024).toFixed(2) + "KB"
+  } else {
+    return size.toFixed(2) + "B"
+  }
+}
+
 const icons = {}
 const icon_template = {
   'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
-  'zip|rar|tar|gz|bz2': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
+  'zip|rar|tar|gz|bz2|tgz': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
   'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
-  'ds_store': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture'
+  'ds_store|localized': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
+  'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
+  'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
+  'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
+  'idx': '#icon-docindex', 'torrent': '#icon-file_bt'
 }
 for (let key in icon_template) {
   key.split('|').forEach((ic) => {
@@ -269,13 +292,13 @@ ul {
 }
 
 .table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
-  width: 55%;
+  width: 54%;
   text-align: left;
   padding-left: 12px;
 }
 
 .table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
-  width: 16%;
+  width: 18%;
 }
 
 .table .thead li:nth-child(3) {
@@ -288,7 +311,9 @@ ul {
 }
 
 .table .thead li:nth-child(4), .table .tbody li:nth-child(4) {
-  width: 10%;
+  width: 9%;
+  text-align: right;
+  padding-right: 10px;
 }
 
 .table .thead li:last-child, .table .tbody li:last-child {

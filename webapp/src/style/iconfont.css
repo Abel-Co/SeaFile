@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3543302 */
-  src: url('iconfont.woff2?t=1658863692046') format('woff2'),
-  url('iconfont.woff?t=1658863692046') format('woff'),
-  url('iconfont.ttf?t=1658863692046') format('truetype');
+  src: url('iconfont.woff2?t=1667562717262') format('woff2'),
+       url('iconfont.woff?t=1667562717262') format('woff'),
+       url('iconfont.ttf?t=1667562717262') format('truetype');
 }
 
 .icon {
@@ -21,6 +21,90 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-docindex:before {
+  content: "\e67a";
+}
+
+.icon-file_video:before {
+  content: "\e69d";
+}
+
+.icon-file_bt:before {
+  content: "\e6a3";
+}
+
+.icon-exe:before {
+  content: "\e605";
+}
+
+.icon-JavaScript:before {
+  content: "\e704";
+}
+
+.icon-img:before {
+  content: "\e616";
+}
+
+.icon-YAML:before {
+  content: "\e626";
+}
+
+.icon-Vue:before {
+  content: "\e799";
+}
+
+.icon-React:before {
+  content: "\e79a";
+}
+
+.icon-iso:before {
+  content: "\e8b2";
+}
+
+.icon-java:before {
+  content: "\e614";
+}
+
+.icon-logo-javascript:before {
+  content: "\e656";
+}
+
+.icon-dmg1:before {
+  content: "\e624";
+}
+
+.icon-reg:before {
+  content: "\e653";
+}
+
+.icon-rpm:before {
+  content: "\e654";
+}
+
+.icon-bat:before {
+  content: "\e694";
+}
+
+.icon-swift:before {
+  content: "\e699";
+}
+
+.icon-rust:before {
+  content: "\ec88";
+}
+
+.icon-Goyuyan:before {
+  content: "\e61b";
+}
+
+.icon-suffix-yml:before {
+  content: "\e669";
+}
+
+.icon-a-kuozhanicon_huaban1fuben33:before {
+  content: "\e646";
 }
 
 .icon-socialmarkdown:before {
@@ -89,10 +173,6 @@
 
 .icon-download:before {
   content: "\e66c";
-}
-
-.icon-refresh:before {
-  content: "\e6e3";
 }
 
 .icon-refresh:before {
