@@ -154,19 +154,11 @@ function downloadAllChecked() {
 }
 
 function byteToText(size) {
-  let gb = Math.floor(size / (1024 * 1024 * 1024))
-  let mb = Math.floor(size / (1024 * 1024))
-  let kb = Math.floor(size / 1024)
-
-  if (gb > 0) {
-    return (size / (1024 * 1024 * 1024)).toFixed(2) + "GB"
-  } else if (mb > 0) {
-    return (size / (1024 * 1024)).toFixed(2) + "MB"
-  } else if (kb > 0) {
-    return (size / 1024).toFixed(2) + "KB"
-  } else {
-    return size.toFixed(2) + "B"
-  }
+  if (size === 0) return "0 B";
+  let k = 1024;
+  let sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+      i = Math.floor(Math.log(size) / Math.log(k));
+  return (size / Math.pow(k, i)).toPrecision(3) + " " + sizes[i];
 }
 
 const icons = {}
