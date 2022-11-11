@@ -1,4 +1,8 @@
-FROM dperson/samba
+FROM alpine
+
+RUN apk add samba openrc --no-cache \
+    && mkdir -p /run/openrc && touch /run/openrc/softlevel \
+    && rc-update add samba && rc-service samba start
 
 WORKDIR /root
 
@@ -10,4 +14,4 @@ ENV APP_ENV=$APP_ENV
 
 EXPOSE 8080 137/udp 138/udp 139 445
 
-ENTRYPOINT ["./start.sh"]
+ENTRYPOINT ["./sea_file"]
