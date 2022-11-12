@@ -171,7 +171,9 @@ const icon_template = {
   'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
   'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
   'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
-  'epub': '#icon-epub'
+  'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
+  'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
+  'sh': '#icon-a-kuozhanicon_huaban1fuben33'
 }
 for (let key in icon_template) {
   key.split('|').forEach((ic) => {
@@ -184,6 +186,9 @@ const icon = (item) => {
     return '#icon-folder'
   } else {
     let fileExtension = item.name.split('.').pop().toLowerCase()
+    if (fileExtension === 'toml' || fileExtension === 'lock') {
+      return icons[item.name.toLowerCase()]
+    }
     return icons[fileExtension]
   }
 }

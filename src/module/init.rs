@@ -1,3 +1,5 @@
+use std::thread::sleep;
+use std::time::Duration;
 use notify::event::CreateKind;
 use rbatis::crud::CRUD;
 
@@ -27,6 +29,10 @@ pub async fn decide_to_init() {
 }
 
 pub async fn daemon() {
-
-    samba::daemon_smb().await
+    tokio::spawn(async {
+        loop {
+            samba::daemon_smb().await;
+            sleep(Duration::from_secs(56))
+        }
+    });
 }
