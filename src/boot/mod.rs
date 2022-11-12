@@ -25,24 +25,6 @@ pub fn get_config_path() -> String {
     return "./".to_string();
 }
 
-const CFG: &str = r#"
-refresh_rate: 30 seconds
-appenders:
-  stdout:
-    kind: console
-    encoder:
-      pattern: "{d(%Y-%m-%d %H:%M:%S)} {h({l})} [{M}] - {m}{n}"
-root:
-  level: trace
-  appenders:
-    - stdout
-"#;
-
-pub fn raw_config(level: &str) -> RawConfig {
-    let log_cfg = CFG.replace("trace", level);
-    ::serde_yaml::from_str::<RawConfig>(log_cfg.as_str()).unwrap()
-}
-
 fn use_env(postgres: Option<Postgres>) -> Option<Postgres> {
     if let Ok(dsn) = env::var("DATABASE_DSN") {
         Some(Postgres { dsn, ..postgres.unwrap() })
@@ -72,17 +54,42 @@ pub fn global() -> &'static Arc<Conf> {
     // println!(">>> env: {:?}", kvs.get("env2").unwrap_or(&"./"));
 }
 
+const CFG: &str = r#"
+refresh_rate: 30 seconds
+appenders:
+  stdout:
+    kind: console
+    encoder:
+      pattern: "{d(%Y-%m-%d %H:%M:%S)} {h({l})} [{M}] - {m}{n}"
+root:
+  level: trace
+  appenders:
+    - stdout
+"#;
+
+pub fn raw_config(level: &str) -> RawConfig {
+    let log_cfg = CFG.replace("trace", level);
+    ::serde_yaml::from_str::<RawConfig>(log_cfg.as_str()).unwrap()
+}
+
 pub async fn start() {
+    // 1.初始化 日志
     // let config_path = global().config_path.clone().unwrap();
-    log4rs::init_raw_config(raw_config("info")).unwrap();
     // log4rs::init_file(config_path + "log4rs.yaml", Default::default()).unwrap();
+    log4rs::init_raw_config(raw_config("info")).unwrap();
+
+    // 2.初始化 数据源
     c::init_rbatis().await;
     // boot::c::init_rbatis_old().await;
 
+    // 3.初始化 数据库
     init::decide_to_init().await;
 
+    // 4.文件系统 监控
     tokio::spawn(async {
-        filesystem::async_watch(global().watch_path.as_ref().unwrap()).await
+        filesystem::async_watch(global().watch_path.as_str()).await
     });
+
+    // 5.巡视索引合法性
     filesystem::async_patrol_watch().await
 }

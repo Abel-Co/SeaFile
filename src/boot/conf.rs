@@ -8,7 +8,7 @@ pub struct Conf {
     pub server: Server,
     pub postgres: Option<Postgres>,
     pub mysql: Option<Mysql>,
-    pub watch_path: Option<String>,
+    pub watch_path: String,
     pub white_list: HashMap<String, Vec<String>>,
 }
 

@@ -170,7 +170,8 @@ const icon_template = {
   'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
   'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
   'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
-  'idx': '#icon-docindex', 'torrent': '#icon-file_bt'
+  'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
+  'epub': '#icon-epub'
 }
 for (let key in icon_template) {
   key.split('|').forEach((ic) => {
