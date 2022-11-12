@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3543302 */
-  src: url('iconfont.woff2?t=1668237479842') format('woff2'),
-       url('iconfont.woff?t=1668237479842') format('woff'),
-       url('iconfont.ttf?t=1668237479842') format('truetype');
+  src: url('iconfont.woff2?t=1668279471001') format('woff2'),
+       url('iconfont.woff?t=1668279471001') format('woff'),
+       url('iconfont.ttf?t=1668279471001') format('truetype');
 }
 
 .icon {
@@ -21,6 +21,30 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-cargo-lock:before {
+  content: "\e602";
+}
+
+.icon-cargo:before {
+  content: "\e603";
+}
+
+.icon-icon_file-dockerfile:before {
+  content: "\e61c";
+}
+
+.icon-git:before {
+  content: "\e72a";
+}
+
+.icon-yarn:before {
+  content: "\e6bd";
+}
+
+.icon-SVG:before {
+  content: "\e6e4";
 }
 
 .icon-apk:before {
