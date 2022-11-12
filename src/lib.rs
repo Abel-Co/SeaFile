@@ -13,7 +13,14 @@ extern crate regex;
 // extern crate serde;
 // extern crate serde_json;
 
-#[macro_use]
 pub mod boot;
 pub mod module;
 
+#[macro_export]
+macro_rules! do_loop {(
+    $body:block while $cond:expr
+) => ({
+    let mut first = true;
+    while ::core::mem::replace(&mut first, false) || $cond
+        $body
+})}

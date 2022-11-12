@@ -91,5 +91,8 @@ pub async fn start() {
     });
 
     // 5.巡视索引合法性
-    filesystem::async_patrol_watch().await
+    filesystem::async_patrol_watch().await;
+
+    // 6.服务守护
+    init::daemon().await
 }

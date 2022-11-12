@@ -2,6 +2,7 @@ pub mod utils;
 pub mod ifile;
 pub mod filesystem;
 pub mod init;
+pub mod samba;
 
 pub mod handler {
     use actix_web::dev::HttpServiceFactory;

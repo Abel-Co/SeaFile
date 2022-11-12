@@ -3,7 +3,7 @@ use rbatis::crud::CRUD;
 
 use crate::boot::c::RB;
 use crate::boot::global;
-use crate::module::ifile;
+use crate::module::{ifile, samba};
 use crate::module::ifile::Files;
 
 pub async fn decide_to_init() {
@@ -24,4 +24,9 @@ pub async fn decide_to_init() {
         let watch_path = global().watch_path.as_str();
         ifile::bs::index(watch_path).await;
     }
+}
+
+pub async fn daemon() {
+
+    samba::daemon_smb().await
 }
