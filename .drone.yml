@@ -41,12 +41,6 @@ steps:
       - ln -s /drone/src/target/.cargo /root/.cargo
       - export CARGO_HOME=~/.cargo
       - echo '[source.crates-io]' > ~/.cargo/config
-#      - echo "replace-with = 'rsproxy'" >> ~/.cargo/config
-#      - echo 'registry = "https://rsproxy.cn/crates.io-index"' >> ~/.cargo/config
-#      - echo '[registries.rsproxy]' >> ~/.cargo/config
-#      - echo 'index = "https://rsproxy.cn/crates.io-index"' >> ~/.cargo/config
-#      - echo '[net]' >> ~/.cargo/config
-#      - echo 'git-fetch-with-cli = true' >> ~/.cargo/config
       - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
 #      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
       - cargo build --release
@@ -60,28 +54,28 @@ steps:
       # event: push
     depends_on:
       - restore
-  - name: 构建镜像
-    image: docker
-    volumes:
-      - name: docker
-        path: /var/run
-    environment:
-      dockerconfig:
-        from_secret: dockerconfig
-    commands:
-      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
-      - repo=registry.cn-beijing.aliyuncs.com/wcik/sea_file:${DRONE_BRANCH##feature/}
-      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
-      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
-      - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
-      - docker push $repo && docker rmi $repo
-      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
-    when:
-      branch: [apr, test01, dev01]
-      # event: push
-    depends_on:
-      - 编译前端
-      - 编译后端
+#  - name: 构建镜像
+#    image: docker
+#    volumes:
+#      - name: docker
+#        path: /var/run
+#    environment:
+#      dockerconfig:
+#        from_secret: dockerconfig
+#    commands:
+#      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
+#      - repo=registry.cn-beijing.aliyuncs.com/wcik/sea_file:${DRONE_BRANCH##feature/}
+#      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
+#      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
+#      - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
+#      - docker push $repo && docker rmi $repo
+#      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
+#    when:
+#      branch: [apr, test01, dev01]
+#      # event: push
+#    depends_on:
+#      - 编译前端
+#      - 编译后端
   - name: 发布应用
     image: alpine/helm
     environment:
