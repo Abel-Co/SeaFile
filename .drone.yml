@@ -41,7 +41,10 @@ steps:
       - ln -s /drone/src/target/.cargo /root/.cargo
       - export CARGO_HOME=~/.cargo
       - echo '[source.crates-io]' > ~/.cargo/config
+      - echo "replace-with = 'rsproxy'" >> ~/.cargo/config
       - echo 'registry = "https://rsproxy.cn/crates.io-index"' >> ~/.cargo/config
+      - echo '[registries.rsproxy]' >> ~/.cargo/config
+      - echo 'index = "https://rsproxy.cn/crates.io-index"' >> ~/.cargo/config
       - echo '[net]' >> ~/.cargo/config
       - echo 'git-fetch-with-cli = true' >> ~/.cargo/config
 #      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
