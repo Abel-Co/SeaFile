@@ -19,9 +19,9 @@ name = "tests"
 path = "tests/lib.rs"
 
 [dependencies]
-actix-web = "4"             # actix-web main
+actix-web = "4.2"             # actix-web main
 actix-files = "0.6"
-actix-web-lab = "0.16"
+actix-web-lab = "0.18"
 async-channel = "1.6"
 futures = "0.3"
 tokio = { version = "1.20", features = ["full"] }
@@ -29,21 +29,21 @@ notify = "5.0.0-pre.16"
 walkdir = "2"
 #bytes = "0.5.6"
 serde = { version = "1", features = ["derive"] }
-serde_yaml = "0.8"          # load config.yaml
+serde_yaml = "0.9"          # load config.yaml
 serde_json = "1.0"
 #serde_qs = "0.7.0"
-validator = { version = "0.15", features = ["derive"] }
+validator = { version = "0.16", features = ["derive"] }
 log4rs = "1.0.0"            # log4rs for log
 log = "0.4"
 rbson = "2.0"
 rbatis = { version = "^3", default-features = false, features = ["postgres", "runtime-async-std-rustls"] }
 once_cell = "1"
 chrono = { version = "0.4", features = ["serde"] }
-jsonwebtoken = "7.2"        # json web token
+jsonwebtoken = "8.1"        # json web token
 rust-crypto = "^0.2"
-bcrypt = "0.9"
+bcrypt = "0.13"
 rand = "0.8"                # Random
 reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
-crc = "2.1"
+crc = "3.0"
 regex = "1.5"
 lazy_static = "1"

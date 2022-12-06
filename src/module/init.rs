@@ -32,6 +32,9 @@ pub async fn daemon() {
     tokio::spawn(async {
         loop {
             samba::daemon_smb().await;
+            // let a = ctrlc::set_handler(move || {
+            //     println!("received Ctrl+C!");
+            // });
             sleep(Duration::from_secs(56))
         }
     });

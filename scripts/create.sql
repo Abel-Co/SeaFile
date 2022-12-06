@@ -14,10 +14,10 @@ drop table if exists files;
 create table files
 (
     id         bigint                    not null primary key,
-    name       varchar(100)              not null,
     kind       varchar(100)              not null,
+    name       varchar(500)              not null,
     size       bigint      default 0     not null,
-    path       varchar(500)              not null,
+    path       varchar(1024)             not null,
     crc        bigint      default 0     not null,
     times      bigint      default 0     not null,
     parent     bigint      default 0     not null,
