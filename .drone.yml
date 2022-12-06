@@ -42,6 +42,8 @@ steps:
       - export CARGO_HOME=~/.cargo
       - echo '[source.crates-io]' > ~/.cargo/config
       - echo 'registry = "https://rsproxy.cn/crates.io-index"' >> ~/.cargo/config
+      - echo '[net]' >> ~/.cargo/config
+      - echo 'git-fetch-with-cli = true' >> ~/.cargo/config
 #      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
 #      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
       - cargo build --release
