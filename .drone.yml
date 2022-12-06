@@ -41,8 +41,9 @@ steps:
       - ln -s /drone/src/target/.cargo /root/.cargo
       - export CARGO_HOME=~/.cargo
       - echo '[source.crates-io]' > ~/.cargo/config
-      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
-      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
+      - echo 'registry = "https://rsproxy.cn/crates.io-index"' >> ~/.cargo/config
+#      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
+#      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
       - cargo build --release
       - cp target/release/sea_file .
       - strip sea_file && upx -9 sea_file
