@@ -69,7 +69,6 @@ steps:
 #      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 #      - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
 #      - docker push $repo && docker rmi $repo
-#      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
     when:
       branch: [apr, test01, dev01]
       # event: push
@@ -110,9 +109,14 @@ steps:
     depends_on:
       - 发布应用
   - name: clean
-    image: alpine
+    image: docker
     pull: if-not-exists
+    volumes:
+      - name: docker
+        path: /var/run
     commands:
+      - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
+      - docker rmi `docker ps -a | grep Exited | awk '{print $1}'` 1 > /dev/null 2>&1 || true
       - exit 0
     depends_on:
       - rebuild
