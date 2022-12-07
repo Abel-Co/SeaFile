@@ -46,9 +46,6 @@ steps:
       - cargo build --release
       - cp target/release/seafile .
       - strip seafile && upx -9 seafile
-      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
-      - cp profiles/$env/* ./
-      - while true; do sleep 1; tar zcvf app.tar.gz dist seafile scripts config.yaml; (($? == 1 )) || break; done
     when:
       branch: [apr, test01, dev01]
       # event: push
@@ -80,6 +77,8 @@ steps:
         from_secret: dockerconfig
     commands:
       - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
+      - cp profiles/$env/* ./
+      - tar zcvf app.tar.gz dist seafile scripts config.yaml
       - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
       - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
