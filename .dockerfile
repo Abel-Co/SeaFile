@@ -1,6 +1,6 @@
 FROM alpine
 
-RUN apk add samba openrc --no-cache \
+RUN apk add samba openrc \
     && mkdir -p /run/openrc && touch /run/openrc/softlevel \
     && chmod -R 711 /home/ && rc-update add samba # && rc-service samba start
 
