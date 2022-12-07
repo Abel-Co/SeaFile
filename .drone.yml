@@ -54,6 +54,22 @@ steps:
       # event: push
     depends_on:
       - restore
+  - name: rebuild
+    image: synchrofood/drone-volume-cache
+    pull: if-not-exists
+    volumes:
+      - name: cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./target
+        - ./webapp/node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+    depends_on:
+      - 编译前端
+      - 编译后端
   - name: 构建镜像
     image: docker
     volumes:
@@ -73,8 +89,7 @@ steps:
       branch: [apr, test01, dev01]
       # event: push
     depends_on:
-      - 编译前端
-      - 编译后端
+      - rebuild
   - name: 发布应用
     image: alpine/helm
     environment:
@@ -93,21 +108,6 @@ steps:
       # event: push
     depends_on:
       - 构建镜像
-  - name: rebuild
-    image: synchrofood/drone-volume-cache
-    pull: if-not-exists
-    volumes:
-    - name: cache
-      path: /cache
-    settings:
-      rebuild: true
-      mount:
-        - ./target
-        - ./webapp/node_modules
-    when:
-      branch: [ apr, test01, dev01 ]
-    depends_on:
-      - 发布应用
   - name: clean
     image: docker
     pull: if-not-exists
@@ -119,7 +119,7 @@ steps:
       - docker rm  `docker ps -a | grep Exited | awk '{print $1}'` 1 > /dev/null 2>&1 || true
       - exit 0
     depends_on:
-      - rebuild
+      - 发布应用
 
 volumes:
   - name: cache
