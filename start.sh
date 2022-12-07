@@ -8,5 +8,5 @@
 
 nohup /sbin/tini -- /usr/bin/samba.sh -u $2 -s $4 &
 
-./sea_file
+./seafile
 

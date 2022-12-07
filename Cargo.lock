@@ -2370,7 +2370,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "sea_file"
+name = "seafile"
 version = "0.1.0"
 dependencies = [
  "actix-files",

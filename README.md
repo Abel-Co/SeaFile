@@ -30,7 +30,7 @@ yarn install && yarn build && cd ..
 cargo build --release
 export env=dev
 cp profiles/$env/config.yaml ./
-tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
+tar zcvf app.tar.gz dist seafile scripts config.yaml start.sh
 ```
 
 ## 镜像
@@ -39,12 +39,12 @@ tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;env、repo 根据实际情况填写：
 
 ```shell
-cp target/release/sea_file .
-strip sea_file && upx -9 sea_file
+cp target/release/seafile .
+strip seafile && upx -9 seafile
 cp profiles/$env/* ./
-tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
+tar zcvf app.tar.gz dist seafile scripts config.yaml start.sh
 mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
-export repo=sea_file
+export repo=seafile
 docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 ```
 
@@ -72,14 +72,14 @@ docker run \
 ```shell
 # 1.部署 postgresql 数据库
 docker run --restart=unless-stopped -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres -d postgres:12-alpine
-# 2.部署 sea_file
+# 2.部署 seafile
 docker run \
 	-d -ti \
-	--name sea_file \
+	--name seafile \
 	-p 8080:8080 -p 139:139 -p 445:445 \
 	-v /data/samba:/mount \
 	-e DATABASE_DSN=postgres://postgres:postgres@192.168.3.120:5432/postgres \
-	abelco/sea_file \
+	abelco/seafile \
 	-u "user;123456" \
 	-s "Samba;/mount/;yes;no;no;all;user;user"
 ```

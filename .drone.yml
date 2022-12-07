@@ -25,7 +25,7 @@ steps:
     depends_on:
       - clone
   - name: 编译前端
-    image: registry.cn-beijing.aliyuncs.com/wcik/node:alpine-auraco
+    image: auraco/node:alpine
     commands:
       # - rm -rf node_modules   # 需要时，可开启，以清理缓存
       - cd webapp && yarn install && yarn build
@@ -44,11 +44,11 @@ steps:
       - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
 #      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
       - cargo build --release
-      - cp target/release/sea_file .
-      - strip sea_file && upx -9 sea_file
+      - cp target/release/seafile .
+      - strip seafile && upx -9 seafile
       - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
       - cp profiles/$env/* ./
-      - tar zcvf app.tar.gz dist sea_file scripts config.yaml start.sh
+      - tar zcvf app.tar.gz dist seafile scripts config.yaml start.sh
     when:
       branch: [apr, test01, dev01]
       # event: push

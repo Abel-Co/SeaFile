@@ -14,4 +14,4 @@ ENV APP_ENV=$APP_ENV
 
 EXPOSE 8080 137/udp 138/udp 139 445
 
-#ENTRYPOINT ["./sea_file"]
+#ENTRYPOINT ["./seafile"]
