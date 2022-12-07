@@ -116,7 +116,7 @@ steps:
         path: /var/run
     commands:
       - docker rmi `docker images | grep none | awk '{print $3}'` 1 > /dev/null 2>&1 || true
-      - docker rmi `docker ps -a | grep Exited | awk '{print $1}'` 1 > /dev/null 2>&1 || true
+      - docker rm  `docker ps -a | grep Exited | awk '{print $1}'` 1 > /dev/null 2>&1 || true
       - exit 0
     depends_on:
       - rebuild
