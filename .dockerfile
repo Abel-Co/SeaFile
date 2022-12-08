@@ -2,12 +2,12 @@ FROM auraco/samba:alpine
 
 EXPOSE 8080 137/udp 138/udp 139 445
 
+WORKDIR /root
+
 ARG APP_ENV
 ENV APP_ENV=$APP_ENV
 
 ADD app.tar.gz ./
-
-WORKDIR /root
 
 #ENTRYPOINT ["./seafile"]
 
