@@ -100,7 +100,8 @@ steps:
       HELM_KUBETOKEN:
         from_secret: kube_token
       HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
-#    commands:
+    commands:
+      - pwd
 #      - echo $PLUGIN_MODE
 #      - echo $PLUGIN_ADD_REPOS
 #      - echo $PLUGIN_RELEASE
