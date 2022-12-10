@@ -90,7 +90,8 @@ steps:
 #    depends_on:
 #      - rebuild
   - name: 发布应用
-    image: alpine/helm
+    image: auraco/helm:alpine
+    pull: if-not-exists
     environment:
       helm_secret:
         from_secret: helm_secret
@@ -99,19 +100,18 @@ steps:
       HELM_KUBETOKEN:
         from_secret: kube_token
       HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
-    commands:
-      - echo $PLUGIN_MODE
-      - echo $PLUGIN_ADD_REPOS
-      - echo $PLUGIN_RELEASE
-      - echo $PLUGIN_CHART
-      - echo $PLUGIN_NAMESPACE
-      - echo $PLUGIN_KUBE_API_SERVER
-      - echo $PLUGIN_KUBE_TOKEN
-      - echo $PLUGIN_SKIP_TLS_VERIFY
-      - echo $helm_secret
-      - echo $HELM_SECRET
-#      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
-#      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+#    commands:
+#      - echo $PLUGIN_MODE
+#      - echo $PLUGIN_ADD_REPOS
+#      - echo $PLUGIN_RELEASE
+#      - echo $PLUGIN_CHART
+#      - echo $PLUGIN_NAMESPACE
+#      - echo $PLUGIN_KUBE_API_SERVER
+#      - echo $PLUGIN_KUBE_TOKEN
+#      - echo $PLUGIN_SKIP_TLS_VERIFY
+#      - echo $helm_secret
+##      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
+##      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
     settings:
       mode: upgrade
       add_repos: "alihelm=https://Ni73Mg:$helm_secret@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik"
