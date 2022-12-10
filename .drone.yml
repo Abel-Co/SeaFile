@@ -100,10 +100,14 @@ steps:
         from_secret: kube_token
       HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
     commands:
-      - stty \-echo
-      - stty --echo
       - echo $PLUGIN_MODE
-      - stty echo
+      - echo $PLUGIN_ADD_REPOS
+      - echo $PLUGIN_RELEASE
+      - echo $PLUGIN_CHART
+      - echo $PLUGIN_NAMESPACE
+      - echo $PLUGIN_KUBE_API_SERVER
+      - echo $PLUGIN_KUBE_TOKEN
+      - echo $PLUGIN_SKIP_TLS_VERIFY
       - echo $helm_secret
       - echo $HELM_SECRET
 #      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
