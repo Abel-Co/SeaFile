@@ -100,8 +100,11 @@ steps:
         from_secret: kube_token
       HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
     commands:
+      - echo $PLUGIN_MODE
 #      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
 #      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+    settings:
+      mode: upgrade
     when:
       branch: [apr, test01, dev01]
       # event: push
