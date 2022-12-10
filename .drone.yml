@@ -95,13 +95,17 @@ steps:
     environment:
       helm_secret:
         from_secret: helm_secret
-      HELM_KUBEAPISERVER:
-        from_secret: kube_api_server
-      HELM_KUBETOKEN:
-        from_secret: kube_token
-      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
+#      HELM_KUBEAPISERVER:
+#        from_secret: kube_api_server
+#      HELM_KUBETOKEN:
+#        from_secret: kube_token
+#      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
     commands:
       - pwd
+      - echo $HELM_KUBEAPISERVER
+      - echo $HELM_KUBETOKEN
+      - echo $HELM_KUBEINSECURE_SKIP_TLS_VERIFY
+      - echo $PLUGIN_ADD_REPOS
 #      - echo $PLUGIN_MODE
 #      - echo $PLUGIN_ADD_REPOS
 #      - echo $PLUGIN_RELEASE
