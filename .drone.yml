@@ -9,132 +9,104 @@ trigger:
   # environment: stating production
 
 steps:
-#  - name: restore
-#    image: synchrofood/drone-volume-cache
-#    pull: if-not-exists
-#    volumes:
-#    - name: cache
-#      path: /cache
-#    settings:
-#      restore: true
-#      mount:
-#        - ./target
-#        - ./webapp/node_modules
-#    when:
-#      branch: [ apr, test01, dev01 ]
-#    depends_on:
-#      - clone
-#  - name: 编译前端
-#    image: auraco/node:alpine
-#    commands:
-#      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
-#      - cd webapp && yarn install && yarn build
-#    when:
-#      branch: [apr, test01, dev01]
-#      # event: push
-#    depends_on:
-#      - restore
-#  - name: 编译后端
-#    image: auraco/rust:alpine
-#    commands:
-#      - mkdir -p target/.cargo
-#      - ln -s /drone/src/target/.cargo /root/.cargo
-#      - export CARGO_HOME=~/.cargo
-#      - echo '[source.crates-io]' > ~/.cargo/config
-#      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
-##      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
-#      - cargo build --release
-#      - cp target/release/seafile .
-#      - strip seafile && upx -9 seafile
-#    when:
-#      branch: [apr, test01, dev01]
-#      # event: push
-#    depends_on:
-#      - restore
-#  - name: rebuild
-#    image: synchrofood/drone-volume-cache
-#    pull: if-not-exists
-#    volumes:
-#      - name: cache
-#        path: /cache
-#    settings:
-#      rebuild: true
-#      mount:
-#        - ./target
-#        - ./webapp/node_modules
-#    when:
-#      branch: [ apr, test01, dev01 ]
-#    depends_on:
-#      - 编译前端
-#      - 编译后端
-#  - name: 构建镜像
-#    image: docker
-#    volumes:
-#      - name: docker
-#        path: /var/run
-#    environment:
-#      dockerconfig:
-#        from_secret: dockerconfig
-#    commands:
-#      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
-#      - cp profiles/$env/* ./
-#      - tar zcvf app.tar.gz dist seafile scripts config.yaml
-#      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
-#      - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
-#      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
-#      - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
-#      - docker push $repo && docker rmi $repo
-#    when:
-#      branch: [apr, test01, dev01]
-#      # event: push
-#    depends_on:
-#      - rebuild
-  - name: 发布应用
-    image: auraco/helm:alpine
+  - name: restore
+    image: synchrofood/drone-volume-cache
     pull: if-not-exists
-    environment:
-      helm_secret:
-        from_secret: helm_secret
-#      HELM_KUBEAPISERVER:
-#        from_secret: kube_api_server
-#      HELM_KUBETOKEN:
-#        from_secret: kube_token
-#      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
-#    commands:
-#      - pwd
-#      - echo $HELM_KUBEAPISERVER
-#      - echo $HELM_KUBETOKEN
-#      - echo $HELM_KUBEINSECURE_SKIP_TLS_VERIFY
-#      - echo $PLUGIN_ADD_REPOS
-#      - echo $PLUGIN_MODE
-#      - echo $PLUGIN_ADD_REPOS
-#      - echo $PLUGIN_RELEASE
-#      - echo $PLUGIN_CHART
-#      - echo $PLUGIN_NAMESPACE
-#      - echo $PLUGIN_KUBE_API_SERVER
-#      - echo $PLUGIN_KUBE_TOKEN
-#      - echo $PLUGIN_SKIP_TLS_VERIFY
-#      - echo $helm_secret
-##      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
-##      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+    volumes:
+    - name: cache
+      path: /cache
     settings:
-      mode: upgrade
-      add_repos: "alihelm=https://Ni73Mg:$helm_secret@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik"
-      release: seafile
-      chart: alihelm/seafile
-      namespace: ${DRONE_BRANCH##feature/}
-      kube_api_server:
-        from_secret: kube_api_server
-      kube_token:
-        from_secret: kube_token
-      timeout: "3m20s"
-      wait_for_upgrade: true
-      skip_tls_verify: true
+      restore: true
+      mount:
+        - ./target
+        - ./webapp/node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+    depends_on:
+      - clone
+  - name: 编译前端
+    image: auraco/node:alpine
+    commands:
+      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
+      - cd webapp && yarn install && yarn build
     when:
       branch: [apr, test01, dev01]
       # event: push
-#    depends_on:
-#      - 构建镜像
+    depends_on:
+      - restore
+  - name: 编译后端
+    image: auraco/rust:alpine
+    commands:
+      - mkdir -p target/.cargo
+      - ln -s /drone/src/target/.cargo /root/.cargo
+      - export CARGO_HOME=~/.cargo
+      - echo '[source.crates-io]' > ~/.cargo/config
+      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
+#      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
+      - cargo build --release
+      - cp target/release/seafile .
+      - strip seafile && upx -9 seafile
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+    depends_on:
+      - restore
+  - name: rebuild
+    image: synchrofood/drone-volume-cache
+    pull: if-not-exists
+    volumes:
+      - name: cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./target
+        - ./webapp/node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+    depends_on:
+      - 编译前端
+      - 编译后端
+  - name: 构建镜像
+    image: docker
+    volumes:
+      - name: docker
+        path: /var/run
+    environment:
+      dockerconfig:
+        from_secret: dockerconfig
+    commands:
+      - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
+      - cp profiles/$env/* ./
+      - tar zcvf app.tar.gz dist seafile scripts config.yaml
+      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
+      - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
+      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
+      - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
+      - docker push $repo && docker rmi $repo
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+    depends_on:
+      - rebuild
+  - name: 发布应用
+    image: alpine/helm
+    environment:
+      helm_secret:
+        from_secret: helm_secret
+      HELM_KUBEAPISERVER:
+        from_secret: kube_api_server
+      HELM_KUBETOKEN:
+        from_secret: kube_token
+      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
+    commands:
+#      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
+#      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+    depends_on:
+      - 构建镜像
   - name: clean
     image: docker
     pull: if-not-exists
