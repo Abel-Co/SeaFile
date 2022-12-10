@@ -8,6 +8,10 @@ end
 $$
 language plpgsql;
 
+-- 添加/删除 trigger
+create trigger user_timestamp before update on files for each row execute procedure upd_timestamp();
+drop trigger user_timestamp on files;
+
 -- 联合索引：减少开销，一条抵 N 条。（参考 索引最左原则）
 -- 文件表
 drop table if exists files;
@@ -24,7 +28,7 @@ create table files
     created_at timestamptz default now() not null,
     updated_at timestamptz default now() not null
 );
-create trigger user_timestamp before update on files for each row execute procedure upd_timestamp();
+create trigger file_timestamp before update on files for each row execute procedure upd_timestamp();
 create index idx_name on files (name);
 create index idx_kind on files (kind);
 create index idx_size on files (size);
