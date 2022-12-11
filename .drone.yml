@@ -105,6 +105,7 @@ steps:
 #      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
     settings:
       add_repos: alihelm=https://Ni73Mg:$helm_secret@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik
+      
     when:
       branch: [apr, test01, dev01]
       # event: push
