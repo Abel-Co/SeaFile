@@ -57,7 +57,6 @@ onMounted(() => {
       clearInterval(interval)
       dom[0].click()
     }
-    console.log('hello wold', interval)
   }, 150)
 })
 </script>

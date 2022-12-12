@@ -1,7 +1,9 @@
 <template>
   <!--  <h1></h1>-->
   <div class="wrapper">
-    <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
+    <a href="#/">
+      <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
+    </a>
     <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
@@ -41,7 +43,7 @@
             </svg>
             <span
                 style="width: 27.5%; position: absolute; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-              <a href="#" @click.prevent="show(item)">{{ item.name }}</a>
+              <a href="#" @click.prevent="handle_click(item)">{{ item.name }}</a>
             </span>
             <span class="iconfont" @click="remove(item)" v-visible="!item.active">&#xe6b4;</span>
             <span class="iconfont" @click="refresh(item)"
@@ -74,6 +76,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { get } from '../utils/request'
+import { useRoute, useRouter } from "vue-router"
 
 const q = ref(null)
 const qh = ref(null)
@@ -81,6 +84,9 @@ const count = ref(0)
 const input = ref(null)
 const root_id = ref(0)
 const list = reactive([])
+const folders = reactive({})
+const route = useRoute()
+const router = useRouter()
 const checked = computed(() => list.filter(item => item.checked))
 const checkedAll = computed({
   get() {
@@ -89,6 +95,20 @@ const checkedAll = computed({
   set(val) {
     list.forEach(item => item.checked = val)
   }
+})
+
+router.beforeEach(async (to, from) => {
+  let item = folders[decodeURIComponent(to.path.split('/').pop())] ?? { kind: 'Folder', name: '', id: 0 }
+  show_child(item)
+  // console.log(to)
+  // list.push(...[])
+})
+// router.beforeResolve(async () => {
+//   // list.push(...[])
+// })
+router.afterEach(async (to, from, failure) => {
+  // console.log(location.hash)
+  // console.log(route.query.id)
 })
 
 function search() {
@@ -100,7 +120,7 @@ function search() {
         list.push(...resp.data)
       })
     } else {
-      show({ kind: 'Folder', id: 0 })
+      show_child({ kind: 'Folder', id: 0 })
     }
   }
   search()
@@ -108,18 +128,20 @@ function search() {
   input.value.focus()
 }
 
-function show(item) {
+function show_child(item) {
+  (async () => {
+    list.length = 0
+    get(`/list/${item.id}`).then((resp) => {
+      list.push(...resp.data)
+    })
+  })()
+}
+
+function handle_click(item) {
   if (item.kind === 'Folder') {
-    (async () => {
-      list.length = 0
-      get(`/list/${item.id}`).then((resp) => {
-        if (item.id === 0) root_id.value = resp.data.id
-        // if (root_id.value !== resp.data.id) {
-        //   list.push(Object.assign({}, item, {id: item.parent ?? 0, name: ' . . /', kind: 'Folder'}))
-        // }
-        list.push(...resp.data)
-      })
-    })()
+    folders[item.name] = item
+    let to = `${location.hash.split('#').pop()}/${item.name}`.replace('//', '/')
+    router.push({ path: `${to}` })
   } else if (item.kind === 'File') {
     // window["item"] = item
     let fileExtension = item.name.split('.').pop().toLowerCase()
@@ -138,7 +160,7 @@ function show(item) {
 }
 
 onMounted(() => {
-  show({ kind: 'Folder', id: 0 })
+  show_child({ kind: 'Folder', name: '', id: 0 })
   // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
 })
 
@@ -154,11 +176,11 @@ function downloadAllChecked() {
 }
 
 function byteToText(size) {
-  if (size === 0) return "0 B";
-  let k = 1024;
+  if (size === 0) return "0 B"
+  let k = 1024
   let sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      i = Math.floor(Math.log(size) / Math.log(k));
-  return (size / Math.pow(k, i)).toPrecision(3) + " " + sizes[i];
+      i = Math.floor(Math.log(size) / Math.log(k))
+  return (size / Math.pow(k, i)).toPrecision(3) + " " + sizes[i]
 }
 
 const icons = {}
@@ -170,7 +192,10 @@ const icon_template = {
   'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
   'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
   'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
-  'idx': '#icon-docindex', 'torrent': '#icon-file_bt'
+  'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
+  'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
+  'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
+  'sh': '#icon-a-kuozhanicon_huaban1fuben33'
 }
 for (let key in icon_template) {
   key.split('|').forEach((ic) => {
@@ -183,6 +208,9 @@ const icon = (item) => {
     return '#icon-folder'
   } else {
     let fileExtension = item.name.split('.').pop().toLowerCase()
+    if (fileExtension === 'toml' || fileExtension === 'lock') {
+      return icons[item.name.toLowerCase()]
+    }
     return icons[fileExtension]
   }
 }
@@ -214,6 +242,8 @@ window.onfocus = () => {
 .logo {
   width: 40%;
   margin: 10px;
+  cursor: pointer;
+  background-image: url("../assets/logo.svg");
 }
 
 a {
