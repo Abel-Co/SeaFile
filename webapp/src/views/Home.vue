@@ -4,7 +4,7 @@
     <a href="#/">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
     </a>
-    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus />
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
     <!--    <span>选择的值为: {{ checked }}</span>-->
@@ -98,8 +98,13 @@ const checkedAll = computed({
 })
 
 router.beforeEach(async (to, from) => {
-  let item = folders[decodeURIComponent(to.path.split('/').pop())] ?? { kind: 'Folder', name: '', id: 0 }
-  show_child(item)
+  if (Object.keys(to.query).length === 0) {
+    let _item = folders[decodeURIComponent(to.path.split('/').pop())]
+    let item = _item ?? { kind: 'Folder', id: 0 }
+    show(item)
+  } else {
+    show(null, to.query["q"])
+  }
   // console.log(to)
   // list.push(...[])
 })
@@ -113,34 +118,32 @@ router.afterEach(async (to, from, failure) => {
 
 function search() {
   qh.value = q.value
-  const search = async () => {
-    list.length = 0
-    if (q.value) {
-      get(`/search/${q.value}`).then((resp) => {
-        list.push(...resp.data)
-      })
-    } else {
-      show_child({ kind: 'Folder', id: 0 })
-    }
+  if (q.value) {
+    router.push({ path: '/', query: { q: q.value } })
+  } else {
+    router.push({ path: '/' })
   }
-  search()
-  q.value = ''
-  input.value.focus()
 }
 
-function show_child(item) {
+function show(item, query) {
   (async () => {
     list.length = 0
-    get(`/list/${item.id}`).then((resp) => {
-      list.push(...resp.data)
-    })
+    if (item) {
+      get(`/list/${item.id}`).then((resp) => {
+        list.push(...resp.data)
+      })
+    } else if (query) {
+      get(`/search/${query}`).then((resp) => {
+        list.push(...resp.data)
+      })
+    }
   })()
 }
 
 function handle_click(item) {
   if (item.kind === 'Folder') {
     folders[item.name] = item
-    let to = `${location.hash.split('#').pop()}/${item.name}`.replace('//', '/')
+    let to = `${location.hash.split('#').pop()}/${item.name}`.replace(/\?q=.*?\//, '').replace('//', '/')
     router.push({ path: `${to}` })
   } else if (item.kind === 'File') {
     // window["item"] = item
@@ -160,8 +163,8 @@ function handle_click(item) {
 }
 
 onMounted(() => {
-  if (location.hash.length > 2) router.push({path: '/'})
-  else show_child({ kind: 'Folder', name: '', id: 0 })
+  if (location.hash.length > 2) router.push({ path: '/' })
+  else show({ kind: 'Folder', name: '', id: 0 })
   // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
 })
 
