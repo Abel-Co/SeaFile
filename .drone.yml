@@ -89,28 +89,42 @@ steps:
       # event: push
     depends_on:
       - rebuild
-  - name: 发布应用
-    image: auraco/helm:alpine   # alpine/helm
-    pull: if-not-exists
-    environment:
-      helm_secret:
-        from_secret: helm_secret
-      HELM_KUBEAPISERVER:
-        from_secret: kube_api_server
-      HELM_KUBETOKEN:
-        from_secret: kube_token
-      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
+#  - name: 发布应用
+#    image: alpine/helm
+#    environment:
+#      helm_secret:
+#        from_secret: helm_secret
+#      HELM_KUBEAPISERVER:
+#        from_secret: kube_api_server
+#      HELM_KUBETOKEN:
+#        from_secret: kube_token
+#      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
 #    commands:
-#      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
-#      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+##      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
+##      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+#    when:
+#      branch: [apr, test01, dev01]
+#      # event: push
+#    depends_on:
+#      - 构建镜像
+  - name: 发布应用
+    image: pelotech/drone-helm3
+    environment:
+     helm_secret:
+       from_secret: helm_secret
     settings:
-      add_repos: alihelm=https://Ni73Mg:$helm_secret@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik
-      
-    when:
-      branch: [apr, test01, dev01]
-      # event: push
-    depends_on:
-      - 构建镜像
+     mode: upgrade
+     add_repos: "alihelm=https://Ni73Mg:${helm_secret}@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik"
+     release: favorites
+     chart: alihelm/favorites
+     namespace: ${DRONE_BRANCH##feature/}
+     kube_api_server:
+       from_secret: kube_api_server
+     kube_token:
+       from_secret: kube_token
+     timeout: "3m20s"
+     wait_for_upgrade: true
+     skip_tls_verify: true
   - name: clean
     image: docker
     pull: if-not-exists
