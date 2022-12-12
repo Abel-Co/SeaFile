@@ -69,6 +69,7 @@ steps:
       - 编译后端
   - name: 构建镜像
     image: docker
+    pull: if-not-exists
     volumes:
       - name: docker
         path: /var/run
@@ -91,6 +92,7 @@ steps:
       - rebuild
   - name: 发布应用
     image: alpine/helm
+    pull: if-not-exists
     environment:
       helm_secret:
         from_secret: helm_secret
