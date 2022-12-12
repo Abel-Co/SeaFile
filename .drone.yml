@@ -114,7 +114,7 @@ steps:
        from_secret: helm_secret
     settings:
      mode: upgrade
-     add_repos: "alihelm=https://Ni73Mg:${helm_secret}@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik"
+     add_repos: "alihelm=https://Ni73Mg:$helm_secret@repomanage.rdc.aliyun.com/helm_repositories/111122-wcik"
      release: favorites
      chart: alihelm/favorites
      namespace: ${DRONE_BRANCH##feature/}
