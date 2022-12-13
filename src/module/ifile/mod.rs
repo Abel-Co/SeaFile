@@ -1,5 +1,6 @@
 use std::{cmp, fs};
 use std::cmp::Ordering;
+use std::ffi::OsStr;
 use std::path::Path;
 
 use rbatis::snowflake::new_snowflake_id;
@@ -30,11 +31,13 @@ impl Files {
     pub async fn new(kind: String, path: &str) -> Self {
         let _file = Path::new(path);
         let parent_path = if let Some(_path)
-            = _file.parent() { _path.to_str().unwrap() } else { "/" };
+            = _file.parent() { _path.to_str().unwrap() } else { "" };
+        let _file_name = if let Some(_name) = _file.file_name() {
+            _name.to_str().unwrap() } else { "" };
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
-            name: format!("{}", _file.file_name().unwrap().to_str().unwrap()),
+            name: _file_name.to_string(),
             parent: dao::check(parent_path).await.map_or(0, |p_file| p_file.id),
             size: fs::metadata(path).map_or(0, |meta| meta.len()),
             kind,
