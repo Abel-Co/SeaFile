@@ -32,7 +32,7 @@ impl Files {
         let parent_path = if let Some(_path)
             = _file.parent() { _path.to_str().unwrap() } else { "" };
         let _file_name = if let Some(_name) = _file.file_name() {
-            _name.to_str().unwrap() } else { "" };
+            _name.to_str().unwrap() } else { "/" };
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
