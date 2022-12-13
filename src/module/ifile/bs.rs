@@ -78,18 +78,19 @@ pub async fn index(path: &str) {
         // let _ = ifile::dao::delete_children(path.as_str()).await;
         // 1.发现数据
         for entry in WalkDir::new(path.clone()) {
-            let entry = entry.unwrap();
-            match entry.file_type() {
-                file_type if file_type.is_file() => {
-                    save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+            if let Ok(entry) = entry {
+                match entry.file_type() {
+                    file_type if file_type.is_file() => {
+                        save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                    }
+                    file_type if file_type.is_dir() => {
+                        save_or_update(CreateKind::Folder, entry.path().to_str().unwrap()).await;
+                    }
+                    file_type if file_type.is_symlink() => {
+                        save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                    }
+                    _ => {}
                 }
-                file_type if file_type.is_dir() => {
-                    save_or_update(CreateKind::Folder, entry.path().to_str().unwrap()).await;
-                }
-                file_type if file_type.is_symlink() => {
-                    save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
-                }
-                _ => {}
             }
         }
         // 2.清理索引
