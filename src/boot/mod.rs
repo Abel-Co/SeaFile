@@ -5,7 +5,7 @@ use log4rs::config::RawConfig;
 use once_cell::sync::OnceCell;
 
 use crate::boot::conf::{Conf, Postgres};
-use crate::module::{filesystem, init};
+use crate::module::init;
 
 pub mod c;
 pub mod conf;
@@ -80,19 +80,10 @@ pub async fn start() {
 
     // 2.初始化 数据源
     c::init_rbatis().await;
-    // boot::c::init_rbatis_old().await;
 
     // 3.初始化 数据库
     init::decide_to_init().await;
 
-    // 4.文件系统 监控
-    tokio::spawn(async {
-        filesystem::async_watch(global().watch_path.as_str()).await
-    });
-
-    // 5.巡视索引合法性
-    filesystem::async_patrol_watch().await;
-
-    // 6.服务守护
+    // 4.启动后台服务守护
     init::daemon().await
 }

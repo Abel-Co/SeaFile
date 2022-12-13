@@ -119,7 +119,11 @@ router.afterEach(async (to, from, failure) => {
 function search() {
   qh.value = q.value
   if (q.value) {
-    router.push({ path: '/', query: { q: q.value } })
+    if (location.hash.split('#/').pop === `?q=${q.value}`) {
+      show(null, q.value)
+    } else {
+      router.push({ path: '/', query: { q: q.value } })
+    }
   } else {
     router.push({ path: '/' })
   }

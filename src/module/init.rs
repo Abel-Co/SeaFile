@@ -1,11 +1,13 @@
+use std::{thread};
 use std::thread::sleep;
 use std::time::Duration;
+use futures::executor::block_on;
 use notify::event::CreateKind;
 use rbatis::crud::CRUD;
 
 use crate::boot::c::RB;
 use crate::boot::global;
-use crate::module::{ifile, samba};
+use crate::module::{filesystem, ifile, samba};
 use crate::module::ifile::Files;
 
 pub async fn decide_to_init() {
@@ -29,13 +31,24 @@ pub async fn decide_to_init() {
 }
 
 pub async fn daemon() {
-    tokio::spawn(async {
+    // 1.文件系统 监视
+    thread::spawn(|| {
+        block_on(async {
+            let _ = filesystem::async_watch(global().watch_path.as_str()).await;
+        })
+    });
+
+    // 2.索引合法性巡视
+    filesystem::async_patrol_watch().await;
+
+    // 3.samba服务保活
+    thread::spawn(|| {
         loop {
-            samba::daemon_smb().await;
-            // let a = ctrlc::set_handler(move || {
-            //     println!("received Ctrl+C!");
-            // });
+            block_on(async {
+                samba::daemon_smb().await;
+            });
             sleep(Duration::from_secs(56))
         }
     });
+
 }

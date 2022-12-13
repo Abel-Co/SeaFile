@@ -1,8 +1,7 @@
-use std::cmp::Ordering;
 use std::{cmp, fs};
+use std::cmp::Ordering;
 use std::path::Path;
 
-use futures::executor::block_on;
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
 use regex::Regex;
@@ -28,14 +27,14 @@ pub struct Files {
 }
 
 impl Files {
-    pub fn new(kind: String, path: &str) -> Self {
+    pub async fn new(kind: String, path: &str) -> Self {
         let _file = Path::new(path);
         let parent_path = _file.parent().unwrap().to_str().unwrap();
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
             name: format!("{}", _file.file_name().unwrap().to_str().unwrap()),
-            parent: block_on(async { dao::check(parent_path).await.map_or(0, |p_file| p_file.id) }),
+            parent: dao::check(parent_path).await.map_or(0, |p_file| p_file.id),
             size: fs::metadata(path).map_or(0, |meta| meta.len()),
             kind,
             crc: crc_utils::crc_i64(path),

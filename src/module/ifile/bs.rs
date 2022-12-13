@@ -47,8 +47,8 @@ pub async fn show(id: i64) -> String {
 
 pub async fn save_or_update(kind: CreateKind, path: &str) {
     match ifile::dao::check(path).await {
-        Some(_file) => ifile::dao::update(_file.id, Files::new(format!("{:?}", kind), path)).await,
-        None => ifile::dao::save(Files::new(format!("{:?}", kind), path)).await
+        Some(_file) => ifile::dao::update(_file.id, Files::new(format!("{:?}", kind), path).await).await,
+        None => ifile::dao::save(Files::new(format!("{:?}", kind), path).await).await
     };
 }
 
