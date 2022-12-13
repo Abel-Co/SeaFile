@@ -6,7 +6,7 @@
     </a>
     <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus />
     <button class="search-btn" type="button" @click="search">搜 索</button>
-    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
+<!--    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>-->
     <!--    <span>选择的值为: {{ checked }}</span>-->
     <div style="width:1200px;height: 20px;margin: 13px auto;">
       <button class="iconfont" @click="downloadAllChecked()" v-show="checked.length > 0"
