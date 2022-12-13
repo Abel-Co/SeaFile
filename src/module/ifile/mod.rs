@@ -1,6 +1,5 @@
 use std::{cmp, fs};
 use std::cmp::Ordering;
-use std::ffi::OsStr;
 use std::path::Path;
 
 use rbatis::snowflake::new_snowflake_id;
