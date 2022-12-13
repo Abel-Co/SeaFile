@@ -29,7 +29,8 @@ pub struct Files {
 impl Files {
     pub async fn new(kind: String, path: &str) -> Self {
         let _file = Path::new(path);
-        let parent_path = _file.parent().unwrap().to_str().unwrap();
+        let parent_path = if let Some(_path) = _file.parent() {
+            _path.to_str().unwrap() } else { "/" };
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
