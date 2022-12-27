@@ -3,7 +3,6 @@ import vue from '@vitejs/plugin-vue'
 import importToCDN from 'vite-plugin-cdn-import'
 import viteCompression from 'vite-plugin-compression';
 
-
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
   let viteConfig = { plugins: [vue()], build: { outDir: '../dist' } }
@@ -13,13 +12,13 @@ export default defineConfig(({ command, mode }) => {
     viteConfig.define = { __APP_ENV__: mode }
     viteConfig.plugins.push(...importToCDN({
       modules: [
-        { name: 'vue', var: 'Vue', path: 'https://cdn.jsdelivr.net/npm/vue@3.2.37/dist/vue.global.min.js' },
-        { name: 'vuex', var: 'Vuex', path: 'https://cdn.jsdelivr.net/npm/vuex@4.0.2/dist/vuex.global.min.js' },
+        { name: 'vue', var: 'Vue', path: 'https://cdn.jsdelivr.net/npm/vue@3.2.45/dist/vue.global.min.js' },
+        { name: 'vuex', var: 'Vuex', path: 'https://cdn.jsdelivr.net/npm/vuex@4.1.0/dist/vuex.global.min.js' },
         {
           name: 'vue-router', var: 'VueRouter',
           path: 'https://cdn.jsdelivr.net/npm/vue-router@4.0.15/dist/vue-router.global.min.js'
         },
-        { name: 'axios', var: 'axios', path: 'https://cdn.jsdelivr.net/npm/axios@0.27.2/dist/axios.min.js' },
+        { name: 'axios', var: 'axios', path: 'https://cdn.jsdelivr.net/npm/axios@1.2.1/dist/axios.min.js' },
       ]
     })/*, viteCompression({
       ext: ".br",
