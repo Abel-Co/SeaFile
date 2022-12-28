@@ -83,6 +83,7 @@ steps:
       - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
       - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
+      - echo $dockerconfig
       - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
       - docker push $repo && docker rmi $repo
     when:
