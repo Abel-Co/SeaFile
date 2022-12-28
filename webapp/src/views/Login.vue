@@ -7,17 +7,17 @@
           <ul>
             <li>
               <comp-input
-                  v-model="accountLoginData.userAccount"
-                  name="userAccount"
+                  v-model="user.username"
+                  name="username"
                   data-vv-as="账号"
                   :placeholder="'请输入邮箱'"
-                  key="login-account"
+                  key="login-username"
               ></comp-input>
             </li>
             <li>
             <comp-input
-                v-model="accountLoginData.userPassword"
-                name="userPassword"
+                v-model="user.password"
+                name="password"
                 type="password"
                 data-vv-as="密码"
                 key="login-password"
@@ -31,6 +31,17 @@
 
   </div>
 </template>
+
+<script setup>
+import { onMounted, reactive } from 'vue'
+
+const user = reactive({})
+
+function login() {
+  console.log(user)
+}
+
+</script>
 
 <script>
 import { mapGetters } from 'vuex'
@@ -79,67 +90,51 @@ export default {
 }
 </script>
 
-<!--<style lang="less" scoped>-->
-<!--.login {-->
-<!--  position: relative;-->
-<!--  width: 680px;-->
-<!--  height: 436px;-->
-<!--  border-radius: 28px;-->
-<!--  background: #FFFFFF url('~@/assets/img/login_bg.png') no-repeat center center;-->
-<!--  background-size: cover;-->
+<style lang="less" scoped>
+.login {
+  position: relative;
+  width: 680px;
+  height: 436px;
+  border-radius: 28px;
+  background: #FFFFFF url('../assets/logo.svg') no-repeat center center;
+  background-size: cover;
 
-<!--  .login-rg {-->
-<!--    position: absolute;-->
-<!--    right: 40px;-->
-<!--    top: 73px;-->
+  .login-rg {
+    position: absolute;
+    right: 40px;
+    top: 73px;
 
-<!--    img {-->
-<!--      width: 97px;-->
-<!--      height: 32px;-->
-<!--      margin: 7px 0;-->
-<!--    }-->
+    img {
+      width: 97px;
+      height: 32px;
+      margin: 7px 0;
+    }
 
-<!--    .label {-->
-<!--      font-size: 14px;-->
-<!--      line-height: 20px;-->
-<!--      margin-bottom: 20px;-->
-<!--    }-->
-<!--  }-->
+    .label {
+      font-size: 14px;
+      line-height: 20px;
+      margin-bottom: 20px;
+    }
+  }
 
-<!--}-->
+}
 
-<!--.login&#45;&#45;inputs {-->
-<!--  width: 256px;-->
+.login--inputs {
+  width: 256px;
 
-<!--  li {-->
-<!--    margin-top: 20px;-->
-<!--  }-->
-<!--}-->
+  li {
+    margin-top: 20px;
+  }
+}
 
-<!--.login&#45;&#45;btn {-->
-<!--  width: 100%;-->
-<!--  border-radius: 8px;-->
-<!--  font-size: 14px;-->
-<!--  margin-top: 20px;-->
-<!--}-->
-<!--</style>-->
+.login--btn {
+  width: 100%;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 20px;
+}
+</style>
 
 
-<!--<template>-->
-<!--  <div>-->
-<!--    <input name="username" v-model="user.username" @keydown.enter="login">-->
-<!--    <input name="password" v-model="user.password" @keydown.enter="login">-->
-<!--    <button @click="login" >登录</button>-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script setup>-->
-<!--import { onMounted, reactive } from 'vue'-->
-
-<!--const user = reactive({})-->
-
-<!--function login() {-->
-<!--  console.log(user)-->
-<!--}-->
-
-<!--</script>-->
+<!-- <input name="username" v-model="user.username" @keydown.enter="login"> -->
+<!-- <button @click="login" >登录</button> -->
