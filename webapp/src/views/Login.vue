@@ -1,32 +1,35 @@
 <template>
   <div class="login">
     <div class="login-rg">
-      <div class="label">账号登陆</div>
+      <h1 class="label">登陆</h1>
       <div class="login--inputs">
-        <form>
+        <form @keydown.enter="handleSubmit">
           <ul>
             <li>
               <comp-input
                   v-model="user.username"
                   name="username"
                   data-vv-as="账号"
-                  :placeholder="'请输入邮箱'"
+                  v-validate="'required'"
+                  :placeholder="'请输入账号'"
                   key="login-username"
               ></comp-input>
             </li>
             <li>
-            <comp-input
-                v-model="user.password"
-                name="password"
-                type="password"
-                data-vv-as="密码"
-                key="login-password"
-            ></comp-input>
+              <comp-input
+                  v-model="user.password"
+                  name="password"
+                  type="password"
+                  data-vv-as="密码"
+                  v-validate="'required'"
+                  :placeholder="'请输入密码'"
+                  key="login-password"
+              ></comp-input>
             </li>
           </ul>
         </form>
       </div>
-      <button class="login--btn" themes="primary" @click="handleSubmit" text="登录"></button>
+      <comp-button class="login--btn" themes="primary" @click="handleSubmit"></comp-button>
     </div>
 
   </div>
@@ -37,72 +40,38 @@ import { onMounted, reactive } from 'vue'
 
 const user = reactive({})
 
-function login() {
-  console.log(user)
-}
-
-</script>
-
-<script>
-import { mapGetters } from 'vuex'
-
-export default {
-  name: 'Login',
-  data() {
-    return {
-      accountLoginData: {
-        userAccount: '',
-        userPassword: ''
-      },
-      loading: false
-    }
-  },
-  computed: {
-    ...mapGetters(['isVisible'])
-  },
-  mounted() {
-    this.$nextTick(() => {
-      document.addEventListener('keyup', (e) => {
-        if (e.keyCode == 27) {
-          this.$emit('close')
-        } else if (e.keyCode == 13 || e.keyCode == 108) {
-          this.handleSubmit()
-        }
-      })
+async function handleSubmit() {
+  console.log('hello world')
+  let validResult = await this.$validator.validate()
+  if (validResult) {
+    this.loading = true
+    this.$store.dispatch('LoginByUsername', this.accountLoginData).then(() => {
+      this.loading = false
+      this.$emit('close')
+    }).catch((error) => {
+      this.loading = false
+      this.$message.error(error)
     })
-  },
-  methods: {
-    async handleSubmit() {
-      let validResult = await this.$validator.validate()
-      if (validResult) {
-        this.loading = true
-        this.$store.dispatch('LoginByUsername', this.accountLoginData).then(() => {
-          this.loading = false
-          this.$emit('close')
-        })
-            .catch((error) => {
-              this.loading = false
-              this.$message.error(error)
-            })
-      }
-    }
   }
 }
+
 </script>
 
 <style lang="less" scoped>
 .login {
-  position: relative;
-  width: 680px;
-  height: 436px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 50%;
+  -webkit-transform: translateX(-50%) translateY(-50%);
   border-radius: 28px;
-  background: #FFFFFF url('../assets/logo.svg') no-repeat center center;
+  //background: #FFFFFF url('../assets/logo.svg') no-repeat center center;
   background-size: cover;
 
   .login-rg {
-    position: absolute;
-    right: 40px;
-    top: 73px;
+    width: 400px;
+    margin: 73px auto auto;
 
     img {
       width: 97px;
@@ -111,7 +80,7 @@ export default {
     }
 
     .label {
-      font-size: 14px;
+      font-size: 34px;
       line-height: 20px;
       margin-bottom: 20px;
     }
@@ -120,7 +89,7 @@ export default {
 }
 
 .login--inputs {
-  width: 256px;
+  width: 356px;
 
   li {
     margin-top: 20px;
@@ -134,7 +103,3 @@ export default {
   margin-top: 20px;
 }
 </style>
-
-
-<!-- <input name="username" v-model="user.username" @keydown.enter="login"> -->
-<!-- <button @click="login" >登录</button> -->

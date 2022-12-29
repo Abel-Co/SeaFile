@@ -7,8 +7,8 @@ Object.assign(components)
 export default {
   install(app) {
     Object.keys(components).forEach(path => {
-      const item = components[path].default
-      app.component(`comp-${decamelize(item.name)}`, item)
+      const name = decamelize(path.split(/[./]/)[2])
+      app.component(`comp-${name}`, components[path].default)
     })
   }
 }
