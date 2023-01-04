@@ -3,8 +3,6 @@ use rbatis::TimestampZ;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-// use crate::module::auth::Login;
-
 pub mod api;
 pub mod bs;
 pub mod dao;
