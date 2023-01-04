@@ -50,7 +50,7 @@ pub struct Users {
     pub updated_at: Option<TimestampZ>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
+#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
 pub enum UserType {
     Admin,
     #[default]

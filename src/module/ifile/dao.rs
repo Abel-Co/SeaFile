@@ -15,12 +15,12 @@ pub async fn check(path: &str) -> Option<Files> {
     ).await.unwrap()
 }
 
-pub async fn search(name: &str) -> Vec<Files> {
+pub async fn search(account: &str, query: &str) -> Vec<Files> {
     // ilike
-    let name = &format!("{}{}{}", "%", name, "%");
+    let query = &format!("/home/{}/{}{}{}", account, "%", query, "%");
     RB.fetch("select * from files where name ilike $1 order by kind desc, path;",
     // 虽代码中已包含对 13-1<2.1 的排序， 但经实际观察，此处继续保留对path的排序，有助于提升web接口性能，40ms 提升到 33ms.
-             vec![Bson::String(name.to_string())]).await.unwrap()
+             vec![Bson::String(query.to_string())]).await.unwrap()
     // like
     /*RB.fetch_list_by_wrapper(
         RB.new_wrapper().like("name", name)

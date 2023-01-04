@@ -30,7 +30,7 @@
 import { reactive, ref } from 'vue'
 import { post } from "../utils/request"
 
-const user = reactive({ username: 'abel ', password: '123456 ' })
+const user = reactive({ username: 'abel', password: '123456' })
 
 async function handleSubmit() {
   post('/login', user).then((resp) => {

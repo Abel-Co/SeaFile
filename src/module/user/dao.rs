@@ -15,7 +15,6 @@ pub async fn get_by_username(username: &str) -> Option<Users> {
     // Some(Users { id: 123456, status: Some(1), username: Some(String::from("abel")), password: Some("123456".to_string()), ..Default::default() })
 }
 
-
 /// 模拟创建账号
 #[allow(unused)]
 async fn test_create() -> Option<Users> {
@@ -42,4 +41,11 @@ async fn test_create() -> Option<Users> {
     let _ = rb_resp.unwrap().rows_affected;
 
     Some(user)
+}
+
+/**
+ * 用户接口: 查
+ */
+pub async fn get(id: i64) -> Users {
+    RB.fetch_by_column("id", &id).await.unwrap()
 }

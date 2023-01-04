@@ -4,6 +4,7 @@ use actix_web::{error, HttpResponse, Responder, Result};
 use actix_web::{delete, get, post, put};
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use actix_web_lab::extract::Path;
+use crate::boot::middleware::JwtToken;
 
 use crate::module::ifile;
 
@@ -13,9 +14,9 @@ pub async fn index(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     HttpResponse::Ok().json("Ok")
 }
 
-#[get("/search/{name}")]
-pub async fn search(Path(name): Path<String>) -> impl Responder {
-    let files = ifile::bs::search(&name).await;
+#[get("/search/{query}")]
+pub async fn search(Path(query): Path<String>, jwt: JwtToken) -> impl Responder {
+    let files = ifile::bs::search(jwt.sub, &query).await;
     HttpResponse::Ok().json(files)
 }
 

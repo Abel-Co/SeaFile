@@ -14,6 +14,8 @@ rc-service samba start
 ```
 
 ```shell
-adduser -D yali
+adduser -D Yali
 echo -e "123456\n123456\n" | smbpasswd -a -s yali
 ```
+> `deluser --remove-home Xugy groupdeluser --remove-home Yali group`
+> 

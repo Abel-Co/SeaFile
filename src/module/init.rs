@@ -1,4 +1,6 @@
 use std::{thread};
+use std::ops::Index;
+use std::process::Command;
 use std::thread::sleep;
 use std::time::Duration;
 use futures::executor::block_on;
@@ -9,8 +11,9 @@ use crate::boot::c::RB;
 use crate::boot::global;
 use crate::module::{filesystem, ifile, samba};
 use crate::module::ifile::Files;
+use crate::module::user::{Users, UserType};
 
-pub async fn decide_to_init() {
+pub async fn if_init_db() {
     let tables: i64 = RB.fetch("select count(*) from pg_tables where tablename = 'files';", vec![]).await.unwrap();
     if tables == 0 {
         // 1.建表
@@ -27,6 +30,24 @@ pub async fn decide_to_init() {
         // 3.初始建立索引
         let watch_path = global().watch_path.as_str();
         ifile::bs::index(watch_path).await;
+    }
+}
+
+pub async fn init_smb_account() {
+    if cfg!(target_os = "linux") {
+        let output = Command::new("sh").arg("-c").arg("cat /etc/os-release").output();
+        if !String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") {return}
+        for user in RB.fetch_list::<Users>().await.unwrap() {
+            let account = user.username.unwrap();
+            let output = Command::new("sh").arg("-c").arg("adduser -D").arg(&account).output();
+            log::info!("{}", String::from_utf8_lossy(&output.unwrap().stdout).to_string());
+            if UserType::User == user.user_type {
+                let password = user.password.unwrap();
+                let double_passwd = format!("{}\n{}\n", password, password);
+                let output = Command::new("echo").arg("-e").arg(double_passwd).arg(" | smbpasswd -a -s").arg(&account).output();
+                log::info!("{}", String::from_utf8_lossy(&output.unwrap().stdout).to_string());
+            }
+        }
     }
 }
 
@@ -50,5 +71,4 @@ pub async fn daemon() {
             sleep(Duration::from_secs(56))
         }
     });
-
 }

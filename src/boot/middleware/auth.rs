@@ -64,7 +64,7 @@ impl<S, B> Service<ServiceRequest> for AuthMiddleware<S>
                 Some(token) => {
                     match JwtToken::verify(token) {
                         Ok(jwt_token) => {
-                            req.extensions_mut().insert(jwt_token).is_some()
+                            req.extensions_mut().insert(jwt_token).is_none()
                         }
                         Err(_) => false
                     }

@@ -82,8 +82,11 @@ pub async fn start() {
     c::init_rbatis().await;
 
     // 3.初始化 数据库
-    init::decide_to_init().await;
+    init::if_init_db().await;
 
-    // 4.启动后台服务守护
+    // 4.初始化 Smb账户
+    init::init_smb_account().await;
+
+    // 5.初始化 后台守护服务
     init::daemon().await
 }

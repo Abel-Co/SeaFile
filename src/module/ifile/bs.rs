@@ -6,7 +6,7 @@ use std::path::Path;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use walkdir::WalkDir;
 
-use crate::module::filesystem;
+use crate::module::{filesystem, user};
 use crate::module::ifile;
 use crate::module::ifile::Files;
 
@@ -20,8 +20,9 @@ pub async fn get(id: i64) -> Option<Files> {
     }
 }
 
-pub async fn search(name: &str) -> Vec<Files> {
-    let mut _files = ifile::dao::search(name).await;
+pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
+    let smb_account = &user::dao::get(user_id).await.username.unwrap();
+    let mut _files = ifile::dao::search(smb_account, query).await;
     filesystem::async_patrol(&_files).await;
     _files.sort_by(|a, b| a.cmp(&b));
     _files
