@@ -15,6 +15,9 @@ pub async fn get_by_username(username: &str) -> Option<Users> {
     // Some(Users { id: 123456, status: Some(1), username: Some(String::from("abel")), password: Some("123456".to_string()), ..Default::default() })
 }
 
+
+/// 模拟创建账号
+#[allow(unused)]
 async fn test_create() -> Option<Users> {
     let user = Users {
         id: new_snowflake_id(),
