@@ -6,24 +6,16 @@
         <form @keydown.enter="handleSubmit">
           <ul>
             <li>
+              <!-- v-validate="'required'" -->
               <comp-input
-                  v-model="user.username"
-                  name="username"
-                  data-vv-as="账号"
-                  v-validate="'required'"
-                  :placeholder="'请输入账号'"
-                  key="login-username"
+                  v-model.trim="user.username" name="username" data-vv-as="账号"
+                  :placeholder="'请输入账号'" key="login-username"
               ></comp-input>
             </li>
             <li>
               <comp-input
-                  v-model="user.password"
-                  name="password"
-                  type="password"
-                  data-vv-as="密码"
-                  v-validate="'required'"
-                  :placeholder="'请输入密码'"
-                  key="login-password"
+                  v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
+                  :placeholder="'请输入密码'" key="login-password"
               ></comp-input>
             </li>
           </ul>
@@ -31,30 +23,31 @@
       </div>
       <comp-button class="login--btn" themes="primary" @click="handleSubmit"></comp-button>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { post } from "../utils/request"
 
-const user = reactive({})
+const user = reactive({ username: 'abel ', password: '123456 ' })
 
 async function handleSubmit() {
-  console.log('hello world')
-  let validResult = await this.$validator.validate()
-  if (validResult) {
-    this.loading = true
-    this.$store.dispatch('LoginByUsername', this.accountLoginData).then(() => {
-      this.loading = false
-      this.$emit('close')
-    }).catch((error) => {
-      this.loading = false
-      this.$message.error(error)
-    })
-  }
+  post('/login', user).then((resp) => {
+    console.log(resp)
+  })
+  // let validResult = await this.$validator.validate()
+  // if (validResult) {
+  //   this.loading = true
+  //   this.$store.dispatch('LoginByUsername', this.accountLoginData).then(() => {
+  //     this.loading = false
+  //     this.$emit('close')
+  //   }).catch((error) => {
+  //     this.loading = false
+  //     this.$message.error(error)
+  //   })
+  // }
 }
-
 </script>
 
 <style lang="less" scoped>
@@ -85,7 +78,6 @@ async function handleSubmit() {
       margin-bottom: 20px;
     }
   }
-
 }
 
 .login--inputs {

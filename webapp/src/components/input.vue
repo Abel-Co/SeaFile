@@ -4,10 +4,10 @@
       <slot name="prev"></slot>
       <input
           :type="type"
-          :value="value"
+          :value="modelValue"
           :maxLength="maxLength"
           :name="name"
-          @input="$emit('change', $event.target.value)"
+          @input="$emit('update:modelValue', $event.target.value)"
           @focus="onFocus"
           @blur="onBlur"
           :placeholder="placeholder"
@@ -23,7 +23,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { onMounted, toRefs } from "vue"
+
+const props = defineProps({
   placeholder: {
     type: String
   },
@@ -32,7 +34,7 @@ defineProps({
     default: 'text'
   },
   maxLength: Number,
-  value: {
+  modelValue: {
     type: String
   },
   name: String,

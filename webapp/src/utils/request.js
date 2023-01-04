@@ -25,8 +25,9 @@ export const del = (url, params = {}, options = {}) => {
 
 function foxy(f, url, params, options) {
   const source = CancelToken.source()
+  console.log(params)
   let request = f(url, {
-    params, ...options, cancelToken: source.token
+    ...params, ...options, cancelToken: source.token
   })
   request.cancel = source.cancel
   return request

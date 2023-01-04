@@ -5,6 +5,8 @@ postgres:
   min: 3
   max: 10
 watch_path: /Users/Abel/Downloads
+jwt:
+  key: 0xa06f853898a9dd4f32441a56879c52878f96c42730ed31c50e00
 white_list:
   /login:
     - POST

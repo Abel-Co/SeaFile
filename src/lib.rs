@@ -8,8 +8,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate rbatis;
 extern crate regex;
-// #[macro_use]
-// extern crate validator_derive;
+
 // extern crate serde;
 // extern crate serde_json;
 

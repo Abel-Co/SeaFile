@@ -48,3 +48,33 @@ comment on column files.times       is '访问次数';
 comment on column files.parent      is '上级主键';
 comment on column files.created_at  is '创建时间';
 comment on column files.updated_at  is '更新时间';
+
+-- 用户表
+drop table if exists users;
+create table users
+(
+    id         bigint                     not null primary key,
+    username   varchar(500) unique        not null,
+    password   varchar(500)               not null,
+    email      varchar(320)                       ,
+    avatar     varchar(500)                       ,
+    phone      varchar(50)                        ,
+    user_type  varchar(50)                        ,
+    status     integer                            ,
+    created_at timestamptz  default now() not null,
+    updated_at timestamptz  default now() not null
+);
+
+create trigger users_timestamp before update on users for each row execute procedure upd_timestamp();
+create index idx_username on users (username);
+comment on table  users             is '用户表';
+comment on column users.id          is '主键: 雪花主键';
+comment on column users.username    is '账号';
+comment on column users.password    is '密码';
+comment on column users.email       is '邮箱';
+comment on column users.phone       is '电话';
+comment on column users.avatar      is '头像';
+comment on column users.user_type   is '用户类型：admin, user';
+comment on column users.status      is '状态: 1.正常; 419.冻结';
+comment on column users.created_at  is '创建时间';
+comment on column users.updated_at  is '更新时间';

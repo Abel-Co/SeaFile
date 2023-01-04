@@ -9,7 +9,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || App::new()
         .wrap(middleware::Compress::default())
         .wrap(middleware::Logger::default())
-        // .wrap(boot::middleware::Auth)
+        .wrap(boot::middleware::Auth)
         .service(module::handler::api_routes())
         .default_service(Files::new("/", "dist/").index_file("index.html"))
     ).bind(boot::global().addr())?.run().await

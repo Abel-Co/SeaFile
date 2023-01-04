@@ -3,12 +3,13 @@ pub mod ifile;
 pub mod filesystem;
 pub mod init;
 pub mod samba;
+pub mod user;
 
 pub mod handler {
     use actix_web::dev::HttpServiceFactory;
     use actix_web::web;
 
-    use crate::module::ifile;
+    use crate::module::{ifile, user};
 
     pub fn api_routes() -> impl HttpServiceFactory {
         web::scope("")
@@ -18,5 +19,6 @@ pub mod handler {
             .service(ifile::api::show)
             .service(ifile::api::visit)
             .service(ifile::api::download)
+            .service(user::api::login)
     }
 }
