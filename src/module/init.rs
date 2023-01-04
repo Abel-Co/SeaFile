@@ -49,7 +49,7 @@ pub async fn init_smb_account() {
                     Ok(output) => String::from_utf8_lossy(&output.stdout).to_string(),
                     Err(err) => err.to_string()
                 };
-                log::info!("{}", output);
+                println!("{:?}", output);
             }
         }
     }
