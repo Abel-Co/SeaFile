@@ -39,12 +39,12 @@ pub async fn init_smb_account() {
         if !String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") {return}
         for user in RB.fetch_list::<Users>().await.unwrap() {
             let account = user.username.unwrap();
-            let output = Command::new("sh").arg("-c").arg("adduser -D").arg(&account).output();
+            let output = Command::new("adduser").arg("-D").arg(&account).output();
             log::info!("adduser: {} - {}", &account, String::from_utf8_lossy(&output.unwrap().stdout).to_string());
             if UserType::User == user.user_type {
                 let password = user.password.unwrap();
-                let double_passwd = format!("\"{}\n{}\n\"", password, password);
-                let output = Command::new("echo").arg("-e").arg(double_passwd).arg(" | smbpasswd -a -s").arg(&account).output();
+                let double_passwd = format!("{}\\n{}\\n", password, password);
+                let output = Command::new("echo -e").arg(double_passwd).arg(" | smbpasswd -a -s").arg(&account).output();
                 log::info!("{}", String::from_utf8_lossy(&output.unwrap().stdout).to_string());
             }
         }
