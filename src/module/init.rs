@@ -44,7 +44,11 @@ pub async fn init_smb_account() {
                 let password = user.password.unwrap();
                 let double_passwd = format!("{}\n{}\n", password, password);
                 let output = Command::new("echo -e").arg(double_passwd).arg(" | smbpasswd -a -s").arg(&account).output();
-                log::info!("{}", String::from_utf8_lossy(&output.unwrap().stdout).to_string());
+                let output = match output {
+                    Ok(output) => String::from_utf8_lossy(&output.stdout).to_string(),
+                    Err(err) => err.to_string()
+                };
+                log::info!("{}", output);
             }
         }
     }
