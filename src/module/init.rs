@@ -40,10 +40,10 @@ pub async fn init_smb_account() {
         for user in RB.fetch_list::<Users>().await.unwrap() {
             let account = user.username.unwrap();
             let output = Command::new("sh").arg("-c").arg("adduser -D").arg(&account).output();
-            log::info!("{}", String::from_utf8_lossy(&output.unwrap().stdout).to_string());
+            log::info!("adduser: {} - {}", &account, String::from_utf8_lossy(&output.unwrap().stdout).to_string());
             if UserType::User == user.user_type {
                 let password = user.password.unwrap();
-                let double_passwd = format!("{}\n{}\n", password, password);
+                let double_passwd = format!("\"{}\n{}\n\"", password, password);
                 let output = Command::new("echo").arg("-e").arg(double_passwd).arg(" | smbpasswd -a -s").arg(&account).output();
                 log::info!("{}", String::from_utf8_lossy(&output.unwrap().stdout).to_string());
             }
