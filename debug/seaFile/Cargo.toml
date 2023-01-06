@@ -1,0 +1,6 @@
+[package]
+name = "seafile"
+version = "0.1.0"
+authors = ["xuguangyuansh <xuguangyuansh@126.com>"]
+edition = "2021"
+resolver = "2"
