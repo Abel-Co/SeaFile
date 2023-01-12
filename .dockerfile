@@ -9,7 +9,7 @@ ENV APP_ENV=$APP_ENV
 
 ADD app.tar.gz ./
 
-#ENTRYPOINT ["./seafile"]
+ENTRYPOINT ["./seafile"]
 
 
 #RUN apk add samba openrc \
