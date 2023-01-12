@@ -1,5 +1,4 @@
 use std::{thread};
-use std::ops::Index;
 use std::process::Command;
 use std::thread::sleep;
 use std::time::Duration;
@@ -42,14 +41,13 @@ pub async fn init_smb_account() {
             let _ = Command::new("adduser").arg("-D").arg(&account).output();
             if UserType::User == user.user_type {
                 let password = user.password.unwrap();
-                // let double_passwd = format!("{}\\n{}\\n", password, password);
-                // let output = Command::new("echo -e").arg(double_passwd).arg(" | smbpasswd -a -s").arg(&account).output();
-                let output = Command::new("echo").arg("-e").arg("'123456\n123456\n'").arg("| smbpasswd").arg("-a -s").arg(&account).output();
+                let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
+                let output = Command::new("sh").arg("-c").arg(shell).output();
                 let output = match output {
                     Ok(output) => String::from_utf8_lossy(&output.stdout).to_string(),
                     Err(err) => err.to_string()
                 };
-                println!("{:?}", output);
+                log::info!("{:?}", output);
             }
         }
     }
