@@ -10,4 +10,6 @@ jwt:
 white_list:
   /login:
     - POST
-  /activate: [ GET ]
+  /: [ GET ]
+  /assets/*: [ GET ]
+  /favicon.ico: [ GET ]

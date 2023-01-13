@@ -58,19 +58,19 @@ pub fn rb() -> &'static Rbatis {
 /// 是否白名单请求
 pub fn is_with_list(req: &ServiceRequest) -> bool {
     // Some({"/login": {"POST": 1}, "/category/warehouse": {"GET": 1}, "/userdocs/warehouse": {"GET": 1}})
-    static WHITE_LIST: OnceCell<Arc<HashMap<String, HashMap<String, i8>>>> = OnceCell::new();
-    let white_list = WHITE_LIST.get_or_init(|| {
+    static WHITELIST_MAP: OnceCell<Arc<HashMap<String, HashMap<String, i8>>>> = OnceCell::new();
+    let whitelist_map = WHITELIST_MAP.get_or_init(|| {
         let conf_white_list = crate::boot::global().white_list.clone();
         Arc::new(conf_white_list.into_iter().map(|(path, methods)|
             (path, methods.into_iter().map(|method| (method, 1)).collect())).collect())
     });
-    match white_list.get(req.path()) {
-        Some(methods) => match methods.get(req.method().as_str()) {
-            Some(_) => true,
-            None => false
-        }
-        None => false
-    }
+
+    let result = whitelist_map.iter().map(|(path, methods)| {
+        let whitelist_path = path.split("*").collect::<Vec<&str>>();
+        if req.path().starts_with(whitelist_path.first().unwrap()) { 1 } else { 0 }
+    }).collect::<Vec<_>>().iter().sum::<i32>();
+
+    result > 0
 }
 
 
