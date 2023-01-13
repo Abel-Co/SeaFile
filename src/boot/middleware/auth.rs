@@ -73,7 +73,7 @@ impl<S, B> Service<ServiceRequest> for AuthMiddleware<S>
             } || /* 是否白名单请求 */ c::is_with_list(&req) {
                 Ok(svc.call(req).await?)
             } else {
-                Err(error::ErrorUnauthorized("invalid token"))
+                Err(error::ErrorUnauthorized(serde_json::json!("invalid token")))
             }
         })
     }

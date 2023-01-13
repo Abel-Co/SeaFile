@@ -65,9 +65,13 @@ pub fn is_with_list(req: &ServiceRequest) -> bool {
             (path, methods.into_iter().map(|method| (method, 1)).collect())).collect())
     });
 
-    let result = whitelist_map.iter().map(|(path, methods)| {
-        let whitelist_path = path.split("*").collect::<Vec<&str>>();
-        if req.path().starts_with(whitelist_path.first().unwrap()) { 1 } else { 0 }
+    let result = whitelist_map.iter().map(|(path, _)| {
+        if path.ends_with("*") {
+            let whitelist_path = path.split("*").collect::<Vec<&str>>();
+            if req.path().starts_with(whitelist_path.first().unwrap()) { 1 } else { 0 }
+        } else {
+            if req.path() == path { 1 } else { 0 }
+        }
     }).collect::<Vec<_>>().iter().sum::<i32>();
 
     result > 0

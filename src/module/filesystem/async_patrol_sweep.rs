@@ -5,6 +5,7 @@ use async_channel::{Receiver, Sender};
 use futures::executor::block_on;
 use once_cell::sync::OnceCell;
 
+#[allow(unused)]
 use crate::module::ifile;
 use crate::module::ifile::Files;
 
@@ -21,7 +22,7 @@ pub async fn async_patrol_watch() {
             while let Ok(files) = ONCE.get().unwrap().1.recv().await {
                 for _file in files {
                     if !Path::new(_file.path.as_str()).exists() {
-                        ifile::dao::delete_by_path(_file.path.as_str()).await;
+                        // ifile::dao::delete_by_path(_file.path.as_str()).await;   // 临时关闭巡视
                     }
                 }
             }

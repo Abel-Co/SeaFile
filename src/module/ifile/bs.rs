@@ -21,15 +21,22 @@ pub async fn get(id: i64) -> Option<Files> {
 }
 
 pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
-    let smb_account = &user::dao::get(user_id).await.username.unwrap();
-    let mut _files = ifile::dao::search(smb_account, query).await;
+    let account = &user::dao::get(user_id).await.username.unwrap();
+    let mut _files = ifile::dao::search(&format!("/home/{}", account), query).await;
     filesystem::async_patrol(&_files).await;
     _files.sort_by(|a, b| a.cmp(&b));
     _files
 }
 
-pub async fn list(parent: i64) -> Vec<Files> {
-    let mut _files = ifile::dao::list(parent).await;
+pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
+    let account = &user::dao::get(user_id).await.username.unwrap();
+    let path = &format!("/home/{}", account);
+    let mut _files = if parent == 0 {
+        let _file = ifile::dao::get_by_path(path).await.unwrap();
+        ifile::dao::list(path, _file.id).await
+    } else {
+        ifile::dao::list(path, parent).await
+    };
     filesystem::async_patrol(&_files).await;
     _files.sort_by(|a, b| a.cmp(&b));
     _files
@@ -103,8 +110,12 @@ pub async fn index(path: &str) {
     });
 }
 
-pub async fn reindex(id: i64) {
+pub async fn reindex(user_id: i64, id: i64) {
     if let Some(_file) = ifile::dao::get(id).await {
-        index(_file.path.as_str()).await
+        let account = user::dao::get(user_id).await.username.unwrap();
+        let path = &format!("/home/{}", account);
+        if _file.path.starts_with(path) {
+            index(_file.path.as_str()).await
+        }
     }
 }

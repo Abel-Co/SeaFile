@@ -4,9 +4,9 @@
     <a href="#/">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
     </a>
-    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus />
+    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
     <button class="search-btn" type="button" @click="search">搜 索</button>
-<!--    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>-->
+    <!--    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>-->
     <!--    <span>选择的值为: {{ checked }}</span>-->
     <div style="width:1200px;height: 20px;margin: 13px auto;">
       <button class="iconfont" @click="downloadAllChecked()" v-show="checked.length > 0"
@@ -167,6 +167,8 @@ function handle_click(item) {
 }
 
 onMounted(() => {
+  let token = localStorage.getItem('token')
+  if (!token) router.push('/login')
   if (location.hash.length > 2) router.push({ path: '/' })
   else show({ kind: 'Folder', name: '', id: 0 })
   // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])

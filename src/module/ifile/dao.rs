@@ -9,18 +9,23 @@ pub async fn get(id: i64) -> Option<Files> {
     RB.fetch_by_column("id", id).await.unwrap()
 }
 
+pub async fn get_by_path(path: &str) -> Option<Files> {
+    RB.fetch_by_column("path", path).await.unwrap()
+}
+
 pub async fn check(path: &str) -> Option<Files> {
     RB.fetch_by_wrapper(
         RB.new_wrapper().eq("crc", crc_i64(path)).eq("path", path)
     ).await.unwrap()
 }
 
-pub async fn search(account: &str, query: &str) -> Vec<Files> {
+pub async fn search(path_prefix: &str, query: &str) -> Vec<Files> {
     // ilike
-    let query = &format!("/home/{}/{}{}{}", account, "%", query, "%");
-    RB.fetch("select * from files where name ilike $1 order by kind desc, path;",
-    // 虽代码中已包含对 13-1<2.1 的排序， 但经实际观察，此处继续保留对path的排序，有助于提升web接口性能，40ms 提升到 33ms.
-             vec![Bson::String(query.to_string())]).await.unwrap()
+    let query = format!("{}{}{}", "%", query, "%").to_string();
+    let path_prefix = format!("{}/%", path_prefix).to_string();
+    RB.fetch("select * from files where path like $1 and name ilike $2 order by kind desc, path;",
+    // 虽代码中已包含对 13-1<2.1 的排序，但经实际观察，此处继续保留对path的排序，有助于提升web接口性能，40ms 提升到 33ms.
+             vec![Bson::String(path_prefix), Bson::String(query)]).await.unwrap()
     // like
     /*RB.fetch_list_by_wrapper(
         RB.new_wrapper().like("name", name)
@@ -31,9 +36,17 @@ pub async fn search(account: &str, query: &str) -> Vec<Files> {
 // #[py_sql(RB, "select * from files where name ilike #{name} order by kind desc, path")]
 // pub async fn search_py_sql(name: &str) -> Vec<Files> {}
 
-pub async fn list(parent: i64) -> Vec<Files> {
+pub async fn list(path_prefix: &str, parent: i64) -> Vec<Files> {
+    /*let mut wrapper = RB.new_wrapper().like_right("path", path_prefix);
+    if parent != 0 {
+        wrapper = wrapper.eq("parent", parent)
+    }
+    // 虽代码中已包含对 13-1<2.1 的排序，但经实际观察，此处继续保留对path的排序，有助于提升web接口性能，40ms 提升到 33ms.
+    wrapper = wrapper.order_bys(&[("kind", false), ("path", true)]);
+    RB.fetch_list_by_wrapper(wrapper).await.unwrap()*/
+
     RB.fetch_list_by_wrapper(
-        RB.new_wrapper().eq("parent", parent)
+        RB.new_wrapper().eq("parent", parent).like_right("path", path_prefix)
             .order_bys(&[("kind", false), ("path", true)])  // 虽代码中已包含对 13-1<2.1 的排序，
         // 但经实际观察，此处继续保留对path的排序，有助于提升web接口性能，40ms 提升到 33ms.
     ).await.unwrap()

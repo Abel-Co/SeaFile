@@ -29,12 +29,14 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { post } from "../utils/request"
+import router from "../router"
 
-const user = reactive({ username: 'abel', password: '123456' })
+const user = reactive({ username: 'xugy', password: '123456' })
 
 async function handleSubmit() {
   post('/login', user).then((resp) => {
-    console.log(resp)
+    localStorage.setItem('token', resp.data)
+    router.push('/')
   })
   // let validResult = await this.$validator.validate()
   // if (validResult) {
