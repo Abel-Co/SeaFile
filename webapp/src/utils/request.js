@@ -55,7 +55,7 @@ axios.interceptors.response.use(response => {
 }, error => {
   if (error?.response?.status === 401) {
     // 未登录。
-    router.push('/login').then(r => {});
+    // router.push('/login').then(r => {});
   } else if (error?.response?.status === 403) {
     // 权限不足。
   }

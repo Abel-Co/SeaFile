@@ -167,8 +167,6 @@ function handle_click(item) {
 }
 
 onMounted(() => {
-  let token = localStorage.getItem('token')
-  if (!token) router.push('/login')
   if (location.hash.length > 2) router.push({ path: '/' })
   else show({ kind: 'Folder', name: '', id: 0 })
   // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
