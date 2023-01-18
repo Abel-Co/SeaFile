@@ -1,18 +1,25 @@
 <template>
-  <div class="login">
+  <div class="l">
     <div class="login-rg">
-      <h1 class="label">登陆</h1>
+      <h2 class="label">修改密码</h2>
       <div class="login--inputs">
         <form @keydown.enter="handleSubmit">
           <ul>
             <li>
               <!-- v-validate="'required'" -->
-              <comp-input
-                  v-model.trim="user.username" name="username" data-vv-as="账号"
-                  :placeholder="'请输入账号'" key="login-username"
+              <label for="">旧密码</label>
+              <comp-input style="border-radius: 2px;"
+                          v-model.trim="user.username" name="username" data-vv-as="账号"
+                          :placeholder="'请输入账号'" key="login-username"
               ></comp-input>
             </li>
             <li>
+              <label for="">新密码</label>
+              <comp-input
+                  v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
+                  :placeholder="'请输入密码'" key="login-password"
+              ></comp-input>
+              <label for="">确认新密码</label>
               <comp-input
                   v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
                   :placeholder="'请输入密码'" key="login-password"
@@ -21,47 +28,28 @@
           </ul>
         </form>
       </div>
-      <comp-button class="login--btn" themes="primary" @click="handleSubmit"></comp-button>
+      <comp-button class="login--btn" themes="primary" @click="" text="更新密码"></comp-button>
+<!--      <comp-button class="login&#45;&#45;btn" themes="cancel" @click="" text="取消"></comp-button>-->
     </div>
   </div>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { post } from "../utils/request"
-import { useRouter } from "vue-router"
+import { post } from "../../utils/request"
+import { useRouter, useRoute } from "vue-router"
 
 const router = useRouter()
+
 const user = reactive({ username: 'xugy', password: '123456' })
 
-async function handleSubmit() {
-  post('/login', user).then((resp) => {
-    localStorage.token = resp.data
-    router.push({ name: 'Home' })
-  })
-  // let validResult = await this.$validator.validate()
-  // if (validResult) {
-  //   this.loading = true
-  //   this.$store.dispatch('LoginByUsername', this.accountLoginData).then(() => {
-  //     this.loading = false
-  //     this.$emit('close')
-  //   }).catch((error) => {
-  //     this.loading = false
-  //     this.$message.error(error)
-  //   })
-  // }
-}
 </script>
 
 <style lang="scss" scoped>
 .login {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 50%;
-  height: 50%;
-  -webkit-transform: translateX(-50%) translateY(-50%);
-  border-radius: 28px;
+  //-webkit-transform: translateX(-50%) translateY(-50%);
+  //border-radius: 28px;
   //background: #FFFFFF url('../assets/logo.svg') no-repeat center center;
   background-size: cover;
 
@@ -85,16 +73,18 @@ async function handleSubmit() {
 
 .login--inputs {
   width: 356px;
-
   li {
     margin-top: 20px;
   }
 }
-
 .login--btn {
-  width: 100%;
-  border-radius: 8px;
+  width: 100px;
+  height: 36px;
   font-size: 14px;
   margin-top: 20px;
+  margin-left: 50px;
+  display: inline-block;
+  border-radius: 6px;
 }
 </style>
+

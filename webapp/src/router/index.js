@@ -9,7 +9,13 @@ const routes = [
   },
   { path: '/show', name: 'Show', component: () => import('../views/Show.vue') },
   { path: '/edit', name: 'Edit', component: () => import('../views/Show.vue') },
-  { path: '/play', name: 'Play', component: () => import('../views/Play.vue') }
+  { path: '/play', name: 'Play', component: () => import('../views/Play.vue') },
+  {
+    path: '/settings', name: 'Settings', component: () => import('../views/settings/Index.vue'),
+    children: [
+      { path: 'password', name: 'Password', component: () => import('../views/settings/Passwd.vue') },
+    ]
+  },
 ]
 
 // export default createRouter({
