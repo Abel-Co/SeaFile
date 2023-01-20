@@ -1,4 +1,9 @@
 <template>
+  <div class="header">
+    <a href="#/">
+      <img class="logo" alt="Vue logo" src="../../assets/logo.svg"/>
+    </a>
+  </div>
   <div class="Layout">
     <div class="Layout-sidebar">
       <template v-for="item in navsidebar">
@@ -27,11 +32,20 @@ if ('admin') {
 </script>
 
 <style lang="scss" scoped>
+.header {
+  height: 60px;
+  min-width: 1920px;
+  max-width: 75%;
+  margin: auto;
+  img {
+    height: 55px;
+  }
+}
 .Layout {
   margin: auto;
-  max-width: 1200px;
   font-size: 22px;
-  background-color: #06a7ff;
+  max-width: 1200px;
+  //background-color: #06a7ff;
 
   &-sidebar {
     width: 25%;
@@ -50,51 +64,7 @@ if ('admin') {
     width: 75%;
     height: 400px;
     float: right;
-    background-color: cornflowerblue;
+    //background-color: cornflowerblue;
   }
-}
-
-.login {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 50%;
-  height: 50%;
-  -webkit-transform: translateX(-50%) translateY(-50%);
-  border-radius: 28px;
-  //background: #FFFFFF url('../assets/logo.svg') no-repeat center center;
-  background-size: cover;
-
-  .login-rg {
-    width: 400px;
-    margin: 73px auto auto;
-
-    img {
-      width: 97px;
-      height: 32px;
-      margin: 7px 0;
-    }
-
-    .label {
-      font-size: 34px;
-      line-height: 20px;
-      margin-bottom: 20px;
-    }
-  }
-}
-
-.login--inputs {
-  width: 356px;
-
-  li {
-    margin-top: 20px;
-  }
-}
-
-.login--btn {
-  width: 100%;
-  border-radius: 8px;
-  font-size: 14px;
-  margin-top: 20px;
 }
 </style>

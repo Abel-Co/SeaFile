@@ -1,10 +1,16 @@
 <template>
-  <!--  <h1></h1>-->
+  <div class="header">
+    <div class="img">
+      <span>Abel</span>
+    </div>
+  </div>
   <div class="wrapper">
     <a href="#/">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
     </a>
-    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    <div class="search">
+      <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    </div>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <!--    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>-->
     <!--    <span>选择的值为: {{ checked }}</span>-->
@@ -22,7 +28,7 @@
     </div>
     <ul class="table">
       <li class="thead">
-        <ul class="tr clearfix">
+        <ul class="tr">
           <li>
             <input type="checkbox" v-model="checkedAll">
           </li>
@@ -33,7 +39,7 @@
         </ul>
       </li>
       <li class="tbody">
-        <ul class="tr clearfix" v-for="item in list" :key="item.id">
+        <ul class="tr" v-for="item in list" :key="item.id">
           <li>
             <input type="checkbox" :value="item.id" v-model="item.checked">
           </li>
@@ -52,7 +58,7 @@
                   v-visible="item.kind === 'File' && !item.active">&#xe66c;</span>
           </li>
           <li :title="item.path">{{ item.path }}</li>
-          <li>{{ byteToText(item.size) }}</li>
+          <li>{{ ('' + item.size).byteToText() }}</li>
           <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
           <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
         </ul>
@@ -82,10 +88,8 @@ const q = ref(null)
 const qh = ref(null)
 const count = ref(0)
 const input = ref(null)
-const root_id = ref(0)
 const list = reactive([])
 const folders = reactive({})
-const route = useRoute()
 const router = useRouter()
 const checked = computed(() => list.filter(item => item.checked))
 const checkedAll = computed({
@@ -105,15 +109,6 @@ router.beforeEach(async (to, from) => {
   } else {
     show(null, to.query["q"])
   }
-  // console.log(to)
-  // list.push(...[])
-})
-// router.beforeResolve(async () => {
-//   // list.push(...[])
-// })
-router.afterEach(async (to, from, failure) => {
-  // console.log(location.hash)
-  // console.log(route.query.id)
 })
 
 function search() {
@@ -183,14 +178,6 @@ function downloadAllChecked() {
   })
 }
 
-function byteToText(size) {
-  if (size === 0) return "0 B"
-  let k = 1024
-  let sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      i = Math.floor(Math.log(size) / Math.log(k))
-  return (size / Math.pow(k, i)).toPrecision(3) + " " + sizes[i]
-}
-
 const icons = {}
 const icon_template = {
   'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
@@ -256,14 +243,6 @@ window.onfocus = () => {
 
 a {
   color: #42b983;
-}
-
-.search-input {
-  display: block;
-  margin: 20px auto;
-  width: 600px;
-  height: 30px;
-  font-size: 16px;
 }
 
 ul {
@@ -373,4 +352,53 @@ ul {
   cursor: pointer;
   /*margin-left: 10px;*/
 }
+</style>
+<style lang="scss" scoped>
+.header {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  padding: 6px;
+  box-sizing: border-box;
+
+  .img {
+    display: flex;
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+    margin-right: 16px;
+    border-radius: 50%;
+    background-color: blueviolet;
+
+    span {
+      color: #f8f9fa;
+      margin: auto;
+      font-size: 13px;
+      font-weight: var(--base-text-weight-semibold, 600);
+    }
+  }
+}
+
+.search {
+  display: flex;
+  margin: 20px auto;
+  width: 630px;
+  height: 38px;
+  border-radius: 20px;
+  border: 1px solid #CCD1DB;
+
+  &-input {
+    margin: auto;
+    width: 585px;
+    height: 33px;
+    border: 0;
+    outline: none;
+    font-size: 17px;
+  }
+}
+
+.search:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
 </style>
