@@ -10,9 +10,9 @@ jwt:
 white_list:
   /login:
     - POST
-  /show: [ GET ]
-  /visit: [ GET ]
-  /download: [ GET ]
+  /show/*: [ GET ]
+  /visit/*: [ GET ]
+  /download/*: [ GET ]
   /: [ GET ]
   /assets/*: [ GET ]
   /favicon.ico: [ GET ]
