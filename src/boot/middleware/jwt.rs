@@ -36,7 +36,7 @@ impl JwtToken {
     /// create jwt_token struct
     pub fn from_user(user: Users) -> JwtToken {
         JwtToken {
-            sub: user.id,
+            sub: user.id.unwrap(),
             exp: (Utc::now() + Duration::days(30)).timestamp() as usize,  // Duration::hours(1)
         }
     }

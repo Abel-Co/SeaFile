@@ -2,14 +2,19 @@ use bcrypt::BcryptResult;
 use rbatis::TimestampZ;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use regex::Regex;
 
 pub mod api;
 pub mod bs;
 pub mod dao;
 
+lazy_static! {
+    pub static ref RE_USERNAME: Regex = Regex::new(r"^[a-zA-Z0-9_]{3,16}$").unwrap();
+}
+
 #[derive(Debug, Default, Validate, Deserialize, Serialize)]
 pub struct Login {
-    #[validate(required, length(max = 50, message = "username must be less than 50 chars."))]
+    #[validate(regex(path = "RE_USERNAME", message = "The username is invalid !"))]
     pub username: Option<String>,
     #[validate(required, length(min = 6, message = "password must be more than 6 chars."))]
     pub password: Option<String>,
@@ -33,18 +38,20 @@ pub fn passhash(pass: &str) -> String {
 
 #[derive(CRUDTable, Debug, Default, Validate, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
 pub struct Users {
-    pub id: i64,
-    #[validate(length(min = 6, message = "username must be more than 6 chars."))]
+    pub id: Option<i64>,
+    #[validate(regex(path = "RE_USERNAME", message = "The username is invalid !"))]
     pub username: Option<String>,
-    #[validate(length(min = 6, message = "password must be more than 6 chars."))]
+    #[validate(required, length(min = 6, message = "password must be more than 6 chars."))]
     pub password: Option<String>,
-    #[validate(length(max = 320, message = "email must be less than 320 chars."))]
+    #[validate(email)]
     pub email: Option<String>,
-    #[validate(length(max = 255, message = "avatar must be less than 255 chars."))]
-    pub avatar: Option<String>,
+    #[validate(phone)]
     pub phone: Option<String>,
-    pub status: Option<i32>,    // 1.账号正常; 419.账号冻结（七牛扩展状态码）;
-    // 类型：user、admin
+    #[validate(url)]
+    pub avatar: Option<String>,
+    pub status: Option<i32>,
+    // 1.账号正常; 419.账号冻结（七牛扩展状态码）;
+    // 类型：User、Admin
     pub user_type: UserType,
     pub created_at: Option<TimestampZ>,
     pub updated_at: Option<TimestampZ>,

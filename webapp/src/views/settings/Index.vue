@@ -7,7 +7,7 @@
   <div class="Layout">
     <div class="Layout-sidebar">
       <template v-for="item in navsidebar">
-        <router-link :to="item.to">{{ item.name }}</router-link>
+        <router-link :to="item.to">{{ item.cn_name }}</router-link>
       </template>
     </div>
     <div class="Layout-main">
@@ -22,12 +22,12 @@ import { post } from "../../utils/request"
 import { useRouter } from "vue-router"
 import manageRoute from "./dynamicRoute.js"
 
-const navsidebar = reactive([{ to: '/settings/password', name: 'Password' }])
+const navsidebar = reactive([{ to: '/settings/password', name: 'Password', cn_name: '修改密码' }])
 
 if ('admin') {
   const router = useRouter()
   router.addRoute('Settings', manageRoute)
-  navsidebar.push({ to: '/settings/users', name: 'Users' })
+  navsidebar.push({ to: '/settings/users', name: 'Users', cn_name: '用户管理' })
 }
 </script>
 
@@ -45,18 +45,23 @@ if ('admin') {
   margin: auto;
   font-size: 22px;
   max-width: 1200px;
-  //background-color: #06a7ff;
 
   &-sidebar {
-    width: 25%;
+    width: 19%;
     float: left;
-    background-color: #42b983;
+    padding: 20px;
+    margin-top: 13px;
 
-    & > a {
+    a {
       display: block;
-      line-height: 22px;
+      padding-left: 20px;
+      line-height: 28px;
       font-size: 14px;
       font-weight: var(--base-text-weight-semibold, 600);
+    }
+    a:hover {
+      background-color: #edf2f4;
+      border-radius: 5px;
     }
   }
 
@@ -64,7 +69,6 @@ if ('admin') {
     width: 75%;
     height: 400px;
     float: right;
-    //background-color: cornflowerblue;
   }
 }
 </style>

@@ -3,23 +3,22 @@
     <div class="login-rg">
       <h1 class="label">登陆</h1>
       <div class="login--inputs">
-        <form @keydown.enter="handleSubmit">
+        <Form @keydown.enter="handleSubmit" ref="userForm">
           <ul>
             <li>
-              <!-- v-validate="'required'" -->
               <comp-input
                   v-model.trim="user.username" name="username" data-vv-as="账号"
-                  :placeholder="'请输入账号'" key="login-username"
+                  rules="account" :placeholder="'请输入账号'" key="login-username" :errors="errors"
               ></comp-input>
             </li>
             <li>
               <comp-input
                   v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
-                  :placeholder="'请输入密码'" key="login-password"
+                  rules="account" :placeholder="'请输入密码'" key="login-password" :errors="errors"
               ></comp-input>
             </li>
           </ul>
-        </form>
+        </Form>
       </div>
       <comp-button class="login--btn" themes="primary" @click="handleSubmit"></comp-button>
     </div>
@@ -28,28 +27,32 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { Form } from 'vee-validate'
 import { post } from "../utils/request"
-import { useRouter } from "vue-router"
 
 const router = useRouter()
+const errors = reactive({})
+const userForm = ref(null)
+
 const user = reactive({ username: 'xugy', password: '123456' })
 
 async function handleSubmit() {
-  post('/login', user).then((resp) => {
-    localStorage.token = resp.data
-    router.push({ name: 'Home' })
-  })
-  // let validResult = await this.$validator.validate()
-  // if (validResult) {
-  //   this.loading = true
-  //   this.$store.dispatch('LoginByUsername', this.accountLoginData).then(() => {
-  //     this.loading = false
-  //     this.$emit('close')
-  //   }).catch((error) => {
-  //     this.loading = false
-  //     this.$message.error(error)
-  //   })
-  // }
+  const result = await userForm.value.validate()
+  // console.log(result.valid, result)
+  if (result.valid) {
+    post('/login', user).then(resp => {
+      localStorage.token = resp.data
+      router.push({ name: 'Home' })
+    }).catch(e => {
+      if (e?.response?.status === 401) {
+        Object.assign(errors, {
+          username: '账号或密码错误!',
+          password: '账号或密码错误!'
+        })
+      }
+    })
+  }
 }
 </script>
 

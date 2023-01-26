@@ -9,8 +9,7 @@ $$
 language plpgsql;
 
 -- 添加/删除 trigger
-create trigger user_timestamp before update on files for each row execute procedure upd_timestamp();
-drop trigger user_timestamp on files;
+-- drop trigger user_timestamp on files;
 
 -- 联合索引：减少开销，一条抵 N 条。（参考 索引最左原则）
 -- 文件表

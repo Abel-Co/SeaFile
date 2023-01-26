@@ -1,5 +1,6 @@
 <template>
   <div class="">
+    <button @click="addUser">添加用户</button>
     <ul class="table">
       <li class="thead">
         <ul class="tr clearfix">
@@ -20,7 +21,7 @@
           <li>
             <!-- <input type="checkbox" :value="item.id" v-model="item.checked"> -->
           </li>
-          <li>{{ item.name }}</li>
+          <li>{{ item.username }}</li>
           <li>{{ item.email }}</li>
           <li>{{ item.phone }}</li>
           <li>{{ ('' + item.size).byteToText() }}</li>
@@ -37,32 +38,49 @@
       </li>
     </ul>
   </div>
+  <DialogWrapper :transition-attrs="{name: 'dialog'}"/>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { openDialog, DialogWrapper } from 'vue3-promise-dialog'
+import UserForm from './UserForm.vue'
+
+async function operate(user) {
+  let obj = await openDialog(UserForm, { text: '更新用户', user })
+  if (obj) {
+    console.log(obj)
+  } else {
+    console.log()
+  }
+}
+
+async function addUser() {
+  let obj = await openDialog(UserForm, { text: '添加用户', user: {} })
+  if (obj) {
+    console.log(obj)
+  } else {
+    console.log()
+  }
+}
 
 const checkedAll = reactive([])
 
 const list = reactive([
   {
-    id: 1, name: 'Abel', email: 'abel@126.com', phone: '13151828702', size: 182702,
+    id: 1, username: 'Abel', email: 'abel@126.com', user_type: 'Admin', phone: '13151828702', size: 182702,
     created_at: new Date(), logged_at: new Date(), checked: true
   }, {
-    id: 2, name: 'Xugy', email: 'xugy@126.com', phone: '13151828702', size: 13128702,
+    id: 2, username: 'Xugy', email: 'xugy@126.com', user_type: 'User', phone: '13151828702', size: 13128702,
     created_at: new Date(), logged_at: new Date(), checked: false
   }, {
-    id: 3, name: 'Yali', email: 'yali@126.com', phone: '13151828702', size: 1315828702,
+    id: 3, username: 'Yali', email: 'yali@126.com', user_type: 'User', phone: '13151828702', size: 1315828702,
     created_at: new Date(), logged_at: new Date(), checked: false
   }, {
-    id: 4, name: 'Tuzi', email: 'tuzi@126.com', phone: '13151828702', size: 2815561828702,
+    id: 4, username: 'Tuzi', email: 'tuzi@126.com', user_type: 'User', phone: '13151828702', size: 2815561828702,
     created_at: new Date(), logged_at: new Date(), checked: false
   },
 ])
-
-function operate(user) {
-  console.log("operate: ", user)
-}
 </script>
 
 <style lang="scss" scoped>
@@ -129,11 +147,11 @@ ul {
     }
 
     li:nth-child(2) {
-      width: 20%;
+      width: 19%;
     }
 
     li:nth-child(3) {
-      width: 28%;
+      width: 27%;
     }
 
     li:nth-child(4) {
@@ -153,8 +171,8 @@ ul {
     }
 
     li:last-child {
-      width: 6%;
-      padding: 0 13px 0 0;
+      width: 8%;
+
       span {
         cursor: pointer;
       }

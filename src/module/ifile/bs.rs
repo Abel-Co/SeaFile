@@ -1,4 +1,4 @@
-use std::{fs};
+use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -6,7 +6,7 @@ use std::path::Path;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use walkdir::WalkDir;
 
-use crate::module::{filesystem, user};
+use crate::module::{auth, filesystem};
 use crate::module::ifile;
 use crate::module::ifile::Files;
 
@@ -21,7 +21,7 @@ pub async fn get(id: i64) -> Option<Files> {
 }
 
 pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
-    let account = &user::dao::get(user_id).await.username.unwrap();
+    let account = auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
     let mut _files = ifile::dao::search(&format!("/home/{}", account), query).await;
     filesystem::async_patrol(&_files).await;
     _files.sort_by(|a, b| a.cmp(&b));
@@ -29,7 +29,7 @@ pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
 }
 
 pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
-    let account = &user::dao::get(user_id).await.username.unwrap();
+    let account = &auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
     let path = &format!("/home/{}", account);
     let mut _files = if parent == 0 {
         let _file = ifile::dao::get_by_path(path).await.unwrap();
@@ -46,7 +46,9 @@ pub async fn show(id: i64) -> String {
     match ifile::dao::get(id).await {
         Some(_file) => {
             let mut buffer = String::new();
-            let _ = File::open(_file.path).unwrap().read_to_string(&mut buffer);
+            if let Ok(mut file) = File::open(_file.path) {
+                let _ = file.read_to_string(&mut buffer);
+            }
             buffer
         }
         None => "".to_string()
@@ -112,7 +114,7 @@ pub async fn index(path: &str) {
 
 pub async fn reindex(user_id: i64, id: i64) {
     if let Some(_file) = ifile::dao::get(id).await {
-        let account = user::dao::get(user_id).await.username.unwrap();
+        let account = auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
         let path = &format!("/home/{}", account);
         if _file.path.starts_with(path) {
             index(_file.path.as_str()).await

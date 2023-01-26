@@ -4,12 +4,13 @@ pub mod filesystem;
 pub mod init;
 pub mod samba;
 pub mod user;
+pub mod auth;
 
 pub mod handler {
     use actix_web::dev::HttpServiceFactory;
     use actix_web::web;
 
-    use crate::module::{ifile, user};
+    use crate::module::{auth, ifile, user};
 
     pub fn api_routes() -> impl HttpServiceFactory {
         web::scope("")
@@ -19,6 +20,8 @@ pub mod handler {
             .service(ifile::api::show)
             .service(ifile::api::visit)
             .service(ifile::api::download)
-            .service(user::api::login)
+            .service(auth::api::login)
+            .service(user::api::create)
+            .service(user::api::update)
     }
 }

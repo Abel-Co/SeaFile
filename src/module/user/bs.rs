@@ -1,39 +1,29 @@
-use actix_web::http::StatusCode;
+use rbatis::snowflake::new_snowflake_id;
 use crate::module::user;
-use crate::module::user::{Login, Users, UserType};
+use crate::module::user::Users;
 
 /**
- * 用户登录
+ * 用户列表
  */
-pub async fn login(login: Login) -> Result<Users, u16> {
-    match user::dao::get_by_username(login.username.as_ref().unwrap()).await {
-        Some(user) => {
-            match user.status {
-                Some(1) => {
-                    match user.user_type {
-                        UserType::Admin => admin_login(login, user).await,
-                        UserType::User => user_login(login, user).await
-                    }
-                }
-                _ => Err(user.status.unwrap_or(401) as u16)
-            }
-        }
-        None => Err(StatusCode::UNAUTHORIZED.as_u16())  // 其他匀按登录失败处理
-    }
+pub async fn list() -> Vec<Users> {
+    user::dao::list().await
 }
 
-async fn admin_login(login: Login, user: Users) -> Result<Users, u16> {
-    if login.verify(user.password.as_ref().unwrap()).unwrap() { // duration: debug 2589, release 280 !!
-        Ok(user)
-    } else {
-        Err(StatusCode::UNAUTHORIZED.as_u16())  // 密码验证，不通过 ！！
-    }
+/**
+ * 创建用户
+ */
+pub async fn create(mut user: Users) -> u64 {
+    user.id = Some(new_snowflake_id());
+    user::dao::save(user).await
 }
 
-async fn user_login(login: Login, user: Users) -> Result<Users, u16> {
-    if login.password == user.password {
-        Ok(user)
-    } else {
-        Err(StatusCode::UNAUTHORIZED.as_u16())  // 其他匀按登录失败处理
+/**
+ * 更新用户
+ */
+pub async fn update(user_id: i64, mut user: Users) -> u64 {
+    if let Some(db_user) = user::dao::get(user_id).await {
+        user.username = db_user.username;
+        return user::dao::save(user).await
     }
+    0
 }

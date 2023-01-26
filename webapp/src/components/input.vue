@@ -2,42 +2,37 @@
   <div class="input" :class="inputClass">
     <div class="input--box">
       <slot name="prev"></slot>
-      <input
+      <Field
+          :name="name"
           :type="type"
           :value="modelValue"
+          :rules="rules"
           :maxLength="maxLength"
-          :name="name"
           @input="$emit('update:modelValue', $event.target.value)"
           @focus="onFocus"
           @blur="onBlur"
           :placeholder="placeholder"
           autocomplete="off"
           @keyup.enter="$emit('keyup')"
-      >
+      ></Field>
       <slot name="suff"></slot>
     </div>
-    <div class="message" v-if="isError">
+    <div class="message" v-if="errorMessage">
       <span>{{ errorMessage }}</span>
     </div>
   </div>
 </template>
-
 <script setup>
-import { onMounted, toRefs } from "vue"
+import { computed, ref } from "vue"
+import { Field, useField } from 'vee-validate'
 
 const props = defineProps({
-  placeholder: {
-    type: String
-  },
-  type: {
-    type: String,
-    default: 'text'
-  },
-  maxLength: Number,
-  modelValue: {
-    type: String
-  },
   name: String,
+  type: { default: 'text' },
+  rules: String,
+  modelValue: String,
+  placeholder: String,
+  maxLength: Number,
   size: {
     type: String,
     default: 'middle',
@@ -45,60 +40,38 @@ const props = defineProps({
       return ['middle', 'large'].includes(value)
     }
   },
-  error: {
-    type: Object,
-    default() {
-      return {}
-    }
+  errors: { type: Object, default: {} }
+})
+const emit = defineEmits(['blur', 'keyup', 'update:modelValue', 'update:errors'])
+
+const { value, errors/*, errorMessage*/ } = useField(props.name, props.rules)
+
+const focus = ref(false)
+const onFocus = () => {
+  focus.value = true
+}
+const onBlur = () => {
+  focus.value = false
+  emit('blur')
+}
+const inputClass = computed(() => {
+  return {
+    [`input__${props.size}`]: true,
+    input__error: errorMessage.value,
+    input__focus: focus.value
   }
+})
+const errorMessage = computed(() => {
+  // console.log('errors', errors.value.toString())
+  return props.errors[props.name] || errors.value.toString()
 })
 </script>
 
 <script>
 export default {
-  $_veeValidate: {
-    value() {
-      return this.value
-    },
-    name() {
-      return this.name
-    },
-    events: 'change'
-  },
   model: {
     prop: 'value',
     event: 'change'
-  },
-  data() {
-    return {
-      focus: false
-    }
-  },
-  computed: {
-    inputClass() {
-      return {
-        [`input__${this.size}`]: true,
-        input__error: this.isError,
-        input__focus: this.focus
-      }
-    },
-    isError() {
-      return this.error.has && this.error.has(this.name)
-    },
-    errorMessage() {
-      if (this.isError) {
-        return this.error.first(this.name)
-      }
-    }
-  },
-  methods: {
-    onFocus() {
-      this.focus = true
-    },
-    onBlur() {
-      this.focus = false
-      this.$emit('blur')
-    }
   },
 }
 </script>
@@ -126,17 +99,17 @@ export default {
   }
 }
 
-.input__middle {
-  & input {
-    height: 48px;
-  }
-}
-
 .input__focus {
   & .input--box {
     & > input {
       border: 1px solid #0057FF;
     }
+  }
+}
+
+.input__middle {
+  & input {
+    height: 48px;
   }
 }
 
@@ -156,13 +129,13 @@ export default {
 }
 
 .input__error {
-  & .input--box {
+  .input--box {
     & > input {
       border-color: #e32425;
     }
   }
 
-  & .message {
+  .message {
     color: #e32425;
     font-size: 10px;
   }
