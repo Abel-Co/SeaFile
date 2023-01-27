@@ -5,7 +5,7 @@
     </div>
   </div>
   <div class="wrapper">
-    <a href="#/" >  <!--@click="q='';router.push('#/')"-->
+    <a href="#/" @click="q=''">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
     </a>
     <div class="search">
@@ -94,7 +94,7 @@ const router = useRouter()
 const checked = computed(() => list.filter(item => item.checked))
 const checkedAll = computed({
   get() {
-    return checked.value.length === list.length
+    return list.length > 0 && checked.length === list.length
   },
   set(val) {
     list.forEach(item => item.checked = val)

@@ -40,7 +40,7 @@ onUpdated(()=>{
 })
 </script>
 
-<style>
+<style lang="scss">
 h1 {
   width: 60%;
   margin: 20px auto;
@@ -53,18 +53,24 @@ h1 {
   margin: auto;
   height: 100vh;
   border-radius: 6px 6px 6px 6px;
+  .vditor-toolbar {
+    height: 0;
+    line-height: 2;
+    border-radius: 6px 6px 0 0;
+    padding-left: 170px;
+  }
+  .vditor-content {
+    .vditor-wysiwyg {
+      .vditor-reset {
+        border-radius: 0 0 6px 6px;
+        padding: 30px 170px;
+      }
+    }
+  }
 }
-.vditor-toolbar {
-  line-height: 2;
-  border-radius: 6px 6px 0 0;
-  padding-left: 170px;
-}
+
 .vditor-content pre.vditor-reset:focus  {
   background-color: white;
-}
-.vditor-wysiwyg .vditor-reset {
-  border-radius: 0 0 6px 6px;
-  padding: 10px 170px;
 }
 .vditor-ir .vditor-reset {
   border-radius: 0 0 6px 6px;
