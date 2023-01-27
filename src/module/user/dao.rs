@@ -23,16 +23,16 @@ pub async fn get(id: i64) -> Option<Users> {
 /**
  * 增加用户
  */
-pub async fn save(users: Users) -> u64 {
-    let rb_resp = RB.save(&users, &[Skip::Value(Bson::Null)]).await;
+pub async fn save(users: &Users) -> u64 {
+    let rb_resp = RB.save(users, &[Skip::Value(Bson::Null)]).await;
     rb_resp.unwrap().rows_affected
 }
 
 /**
  * 更新用户
  */
-pub async fn update(users: Users) -> u64 {
-    RB.update_by_column("id", &users).await.unwrap()
+pub async fn update(users: &Users) -> u64 {
+    RB.update_by_column("id", users).await.unwrap()
 }
 
 /**
