@@ -16,7 +16,7 @@ pub async fn daemon_smb() {
     do_loop!({
         if let Ok(output) = Command::new("sh").arg("-c").arg("rc-status | grep samba").output() {
             samba_status = String::from_utf8_lossy(&output.stdout).to_string();
-            log::info!("rc-status samba:{}", samba_status.replacen("   ", "  ", 14));
+            log::info!("rc-status samba:{}", samba_status.replacen("    ", "", 9));
             if let Some(_) = SAMBA_STATUS.find(&samba_status) {
                 log::info!("smb died, now restart ...");
                 if let Ok(output) = Command::new("rc-service").arg("samba").arg("restart").output() {
