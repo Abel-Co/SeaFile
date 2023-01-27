@@ -21,6 +21,7 @@ pub mod handler {
             .service(ifile::api::visit)
             .service(ifile::api::download)
             .service(auth::api::login)
+            .service(user::api::list)
             .service(user::api::create)
             .service(user::api::update)
     }

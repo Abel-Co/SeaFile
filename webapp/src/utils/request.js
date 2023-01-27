@@ -1,12 +1,34 @@
 import axios from "axios"
 import JSONBigInt from 'json-bigint'
-import router from "../router"
+// import router from "../router"
+
+// axios.defaults.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+axios.defaults.headers = { 'Content-Type': 'application/json' }
+axios.defaults.transformRequest = [data => JSONBigInt.stringify(data)]
+axios.defaults.transformResponse = [data => JSONBigInt.parse(data)]
+
+axios.interceptors.request.use(config => {
+  let token = localStorage.getItem('token')
+  if (token) config.headers['Authorization'] = `Bearer ${token}`
+  return config
+}, error => {
+  // window.location.href = window.location.origin + '/#/login';
+  return Promise.reject(error)
+})
+
+axios.interceptors.response.use(response => {
+  return response
+}, error => {
+  if (error?.response?.status === 401) {
+    // 未登录。
+    // router.push('/login').then(r => {});
+  } else if (error?.response?.status === 403) {
+    // 权限不足。
+  }
+  return Promise.reject(error)
+})
 
 const CancelToken = axios.CancelToken
-
-axios.defaults.transformResponse = [data => {
-  return JSONBigInt.parse(data)
-}]
 
 export const get = (url, params = {}, options = {}) => {
   return foxy(axios.get, url, params, options)
@@ -32,33 +54,3 @@ function foxy(f, url, params, options) {
   request.cancel = source.cancel
   return request
 }
-
-// axios.defaults.transformRequest = [function (data) {
-//   data = Qs.stringify(data);
-//   return data;
-// }];
-// axios.defaults.headers = {
-//   'Content-Type': 'application/x-www-form-urlencoded'
-// };
-
-axios.interceptors.request.use(config => {
-  let token = localStorage.getItem('token')
-  if (token) config.headers['Authorization'] = `Bearer ${token}`
-  return config
-}, error => {
-  // window.location.href = window.location.origin + '/#/login';
-  return Promise.reject(error)
-})
-
-axios.interceptors.response.use(response => {
-  return response
-}, error => {
-  if (error?.response?.status === 401) {
-    // 未登录。
-    // router.push('/login').then(r => {});
-  } else if (error?.response?.status === 403) {
-    // 权限不足。
-  }
-  return Promise.reject(error);
-})
-

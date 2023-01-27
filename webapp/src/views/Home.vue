@@ -5,7 +5,7 @@
     </div>
   </div>
   <div class="wrapper">
-    <a href="#/">
+    <a href="#/" >  <!--@click="q='';router.push('#/')"-->
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
     </a>
     <div class="search">
@@ -128,11 +128,11 @@ function show(item, query) {
   (async () => {
     list.length = 0
     if (item) {
-      get(`/list/${item.id}`).then((resp) => {
+      get(`/list/${item.id}`).then(resp => {
         list.push(...resp.data)
       })
     } else if (query) {
-      get(`/search/${query}`).then((resp) => {
+      get(`/search/${query}`).then(resp => {
         list.push(...resp.data)
       })
     }
@@ -193,7 +193,7 @@ const icon_template = {
   'sh': '#icon-a-kuozhanicon_huaban1fuben33'
 }
 for (let key in icon_template) {
-  key.split('|').forEach((ic) => {
+  key.split('|').forEach(ic => {
     icons[ic] = icon_template[key]
   })
 }
@@ -217,7 +217,7 @@ const download = (item) => {
 }
 const refresh = (item) => {
   (async () => {
-    get(`/index/${item.id}/${item.name}`).then((resp) => {
+    get(`/index/${item.id}/${item.name}`).then(resp => {
       alert('操作成功')
     })
   })()

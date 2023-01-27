@@ -2,14 +2,23 @@
   <div class="user--dialog">
     <div class="center">
       <h1>{{ text }}</h1>
-      <p>用&nbsp;&nbsp;户&nbsp;&nbsp;名：<input type="text" v-model.trim="user.username" @keydown.esc="closeDialog(false)" v-focus title="大小写字母、数字、下划线"></p>
-      <p>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：<input type="text" v-model.trim="user.email" @keydown.esc="closeDialog(false)"></p>
-      <p>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱：<input type="text" v-model.trim="user.email" @keydown.esc="closeDialog(false)"></p>
-      <p>手&nbsp;&nbsp;机&nbsp;&nbsp;号：<input type="text" v-model.trim="user.phone" @keydown.esc="closeDialog(false)"></p>
+      <p>用&nbsp;&nbsp;户&nbsp;&nbsp;名：<input type="text" v-model.trim="user.username"
+                                               @keydown.esc="closeDialog(false)" v-focus title="大小写字母、数字、下划线">
+      </p>
+      <p>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：<input type="password" v-model.trim="user.password"
+                                                               @keydown.esc="closeDialog(false)"></p>
+      <p>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱：<input type="text" v-model.trim="user.email"
+                                                               @keydown.esc="closeDialog(false)"></p>
+      <p>手&nbsp;&nbsp;机&nbsp;&nbsp;号：<input type="text" v-model.trim="user.phone" @keydown.esc="closeDialog(false)">
+      </p>
       <p>
         用户属性：
-        <input type="radio" v-model.trim="user.user_type" value="User" checked style="width: 17px; margin-right:14px;">普通用户
+        <input type="radio" v-model.trim="user.user_type" value="User" style="width: 17px; margin-right:14px;">普通用户
         <input type="radio" v-model.trim="user.user_type" value="Admin" style="width: 38px; margin-right:5px;">管理员
+      </p>
+      <p>用户状态：
+        <input type="radio" v-model.trim="user.status" value="1" style="width: 38px; margin-right:5px;">启用
+        <input type="radio" v-model.trim="user.status" value="419" style="width: 38px; margin-right:5px;">停用
       </p>
       <button @click="closeDialog()" class="btn yes">YES</button>
       <button @click="closeDialog(false)" class="btn cancel">NO</button>
@@ -30,6 +39,7 @@ document.addEventListener('keydown', (e) => {
 import { closeDialog } from "vue3-promise-dialog"
 
 const props = defineProps(['text', 'user'])
+
 const returnValue = () => {
   return props.user
 }
@@ -56,7 +66,6 @@ defineExpose({ returnValue, closeDialog })
 
     input {
       width: 200px;
-      //display: block;
     }
   }
 
@@ -79,30 +88,3 @@ defineExpose({ returnValue, closeDialog })
   }
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

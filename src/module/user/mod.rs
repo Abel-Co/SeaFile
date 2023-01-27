@@ -53,6 +53,7 @@ pub struct Users {
     // 1.账号正常; 419.账号冻结（七牛扩展状态码）;
     // 类型：User、Admin
     pub user_type: UserType,
+    pub usage: Option<u64>,
     pub created_at: Option<TimestampZ>,
     pub updated_at: Option<TimestampZ>,
 }

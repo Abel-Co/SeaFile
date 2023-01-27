@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <button @click="addUser">添加用户</button>
+    <button @click="manage_user">添加用户</button>
     <ul class="table">
       <li class="thead">
         <ul class="tr clearfix">
@@ -28,7 +28,7 @@
           <li>{{ new Date(item.created_at).format("yyyy-MM-dd") }}</li>
           <li>{{ new Date(item.logged_at).format("yyyy-MM-dd") }}</li>
           <li>
-            <a href="#" @click.prevent="operate(item)">
+            <a href="#" @click.prevent="manage_user(item)">
               <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-modify"></use>
               </svg>
@@ -42,45 +42,26 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { openDialog, DialogWrapper } from 'vue3-promise-dialog'
 import UserForm from './UserForm.vue'
+import { get, post, put } from "../../utils/request"
 
-async function operate(user) {
-  let obj = await openDialog(UserForm, { text: '更新用户', user })
-  if (obj) {
-    console.log(obj)
-  } else {
-    console.log()
+const list = reactive([])
+get('/user').then(resp => list.push(...resp.data))
+
+const user_template = { user_type: 'User', status: 1, usage: 0 }
+let _user = Object.assign({}, user_template)
+
+async function manage_user(user) {
+  user.id || (user = _user)
+  const title = user.id ? '更新用户' : '添加用户'
+  const result = await openDialog(UserForm, { text: title, user })
+  if (result) {
+    (user.id ? put(`/user/${user.id}`, user) : post('/user', user)).catch(_ => _)
+    user.id || (_user = Object.assign({}, user_template))
   }
 }
-
-async function addUser() {
-  let obj = await openDialog(UserForm, { text: '添加用户', user: {} })
-  if (obj) {
-    console.log(obj)
-  } else {
-    console.log()
-  }
-}
-
-const checkedAll = reactive([])
-
-const list = reactive([
-  {
-    id: 1, username: 'Abel', email: 'abel@126.com', user_type: 'Admin', phone: '13151828702', size: 182702,
-    created_at: new Date(), logged_at: new Date(), checked: true
-  }, {
-    id: 2, username: 'Xugy', email: 'xugy@126.com', user_type: 'User', phone: '13151828702', size: 13128702,
-    created_at: new Date(), logged_at: new Date(), checked: false
-  }, {
-    id: 3, username: 'Yali', email: 'yali@126.com', user_type: 'User', phone: '13151828702', size: 1315828702,
-    created_at: new Date(), logged_at: new Date(), checked: false
-  }, {
-    id: 4, username: 'Tuzi', email: 'tuzi@126.com', user_type: 'User', phone: '13151828702', size: 2815561828702,
-    created_at: new Date(), logged_at: new Date(), checked: false
-  },
-])
 </script>
 
 <style lang="scss" scoped>
@@ -159,15 +140,16 @@ ul {
     }
 
     li:nth-child(5) {
-      width: 9%;
+      width: 15%;
     }
 
     li:nth-child(6) {
-      width: 12%;
+      width: 18%;
     }
 
     li:nth-child(7) {
-      width: 12%;
+      //width: 12%;
+      width: 0;
     }
 
     li:last-child {

@@ -19,7 +19,7 @@ onMounted(() => {
     mode: 'wysiwyg',
     after: () => {
       (async () => {
-        get(`/show/${item.id}/${item.name}`).then((resp) => {
+        get(`/show/${item.id}/${item.name}`).then(resp => {
           vditor.value!.setValue(resp.data);
           vditor.value.disabled()
         })

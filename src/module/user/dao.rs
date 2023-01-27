@@ -14,6 +14,13 @@ pub async fn list() -> Vec<Users> {
 }
 
 /**
+ * Get用户
+ */
+pub async fn get(id: i64) -> Option<Users> {
+    Some(RB.fetch_by_column("id", &id).await.unwrap())
+}
+
+/**
  * 增加用户
  */
 pub async fn save(users: Users) -> u64 {
@@ -22,10 +29,10 @@ pub async fn save(users: Users) -> u64 {
 }
 
 /**
- * Get用户
+ * 更新用户
  */
-pub async fn get(id: i64) -> Option<Users> {
-    Some(RB.fetch_by_column("id", &id).await.unwrap())
+pub async fn update(users: Users) -> u64 {
+    RB.update_by_column("id", &users).await.unwrap()
 }
 
 /**
