@@ -2,11 +2,14 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use actix_web::dev::ServiceRequest;
+use notify::event::CreateKind;
 use once_cell::sync::OnceCell;
 use rbatis::core::db::DBPoolOptions;
 use rbatis::rbatis::Rbatis;
 
 use regex::Regex;
+use crate::boot::global;
+use crate::module::ifile;
 
 lazy_static! {
     pub static ref RB: Rbatis = Rbatis::new();
@@ -33,6 +36,27 @@ pub async fn init_rbatis() {
         log::info!("rbatis::datasource {}   {} ~ {}", desensitive(&db.dsn), db.min, db.max)
     }
 }
+
+pub async fn init_db_schema() {
+    let tables: i64 = RB.fetch("select count(*) from pg_tables where tablename = 'files';", vec![]).await.unwrap();
+    if tables == 0 {
+        // 1.建表
+        let sql = std::fs::read_to_string("scripts/create.sql").unwrap();
+        let _ = RB.exec(sql.as_str(), vec![]).await;
+        // 2.记录管理路径
+        let watch_path = global().watch_path.as_str();
+        ifile::bs::save_or_update(CreateKind::Folder, watch_path).await;
+    }
+    // let files: i64 = RB.fetch("select count(*) from files;", vec![]).await.unwrap();
+    // if files < 2 {
+    let root_path = ifile::dao::check(global().watch_path.as_str()).await;
+    if let None = root_path {
+        // 3.初始建立索引
+        let watch_path = global().watch_path.as_str();
+        ifile::bs::index(watch_path).await;
+    }
+}
+
 
 // Rbatis new_addition ------------------------------------------------------
 pub static RB_OLD: OnceCell<Arc<Rbatis>> = OnceCell::new();

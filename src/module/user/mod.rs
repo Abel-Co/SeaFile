@@ -1,8 +1,9 @@
 use bcrypt::BcryptResult;
 use rbatis::TimestampZ;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-use regex::Regex;
+
 use crate::module::utils::encryption;
 
 pub mod api;
@@ -69,16 +70,20 @@ pub enum UserType {
     User,
 }
 
-// impl Users {
-//     pub fn from_login(login: Login) -> Users {
-//         Users {
-//             status: Some(0),
-//             email: login.username.to_owned(),
-//             password: login.password,
-//             ..Default::default()
-//         }
-//     }
-// }
+impl Users {
+    pub fn from_login(login: Login) -> Users {
+        Users {
+            status: Some(0),
+            email: login.username.to_owned(),
+            password: login.password,
+            ..Default::default()
+        }
+    }
+    pub fn set_password(mut self, password: Option<String>) -> Self {
+        self.password = password;
+        self
+    }
+}
 
 #[derive(Debug, Validate, Serialize, Deserialize)]
 pub struct Password {

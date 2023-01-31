@@ -10,7 +10,7 @@ async fn main() -> std::io::Result<()> {
         .wrap(middleware::Compress::default())
         .wrap(middleware::Logger::default())
         .wrap(boot::middleware::Auth)
-        .service(module::handler::api_routes())
+        .service(module::router::api_routes())
         .default_service(Files::new("/", "dist/").index_file("index.html"))
     ).bind(boot::global().addr())?.run().await
 }

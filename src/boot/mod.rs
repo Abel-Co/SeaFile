@@ -3,9 +3,10 @@ use std::sync::Arc;
 
 use log4rs::config::RawConfig;
 use once_cell::sync::OnceCell;
+use log4rs::init_raw_config;
 
 use crate::boot::conf::{Conf, Postgres};
-use crate::module::init;
+use crate::module;
 
 pub mod c;
 pub mod conf;
@@ -73,20 +74,10 @@ pub fn raw_config(level: &str) -> RawConfig {
 }
 
 pub async fn start() {
-    // 1.初始化 日志
     // let config_path = global().config_path.clone().unwrap();
     // log4rs::init_file(config_path + "log4rs.yaml", Default::default()).unwrap();
-    log4rs::init_raw_config(raw_config("info")).unwrap();
-
-    // 2.初始化 数据源
-    c::init_rbatis().await;
-
-    // 3.初始化 数据库
-    init::if_init_db().await;
-
-    // 4.初始化 Smb账户
-    init::init_smb_account().await;
-
-    // 5.初始化 后台守护服务
-    init::daemon().await
+    init_raw_config(raw_config("info")).unwrap();   // 1.初始化 日志
+    c::init_rbatis().await;                         // 2.初始化 数据源
+    c::init_db_schema().await;                      // 3.初始化 数据库
+    module::start().await;                          // 4.业务模块 启动
 }

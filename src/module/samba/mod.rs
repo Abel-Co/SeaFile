@@ -3,6 +3,7 @@ use std::process::Command;
 use regex::Regex;
 
 use crate::do_loop;
+use crate::module::user;
 
 lazy_static! {
     pub static ref RE_SAMBA_STATUS: Regex = Regex::new("crashed|stopped").unwrap();
@@ -29,19 +30,41 @@ pub async fn daemon_smb() {
     } while RE_SAMBA_STATUS.is_match(&samba_status) )
 }
 
+pub async fn init_smb_account() {
+    if cfg!(target_os = "linux") {
+        let output = Command::new("sh").arg("-c").arg("cat /etc/os-release").output();
+        if !String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") { return; }
+        for user in user::dao::list().await {
+            let account = user.username.unwrap();
+            let _ = Command::new("adduser").arg("-D").arg(&account).output();
+            if let (Some(1), Some(password)) = (user.status, user.password) {
+                let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
+                let output = Command::new("sh").arg("-c").arg(shell).output();
+                let output = match output {
+                    Ok(output) => String::from_utf8_lossy(&output.stdout).to_string(),
+                    Err(err) => err.to_string()
+                };
+                log::info!("{:?}", output);
+            }
+        }
+    }
+}
+
 /**
  * 添加系统smb账户
  */
-pub async fn create(account: &str, password: &str) -> Result<(), String> {
+pub async fn create(account: &str, password: Option<String>) -> Result<(), String> {
     if cfg!(target_os = "linux") {
         let output = Command::new("cat").arg("/etc/os-release").output();
         if String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") {
             if let Err(e) = Command::new("adduser").arg("-D").arg(account).output() {
                 return Err(e.to_string());
             }
-            let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
-            if let Err(e) = Command::new("sh").arg("-c").arg(shell).output() {
-                return Err(e.to_string());
+            if let Some(password) = password {
+                let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
+                if let Err(e) = Command::new("sh").arg("-c").arg(shell).output() {
+                    return Err(e.to_string());
+                }
             }
         }
     }
