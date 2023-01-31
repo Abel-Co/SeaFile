@@ -3,6 +3,7 @@ use rbatis::TimestampZ;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use regex::Regex;
+use crate::module::utils::encryption;
 
 pub mod api;
 pub mod bs;
@@ -21,9 +22,12 @@ pub struct Login {
 }
 
 impl Login {
-    /// 验证密码
+    /// 加盐hash验证, // duration: debug 2589, release 280 !!
     pub fn verify(&self, hash: &str) -> BcryptResult<bool> {
         bcrypt::verify(self.password.as_ref().unwrap().as_bytes(), hash)
+    }
+    pub fn verify_aes(&self, cipher: &str) -> bool {
+        encryption::aes(&self.password.as_ref().unwrap()) == cipher
     }
 }
 
@@ -36,12 +40,12 @@ pub fn passhash(pass: &str) -> String {
     bcrypt::hash(pass.as_bytes(), bcrypt::DEFAULT_COST).unwrap()
 }
 
-#[derive(CRUDTable, Debug, Default, Validate, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
+#[derive(CRUDTable, Debug, Default, Clone, Validate, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
 pub struct Users {
     pub id: Option<i64>,
     #[validate(regex(path = "RE_USERNAME", message = "The username is invalid !"))]
     pub username: Option<String>,
-    #[validate(required, length(min = 6, message = "password must be more than 6 chars."))]
+    #[validate(length(min = 6, message = "password must be more than 6 chars."))]
     pub password: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
@@ -58,7 +62,7 @@ pub struct Users {
     pub updated_at: Option<TimestampZ>,
 }
 
-#[derive(Debug, Default, PartialEq, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]   // 增加了 sqlx::FromRow
 pub enum UserType {
     Admin,
     #[default]

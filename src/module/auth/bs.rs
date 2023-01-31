@@ -1,41 +1,20 @@
 use actix_web::http::StatusCode;
 use crate::module::user;
-use crate::module::user::{Login, Users, UserType};
+use crate::module::user::{Login, Users};
 
 /**
  * 用户登录
  */
 pub async fn login(login: Login) -> Result<Users, u16> {
-    match user::dao::get_by_username(login.username.as_ref().unwrap()).await {
-        Some(user) => {
-            match user.status {
-                Some(1) => {
-                    match user.user_type {
-                        UserType::Admin => admin_login(login, user).await,
-                        UserType::User => user_login(login, user).await
-                    }
-                }
-                _ => Err(user.status.unwrap_or(401) as u16)
-            }
+    if let Some(user) = user::dao::get_by_username(&login.username.as_ref().unwrap()).await {
+        if user.status != Some(1) {
+            return Err(user.status.unwrap_or(401) as u16);
         }
-        None => Err(StatusCode::UNAUTHORIZED.as_u16())  // 其他匀按登录失败处理
+        if login.verify_aes(&user.password.as_ref().unwrap()) {
+            return Ok(user)
+        }
     }
-}
-
-async fn admin_login(login: Login, user: Users) -> Result<Users, u16> {
-    if login.verify(user.password.as_ref().unwrap()).unwrap() { // duration: debug 2589, release 280 !!
-        Ok(user)
-    } else {
-        Err(StatusCode::UNAUTHORIZED.as_u16())  // 密码验证，不通过 ！！
-    }
-}
-
-async fn user_login(login: Login, user: Users) -> Result<Users, u16> {
-    if login.password == user.password {
-        Ok(user)
-    } else {
-        Err(StatusCode::UNAUTHORIZED.as_u16())  // 其他匀按登录失败处理
-    }
+    return Err(StatusCode::UNAUTHORIZED.as_u16());  // 其他匀按登录失败处理
 }
 
 /**
