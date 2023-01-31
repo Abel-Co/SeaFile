@@ -105,7 +105,7 @@ docker run \
 
 ![img_2.png](docs/assets/img_2.png)
 
-![img_3.png](docs/assets/img_3.png)
+<a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img_3.png](docs/assets/img_3.png)</a>
 
 ## 迭代计划
 | 序号  |                       功能                       | 进展  |
