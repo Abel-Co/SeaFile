@@ -4,6 +4,7 @@ use regex::Regex;
 
 use crate::do_loop;
 use crate::module::user;
+use crate::module::utils::encryption;
 
 lazy_static! {
     pub static ref RE_SAMBA_STATUS: Regex = Regex::new("crashed|stopped").unwrap();
@@ -38,6 +39,7 @@ pub async fn init_smb_account() {
             let account = user.username.unwrap();
             let _ = Command::new("adduser").arg("-D").arg(&account).output();
             if let (Some(1), Some(password)) = (user.status, user.password) {
+                let password = encryption::unaes(&password);
                 let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
                 let output = Command::new("sh").arg("-c").arg(shell).output();
                 let output = match output {
