@@ -2,12 +2,14 @@ use std::{cmp, fs};
 use std::cmp::Ordering;
 use std::path::Path;
 
+use rayon::prelude::*;
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+use crate::module::filesystem;
 use crate::module::utils::crc_utils;
 
 pub mod api;
@@ -96,4 +98,14 @@ impl PartialEq<Self> for Files {
     fn eq(&self, other: &Self) -> bool {
         self.path == other.path
     }
+}
+
+/**
+ * 巡检、脱敏、排序
+ */
+async fn desensitize_sort(mut files: Vec<Files>) -> Vec<Files> {
+    filesystem::async_patrol(&files).await; // 巡检, push to queue only
+    files.par_iter_mut().for_each(|x| x.path = x.path[6..].to_string()); // 脱敏
+    files.par_sort_by(|a, b| a.cmp(&b));    // 排序
+    files
 }

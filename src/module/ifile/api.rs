@@ -8,18 +8,27 @@ use crate::boot::middleware::JwtToken;
 
 use crate::module::ifile;
 
+/**
+ * 目录树浏览
+ */
 #[get("/list/{parent}")]
 pub async fn list(Path(parent): Path<i64>, jwt: JwtToken) -> impl Responder {
     let files = ifile::bs::list(jwt.sub, parent).await;
     HttpResponse::Ok().json(files)
 }
 
+/**
+ * 构建索引
+ */
 #[get("/index/{id}/{_name}")]
 pub async fn index(Path((id, _name)): Path<(i64, String)>, jwt: JwtToken) -> impl Responder {
     ifile::bs::reindex(jwt.sub, id).await;
     HttpResponse::Ok().json("Ok")
 }
 
+/**
+ * 文件搜索
+ */
 #[get("/search/{query}")]
 pub async fn search(Path(query): Path<String>, jwt: JwtToken) -> impl Responder {
     let files = ifile::bs::search(jwt.sub, &query).await;

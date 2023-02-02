@@ -7,7 +7,6 @@ use jsonwebtoken::{encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 
 use crate::boot::global;
-use crate::module::user::Users;
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct JwtToken {
@@ -34,12 +33,18 @@ impl JwtToken {
     }
 
     /// create jwt_token struct
-    pub fn from_user(user: Users) -> JwtToken {
+    pub fn from_id(subject_id: i64) -> Self {
+        JwtToken {
+            sub: subject_id,
+            exp: (Utc::now() + Duration::days(30)).timestamp() as usize,
+        }
+    }
+    /*pub fn from_user(user: &Users) -> JwtToken {
         JwtToken {
             sub: user.id.unwrap(),
             exp: (Utc::now() + Duration::days(30)).timestamp() as usize,  // Duration::hours(1)
         }
-    }
+    }*/
 
     /// create token
     /// secret: your secret string

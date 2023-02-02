@@ -33,6 +33,7 @@
             <input type="checkbox" v-model="checkedAll">
           </li>
           <li>名字</li>
+          <li>操作</li>
           <li>路径</li>
           <li>大小</li>
           <li>修改时间</li>
@@ -47,15 +48,16 @@
             <svg class="icon" aria-hidden="true">
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
-            <span
-                style="width: 27.5%; position: absolute; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+            <span>
               <a href="#" @click.prevent="handle_click(item)">{{ item.name }}</a>
             </span>
-            <span class="iconfont" @click="remove(item)" v-visible="!item.active">&#xe6b4;</span>
-            <span class="iconfont" @click="refresh(item)"
-                  v-visible="item.kind === 'Folder' && !item.active">&#xe6e3;</span>
-            <span class="iconfont" @click="download(item)"
-                  v-visible="item.kind === 'File' && !item.active">&#xe66c;</span>
+          </li>
+          <li>
+            <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File'">&#xe66c;</span>
+            <span class="iconfont" @click="openx11(item)" v-visible="true"
+                  style="color: gray; font-size: 17px">&#xe64c;</span>
+            <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder'">&#xe6e3;</span>
+            <span class="iconfont" @click="remove(item)" v-visible="true">&#xe6b4;</span>
           </li>
           <li :title="item.path">{{ item.path }}</li>
           <li>{{ ('' + item.size).byteToText() }}</li>
@@ -146,12 +148,12 @@ function handle_click(item) {
     router.push({ path: `${to}` })
   } else if (item.kind === 'File') {
     // window["item"] = item
-    let fileExtension = item.name.split('.').pop().toLowerCase()
+    let suffix = item.name.split('.').pop().toLowerCase()
     switch (true) {
-      case /txt|md/.test(fileExtension):
+      case /txt|md/.test(suffix):
         window.open(`#/show?${item.id}=${item.name}`, '_blank')
         break
-      case /mp4|mkv/.test(fileExtension):
+      case /mp4|mkv/.test(suffix):
         window.open(`#/play?${item.id}=${item.name}`, '_blank')
         break
       default:
@@ -190,7 +192,7 @@ const icon_template = {
   'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
   'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
   'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
-  'sh': '#icon-a-kuozhanicon_huaban1fuben33'
+  'sh': '#icon-a-kuozhanicon_huaban1fuben33', 'webp': '#icon-webp'
 }
 for (let key in icon_template) {
   key.split('|').forEach(ic => {
@@ -202,19 +204,32 @@ const icon = (item) => {
   if (item.kind === 'Folder') {
     return '#icon-folder'
   } else {
-    let fileExtension = item.name.split('.').pop().toLowerCase()
-    if (fileExtension === 'toml' || fileExtension === 'lock') {
+    let suffix = item.name.split('.').pop().toLowerCase()
+    if (suffix === 'toml' || suffix === 'lock') {
       return icons[item.name.toLowerCase()]
     }
-    return icons[fileExtension]
+    return icons[suffix]
   }
-}
-const remove = (item) => {
-  console.log(item)
 }
 const download = (item) => {
   window.open(`${location.origin}/download/${item.id}/${item.name}`, '_blank')
 }
+const openx11 = (item) => {
+  switch (platform) {
+    case 'macOS':
+      window.open(`smb://${location.hostname}/${item.path}`)
+      break
+    case 'Windows': {
+      const path = item.kind === 'Folder' ? item.path : item.path.slice(0, item.path.lastIndexOf('/'))
+      window.open(`smb://${location.hostname}/${path}`)
+      break
+    }
+    case 'Linux':
+      // Arch、Fedora、Ubuntu、？
+      break
+  }
+}
+
 const refresh = (item) => {
   (async () => {
     get(`/index/${item.id}/${item.name}`).then(resp => {
@@ -222,13 +237,27 @@ const refresh = (item) => {
     })
   })()
 }
+const remove = (item) => {
+  console.log(item)
+}
+
+const platform = (() => {
+  const userAgent = navigator.userAgent
+  if (userAgent.indexOf('Macintosh') || userAgent.indexOf('Mac OS') || userAgent.indexOf('OS X')) {
+    return 'macOS'
+  } else if (userAgent.indexOf('Windows')) {
+    return 'Windows'
+  } else if (userAgent.indexOf('Linux')) {
+    return 'Linux'
+  }
+})()
 
 window.onfocus = () => {
   // input.value.focus()
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .wrapper {
   text-align: center;
   margin-top: 30px;
@@ -250,110 +279,6 @@ ul {
   padding: 0;
 }
 
-/* 表格基本样式规范 */
-.table {
-  width: 1200px;
-  margin: 0 auto;
-  background-color: powderblue;
-}
-
-.table .tr {
-  display: flex;
-  vertical-align: middle;
-}
-
-.table .tr li {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* 行--设置行高 */
-.table .thead .tr {
-  background-color: #008080;
-  color: #fff;
-  font-size: 15px;
-  height: 36px;
-  line-height: 39px;
-}
-
-.table .tbody .tr {
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
-  height: 36px;
-  line-height: 38px;
-}
-
-.table .tbody .tr:hover {
-  background-color: rgb(248 249 250);
-}
-
-.table .tbody .tr:not(:first-child) {
-  border-top: 1px solid rgb(246 247 249);
-}
-
-/*li { border: 1px solid black; }*/
-
-/* 列--设计列宽 */
-.table .thead li:first-child, .table .tbody li:first-child {
-  min-width: 36px;
-}
-
-.table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
-  width: 54%;
-  text-align: left;
-  padding-left: 12px;
-}
-
-.table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
-  width: 18%;
-}
-
-.table .thead li:nth-child(3) {
-  text-align: center;
-}
-
-.table .tbody li:nth-child(3) {
-  text-align: left;
-  text-indent: 1em;
-}
-
-.table .thead li:nth-child(4), .table .tbody li:nth-child(4) {
-  width: 9%;
-  text-align: right;
-  padding-right: 10px;
-}
-
-.table .thead li:last-child, .table .tbody li:last-child {
-  width: 14%;
-}
-
-.table .tbody .tr li:nth-child(2) > span {
-  float: right;
-  margin-left: 2px;
-  margin-right: 5px;
-  cursor: pointer;
-}
-
-.search-btn {
-  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
-  background-color: #f8f9fa;
-  border: 1px solid #dadce0;
-  color: #202124;
-  font-family: arial, sans-serif;
-  font-size: 15px;
-  line-height: 27px;
-  border-radius: 4px;
-  padding: 0 16px;
-  height: 34px;
-  min-width: 80px;
-  text-align: center;
-  cursor: pointer;
-  /*margin-left: 10px;*/
-}
-</style>
-<style lang="scss" scoped>
 .header {
   display: flex;
   height: 60px;
@@ -375,6 +300,107 @@ ul {
       margin: auto;
       font-size: 13px;
       font-weight: var(--base-text-weight-semibold, 600);
+    }
+  }
+}
+
+//li { border: 1px solid black; }
+/* 表格基本样式规范 */
+.table {
+  width: 1200px;
+  margin: 0 auto;
+  background-color: powderblue;
+
+  .tr {
+    display: flex;
+    vertical-align: middle;
+
+    li {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  /* 行--设置行高 */
+  .thead .tr {
+    background-color: #008080;
+    color: #fff;
+    font-size: 15px;
+    height: 36px;
+    line-height: 39px;
+  }
+
+  .tbody {
+    .tr {
+      background-color: #fff;
+      color: #333;
+      font-size: 14px;
+      height: 36px;
+      line-height: 38px;
+    }
+
+    .tr:hover {
+      background-color: rgb(248 249 250);
+    }
+
+    .tr:not(:first-child) {
+      border-top: 1px solid rgb(246 247 249);
+    }
+  }
+
+  /* 列--设计列宽 */
+  .thead, .tbody {
+    li {
+      text-align: center;
+    }
+
+    li:first-child {
+      min-width: 36px;
+    }
+
+    li:nth-child(2) {
+      width: 43%;
+      text-align: left;
+      padding-left: 8px;
+
+      span {
+        width: 24.6%;
+        position: absolute;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    li:nth-child(3) {
+      width: 7.2%;
+      padding: 0 8px;
+      cursor: pointer;
+
+      span {
+        margin: 2px;
+      }
+
+      span:nth-child(2) {
+        margin-left: 5px;
+      }
+    }
+
+    li:nth-child(4) {
+      width: 24%;
+      padding: 0 8px;
+      text-align: left;
+    }
+
+    li:nth-child(5) {
+      width: 6%;
+      text-align: right;
+      padding: 0 10px;
+    }
+
+    li:last-child {
+      width: 13%;
     }
   }
 }
@@ -401,4 +427,20 @@ ul {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
+.search-btn {
+  box-shadow: 0 1px 1px rgb(0 0 0 / 10%);
+  background-color: #f8f9fa;
+  border: 1px solid #dadce0;
+  color: #202124;
+  font-family: arial, sans-serif;
+  font-size: 15px;
+  line-height: 27px;
+  border-radius: 4px;
+  padding: 0 16px;
+  height: 34px;
+  min-width: 80px;
+  text-align: center;
+  cursor: pointer;
+  /*margin-left: 10px;*/
+}
 </style>

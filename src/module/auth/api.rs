@@ -4,10 +4,10 @@ use actix_web::{delete, get, post, put};
 use actix_web::http::StatusCode;
 use actix_web::web::Json;
 use validator::Validate;
-
 use crate::boot::middleware::JwtToken;
+
 use crate::module::auth;
-use crate::module::user::Login;
+use crate::module::auth::{Subject, Login};
 
 /**
  * 登录
@@ -19,8 +19,8 @@ pub async fn login(login: Json<Login>) -> impl Responder {
     }
     match auth::bs::login(login.into_inner()).await {
         Ok(user) => {
-            let jwt_token = JwtToken::from_user(user).create();
-            HttpResponse::Ok().json(jwt_token.unwrap())
+            let jwt_token = JwtToken::from_id(user.id.unwrap());
+            HttpResponse::Ok().json(Subject::new(&user.username.unwrap(), jwt_token))
         }
         Err(code) => match code {
             419 => HttpResponse::build(StatusCode::from_u16(419).unwrap()).json("账号已冻结！"),

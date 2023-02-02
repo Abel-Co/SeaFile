@@ -22,24 +22,20 @@ pub async fn get(id: i64) -> Option<Files> {
 
 pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
     let account = auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
-    let mut _files = ifile::dao::search(&format!("/home/{}", account), query).await;
-    filesystem::async_patrol(&_files).await;
-    _files.sort_by(|a, b| a.cmp(&b));
-    _files
+    let files = ifile::dao::search(&format!("/home/{}", account), query).await;
+    ifile::desensitize_sort(files).await
 }
 
 pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
     let account = &auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
     let path = &format!("/home/{}", account);
-    let mut _files = if parent == 0 {
+    let files = if parent == 0 {
         let _file = ifile::dao::get_by_path(path).await.unwrap();
         ifile::dao::list(path, _file.id).await
     } else {
         ifile::dao::list(path, parent).await
     };
-    filesystem::async_patrol(&_files).await;
-    _files.sort_by(|a, b| a.cmp(&b));
-    _files
+    ifile::desensitize_sort(files).await
 }
 
 pub async fn show(id: i64) -> String {

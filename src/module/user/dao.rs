@@ -3,7 +3,7 @@ use rbatis::snowflake::new_snowflake_id;
 use rbson::Bson;
 
 use crate::boot::c::RB;
-use crate::module::user;
+use crate::module::auth;
 use crate::module::user::{Users, UserType};
 
 /**
@@ -50,7 +50,7 @@ async fn test_create() -> Option<Users> {
     let user = Users {
         id: Some(new_snowflake_id()),
         username: Some("abel".to_string()),
-        password: Some(user::passhash("123456")),
+        password: Some(auth::passhash("123456")),
         user_type: UserType::Admin,
         status: Some(1),
         ..Default::default()

@@ -95,6 +95,20 @@ docker run \
 
 <a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img_3.png](docs/assets/img_3.png)</a>
 
+## 关于直接本地smb打开
+![smb-local.png](docs/assets/smb-local.png)
+- macOS
+
+  不需要做什么，直接点击打开即可。
+
+- Windows
+
+  开发中，大概过程：添加注册表、添加vbs脚本。
+
+- Linux
+
+  开发中，初期主要支持 ArchLinux 的 dolphin 。
+
 ## 迭代计划
 | 序号  |                   功能                   | 进展  |
 |:---:|:--------------------------------------:|:---:|
