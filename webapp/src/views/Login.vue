@@ -42,7 +42,7 @@ async function handleSubmit() {
   // console.log(result.valid, result)
   if (result.valid) {
     post('/login', user).then(resp => {
-      localStorage.token = resp.data
+      localStorage.subject = JSON.stringify(resp.data)
       router.push({ name: 'Home' })
     }).catch(e => {
       if (e?.response?.status === 401) {
