@@ -8,8 +8,9 @@ axios.defaults.transformRequest = [data => JSONBigInt.stringify(data)]
 axios.defaults.transformResponse = [data => JSONBigInt.parse(data)]
 
 axios.interceptors.request.use(config => {
-  let token = localStorage.getItem('token')
-  if (token) config.headers['Authorization'] = `Bearer ${token}`
+  const subject = localStorage.getItem('subject')
+  const token = subject && JSON.parse(subject).token
+  token && (config.headers['Authorization'] = `Bearer ${token}`)
   return config
 }, error => {
   // window.location.href = window.location.origin + '/#/login';

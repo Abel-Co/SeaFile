@@ -1,4 +1,5 @@
 use actix_web::{Error, FromRequest, HttpMessage, HttpRequest};
+use actix_web::cookie::time::ext::NumericalDuration;
 use actix_web::dev::Payload;
 use chrono::{Duration, Utc};
 use futures::future::{ok, Ready};
@@ -36,7 +37,7 @@ impl JwtToken {
     pub fn from_id(subject_id: i64) -> Self {
         JwtToken {
             sub: subject_id,
-            exp: (Utc::now() + Duration::days(30)).timestamp() as usize,
+            exp: (Utc::now() + Duration::days(30)).timestamp_millis() as usize,
         }
     }
     /*pub fn from_user(user: &Users) -> JwtToken {
