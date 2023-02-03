@@ -1,9 +1,10 @@
 <template>
-  <div class="header">
-    <div class="img">
-      <span>Abel</span>
-    </div>
-  </div>
+  <!--  <div class="header">
+      <div class="img">
+        <span>Abel</span>
+      </div>
+    </div>-->
+  <Header />
   <div class="wrapper">
     <a href="#/" @click="q=''">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
@@ -83,6 +84,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import Header from './Header.vue'
 import { get } from '../utils/request'
 import { useRoute, useRouter } from "vue-router"
 

@@ -1,5 +1,4 @@
 use actix_web::{Error, FromRequest, HttpMessage, HttpRequest};
-use actix_web::cookie::time::ext::NumericalDuration;
 use actix_web::dev::Payload;
 use chrono::{Duration, Utc};
 use futures::future::{ok, Ready};

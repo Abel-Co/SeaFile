@@ -3,10 +3,20 @@ import vue from '@vitejs/plugin-vue'
 import importToCDN from 'vite-plugin-cdn-import'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
+import Components from 'unplugin-vue-components/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
-// https://vitejs.dev/config/
+/** https://vitejs.dev/config/ */
 export default defineConfig(({ command, mode }) => {
-  let viteConfig = { plugins: [vue()], build: { outDir: '../dist' } }
+  let viteConfig = {
+    plugins: [
+      vue(),
+      Components({
+        resolvers: [NaiveUiResolver()]
+      })
+    ],
+    build: { outDir: '../dist' }
+  }
   if (command === 'build') {  // 情景配置
     const env = loadEnv(mode, process.cwd(), '')
     viteConfig.base = '/'   // env.BASE    // github.io/<REPO>/
