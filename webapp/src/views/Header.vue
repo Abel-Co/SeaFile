@@ -3,6 +3,11 @@
     <!--左侧Logo-->
     <div class="layout-header-left">
       <!-- Logo -->
+      <div class="header" v-show="page">
+        <a href="#/">
+          <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
+        </a>
+      </div>
       <!-- 搜索框 -->
     </div>
     <!--右侧用户-->
@@ -56,6 +61,8 @@ const message = useMessage()
 const dialog = useDialog()
 const router = useRouter()
 const route = useRoute()
+
+defineProps({page: String})
 
 // 退出登录
 const doLogout = () => {
@@ -157,7 +164,7 @@ const avatarSelect = (key) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 64px;
+      height: 60px;
       line-height: 64px;
       overflow: hidden;
       white-space: nowrap;

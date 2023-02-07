@@ -1,10 +1,11 @@
 <template>
-  <div class="header">
-    <a href="#/">
-      <img class="logo" alt="Vue logo" src="../../assets/logo.svg"/>
-    </a>
-  </div>
+  <Header :page="'setting'"/>
   <div class="Layout">
+    <n-space vertical>
+      <n-card title="小卡片" size="small">
+        卡片内容
+      </n-card>
+    </n-space>
     <div class="Layout-sidebar">
       <template v-for="item in navsidebar">
         <router-link :to="item.to">{{ item.cn_name }}</router-link>
@@ -21,6 +22,7 @@ import { reactive, ref } from 'vue'
 import { post } from "../../utils/request"
 import { useRouter } from "vue-router"
 import manageRoute from "./dynamicRoute.js"
+import Header from "../Header.vue"
 
 const navsidebar = reactive([{ to: '/settings/password', name: 'Password', cn_name: '修改密码' }])
 
