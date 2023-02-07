@@ -47,6 +47,7 @@
 </template>
 
 <script setup>
+import {NAvatar, NDropdown, NIcon, NTooltip} from 'naive-ui'
 import { shallowRef } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDialog, useMessage } from 'naive-ui'

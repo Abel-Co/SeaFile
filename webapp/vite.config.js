@@ -1,16 +1,17 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
-import Components from 'unplugin-vue-components/vite'
-import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+/*import Components from 'unplugin-vue-components/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'*/
+import importToCDN, { autoComplete } from 'vite-plugin-cdn-import'
 import viteCompression from 'vite-plugin-compression'
 
 /** https://vitejs.dev/config/ */
 export default defineConfig(({ command, mode }) => {
   let viteConfig = {
-    plugins: [vue(), Components({ resolvers: [NaiveUiResolver()] })],
+    plugins: [vue(), ],
     build: { outDir: '../dist' },
-    resolve: {
+    /*resolve: {
       alias: {
         // 'vue': 'https://cdn.jsdelivr.net/npm/vue@3.2.47/+esm',
         'vue': 'https://cdn.bytedance.com/cdn/vue/3.2.31/vue.runtime.esm-browser.prod.min.js',
@@ -24,13 +25,31 @@ export default defineConfig(({ command, mode }) => {
         // 'vue3-promise-dialog': 'https://cdn.jsdelivr.net/npm/vue3-promise-dialog@0.3.4/+esm',  // 不可用：组件所在页面失败
         // 'vue3-video-play': 'https://cdn.jsdelivr.net/npm/vue3-video-play@1.3.1-beta.6/+esm'    // 不可用：组件所在页面失败
       }
-    }
+    }*/
   }
   if (command === 'build') {  // 情景配置
     const env = loadEnv(mode, process.cwd(), '')
     viteConfig.base = '/'   // env.BASE    // github.io/<REPO>/
     viteConfig.define = { __APP_ENV__: mode }
     viteConfig.plugins.push(
+      ...importToCDN({
+        modules: [
+          { name: 'vue', var: 'Vue', path: 'https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.min.js' },
+          { name: 'vuex', var: 'Vuex', path: 'https://cdn.jsdelivr.net/npm/vuex@4.1.0/dist/vuex.global.prod.min.js' },
+          {
+            name: 'vue-router', var: 'VueRouter',
+            path: 'https://cdn.jsdelivr.net/npm/vue-router@4.1.6/dist/vue-router.global.prod.min.js'
+          },
+          { name: 'axios', var: 'axios', path: 'https://cdn.jsdelivr.net/npm/axios@1.3.1/dist/axios.min.js' },
+          // { name: 'less',  var: 'less', path: 'https://cdn.jsdelivr.net/npm/less@4.1.3/dist/less.min.js' },
+          { name: 'lodash', var: '_', path: 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js' },
+          {
+            name: 'vee-validate', var: 'VeeValidate',
+            path: 'https://cdn.jsdelivr.net/npm/vee-validate@4.7.3/dist/vee-validate.min.js'
+          },
+          { name: 'naive-ui', var: 'naive-ui', path: 'https://cdn.jsdelivr.net/npm/naive-ui@2.34.3/dist/index.prod.min.js' }
+        ]
+      }),
       /*viteCompression({
       ext: ".br",
       algorithm: "brotliCompress",

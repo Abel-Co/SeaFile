@@ -13,6 +13,7 @@
 </template>
 
 <script setup>
+import {NDialogProvider, NLoadingBarProvider, NNotificationProvider, NMessageProvider} from 'naive-ui'
 import DialogContent from "./DialogContent.vue"
 import MessageContent from "./MessageContent.vue"
 </script>

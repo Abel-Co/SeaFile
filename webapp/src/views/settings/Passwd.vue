@@ -35,6 +35,8 @@
 </template>
 
 <script setup>
+import Button from '../../components/Button.vue'
+import Input from '../../components/Button.vue'
 import { reactive, ref } from 'vue'
 import { post } from "../../utils/request"
 import { useRouter, useRoute } from "vue-router"
