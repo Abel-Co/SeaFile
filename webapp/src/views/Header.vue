@@ -12,7 +12,7 @@
         <n-tooltip placement="bottom">
           <template #trigger>
             <n-icon size="18">
-              <component :is="item.icon" v-on="item.eventObject || {}"/>
+              <component :is="item.icon" v-on="item.event || {}"/>
             </n-icon>
           </template>
           <span>{{ item.tips }}</span>
@@ -47,9 +47,10 @@
 </template>
 
 <script setup>
-import { reactive, toRefs } from 'vue'
+import { shallowRef } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useDialog, useMessage, NTooltip, NAvatar, NDropdown, NIcon } from 'naive-ui'
+import { useDialog, useMessage } from 'naive-ui'
+import { GithubOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@vicons/antd'
 
 const message = useMessage()
 const dialog = useDialog()
@@ -66,13 +67,13 @@ const doLogout = () => {
     onPositiveClick: () => {
       localStorage.removeItem('subject')
       // userStore.logout().then(() => {
-        message.success('成功退出登录')
-        router.replace({
-          name: 'Login',
-          query: {
-            redirect: route.fullPath,
-          },
-        }).finally(() => location.reload())
+      message.success('成功退出登录')
+      router.replace({
+        name: 'Login',
+        query: {
+          redirect: route.fullPath,
+        },
+      }).finally(() => location.reload())
       // })
     },
     onNegativeClick: () => {
@@ -80,18 +81,19 @@ const doLogout = () => {
   })
 }
 
-const state = reactive({ username: 'Abel' || '', fullscreenIcon: 'FullscreenOutlined', })
+const state = shallowRef({ username: 'Abel' || '', fullscreenIcon: FullscreenOutlined, })
 
 // 切换全屏图标
 const toggleFullscreenIcon = () =>
     (state.fullscreenIcon =
-        document.fullscreenElement !== null ? 'FullscreenExitOutlined' : 'FullscreenOutlined')
+        document.fullscreenElement !== null ? FullscreenExitOutlined : FullscreenOutlined)
 
 // 监听全屏切换事件
 document.addEventListener('fullscreenchange', toggleFullscreenIcon)
 
 // 全屏切换
 const toggleFullScreen = () => {
+  console.log('toggleFullScreen')
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen()
   } else {
@@ -104,9 +106,9 @@ const toggleFullScreen = () => {
 // 图标列表
 const iconList = [
   {
-    icon: 'GithubOutlined',
-    tips: 'github',
-    eventObject: {
+    icon: GithubOutlined,
+    tips: 'Github',
+    event: {
       click: () => window.open('https://github.com/Abel-Co/SeaFile'),
     },
   }
@@ -142,7 +144,7 @@ const avatarSelect = (key) => {
   align-items: center;
   padding: 0;
   //height: @header-height;
-  box-shadow: 0 1px 4px rgb(0 21 41 / 8%);
+  //box-shadow: 0 1px 4px rgb(0 21 41 / 8%);
   transition: all 0.2s ease-in-out;
   width: 100%;
   z-index: 11;

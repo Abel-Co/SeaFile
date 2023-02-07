@@ -6,21 +6,21 @@
         <Form @keydown.enter="handleSubmit" ref="userForm">
           <ul>
             <li>
-              <comp-input
+              <Input
                   v-model.trim="user.username" name="username" data-vv-as="账号"
                   rules="account" :placeholder="'请输入账号'" key="login-username" :errors="errors"
-              ></comp-input>
+              />
             </li>
             <li>
-              <comp-input
+              <Input
                   v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
                   rules="account" :placeholder="'请输入密码'" key="login-password" :errors="errors"
-              ></comp-input>
+              />
             </li>
           </ul>
         </Form>
       </div>
-      <comp-button class="login--btn" themes="primary" @click="handleSubmit"></comp-button>
+      <Button class="login--btn" themes="primary" @click="handleSubmit"></Button>
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 /**/dist
 /**/target
-/**/test.html
 /**/node_modules
+/**/visualizer.html
 /**/.DS_Store
 /**/.vscode
 /**/.docker

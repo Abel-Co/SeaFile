@@ -8,27 +8,27 @@
             <li>
               <!-- v-validate="'required'" -->
               <label for="">旧密码</label>
-              <comp-input style="border-radius: 2px;"
+              <Input style="border-radius: 2px;"
                           v-model.trim="user.username" name="username" data-vv-as="账号"
                           :placeholder="'请输入账号'" key="login-username"
-              ></comp-input>
+              ></Input>
             </li>
             <li>
               <label for="">新密码</label>
-              <comp-input
+              <Input
                   v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
                   :placeholder="'请输入密码'" key="login-password"
-              ></comp-input>
+              ></Input>
               <label for="">确认新密码</label>
-              <comp-input
+              <Input
                   v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
                   :placeholder="'请输入密码'" key="login-password"
-              ></comp-input>
+              ></Input>
             </li>
           </ul>
         </form>
       </div>
-      <comp-button class="login--btn" themes="primary" @click="" text="更新密码"></comp-button>
+      <Button class="login--btn" themes="primary" @click="" text="更新密码"></Button>
 <!--      <comp-button class="login&#45;&#45;btn" themes="cancel" @click="" text="取消"></comp-button>-->
     </div>
   </div>
