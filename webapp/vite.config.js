@@ -9,7 +9,7 @@ import viteCompression from 'vite-plugin-compression'
 /** https://vitejs.dev/config/ */
 export default defineConfig(({ command, mode }) => {
   let viteConfig = {
-    plugins: [vue(), ],
+    plugins: [vue(),],
     build: { outDir: '../dist' },
     /*resolve: {
       alias: {
@@ -47,7 +47,14 @@ export default defineConfig(({ command, mode }) => {
             name: 'vee-validate', var: 'VeeValidate',
             path: 'https://cdn.jsdelivr.net/npm/vee-validate@4.7.3/dist/vee-validate.min.js'
           },
-          { name: 'naive-ui', var: 'naive-ui', path: 'https://cdn.jsdelivr.net/npm/naive-ui@2.34.3/dist/index.prod.min.js' }
+          {
+            name: 'naive-ui', var: 'naive-ui',
+            path: 'https://cdn.jsdelivr.net/npm/naive-ui@2.34.3/dist/index.prod.min.js'
+          },
+          {
+            name: 'vditor', var: 'vditor', path: 'https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/index.min.js',
+            css: 'https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/js/highlight.js/styles/dracula.min.css'
+          }
         ]
       }),
       /*viteCompression({
@@ -55,12 +62,12 @@ export default defineConfig(({ command, mode }) => {
       algorithm: "brotliCompress",
       deleteOriginFile: true
     }), */visualizer({
-      gzipSize: true,
-      brotliSize: true,
-      emitFile: false,
-      filename: "visualizer.html",
-      open: false
-    }),)
+        gzipSize: true,
+        brotliSize: true,
+        emitFile: false,
+        filename: "visualizer.html",
+        open: false
+      }),)
   } else if (command === 'serve') {
     viteConfig.server = {
       open: '/',          // 开发服启动时打开浏览器
