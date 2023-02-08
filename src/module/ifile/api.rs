@@ -35,12 +35,18 @@ pub async fn search(Path(query): Path<String>, jwt: JwtToken) -> impl Responder 
     HttpResponse::Ok().json(files)
 }
 
+/**
+ * 读取文件
+ */
 #[get("/show/{id}/{_name}")]
 pub async fn show(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     let content = ifile::bs::show(id).await;
     HttpResponse::Ok().json(content)
 }
 
+/**
+ * 原生访问
+ */
 #[get("/visit/{id}/{_name}")]
 pub async fn visit(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     match ifile::bs::get(id).await {
@@ -56,6 +62,9 @@ pub async fn visit(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     }
 }
 
+/**
+ * 下载档案
+ */
 #[get("/download/{id}/{_name}")]
 pub async fn download(Path((id, _name)): Path<(i64, String)>) -> Result<impl Responder> {
     match ifile::bs::get(id).await {
