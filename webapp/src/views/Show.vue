@@ -3,6 +3,8 @@
   <div id="vditor" />
 </template>
 
+<script src="https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/index.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/js/highlight.js/styles/dracula.min.css" rel="stylesheet">
 <script setup lang="ts">
 import {onMounted, onUpdated, reactive, ref} from 'vue';
 import {get} from '../utils/request';

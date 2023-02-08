@@ -3,7 +3,7 @@
   <div class="Layout">
     <n-space vertical>
       <n-card title="小卡片" size="small">
-        卡片内容
+        https://secure.gravatar.com/avatar/0694061944a30a821c3541cc288aa01a?d=identicon&s=870
       </n-card>
     </n-space>
     <div class="Layout-sidebar">
