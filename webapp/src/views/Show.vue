@@ -1,15 +1,21 @@
 <template>
-  <h1>{{item.path}}</h1>
-  <div id="vditor" />
+  <RemoveScript src="https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/index.min.js" />
+  <h1>{{ item.path }}</h1>
+  <div id="vditor"/>
 </template>
 
-<script src="https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/index.min.js"></script>
+<!--See => -->
+<!--https://techvblogs.com/blog/how-to-load-an-external-script-in-vue-component、-->
+<!--https://juejin.cn/post/7049217566144725029-->
+<!--<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/index.min.js"></script>-->
 <link href="https://cdn.jsdelivr.net/npm/vditor@3.9.0/dist/js/highlight.js/styles/dracula.min.css" rel="stylesheet">
 <script setup lang="ts">
 import {onMounted, onUpdated, reactive, ref} from 'vue';
 import {get} from '../utils/request';
 import Vditor from 'vditor';
-import 'vditor/dist/index.css';
+// import 'vditor/dist/index.css';
+import RemoveScript from '../components/RemoteScript.vue';
+
 
 const vditor = ref<Vditor | null>(null);
 // const item = reactive(window.opener.item)  // 不利于基于url直接访问资源
@@ -37,7 +43,7 @@ onMounted(() => {
     },
   });
 });
-onUpdated(()=>{
+onUpdated(() => {
 
 })
 </script>
@@ -48,6 +54,7 @@ h1 {
   margin: 20px auto;
   min-width: 1240px;
 }
+
 #vditor {
   box-shadow: 0 0 20px rgb(208 208 208);
   min-width: 1240px;
@@ -55,12 +62,14 @@ h1 {
   margin: auto;
   height: 100vh;
   border-radius: 6px 6px 6px 6px;
+
   .vditor-toolbar {
     height: 0;
     line-height: 2;
     border-radius: 6px 6px 0 0;
     padding-left: 170px;
   }
+
   .vditor-content {
     .vditor-wysiwyg {
       .vditor-reset {
@@ -71,21 +80,25 @@ h1 {
   }
 }
 
-.vditor-content pre.vditor-reset:focus  {
+.vditor-content pre.vditor-reset:focus {
   background-color: white;
 }
+
 .vditor-ir .vditor-reset {
   border-radius: 0 0 6px 6px;
   padding: 10px 170px;
 }
+
 .vditor-sv .vditor-reset {
   border-radius: 0 0 6px 6px;
   padding: 10px 170px;
 }
+
 .vditor-toolbar .vditor-toolbar__item button svg {
   height: 22px;
   width: 22px;
 }
+
 .vditor-toolbar__item .vditor-tooltipped {
   width: auto;
 }

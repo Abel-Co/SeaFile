@@ -17,6 +17,7 @@
     "json-bigint": "^1.0.0",
     "lodash": "^4.17.21",
     "naive-ui": "^2.34.3",
+    "rollup-plugin-external-globals": "^0.7.1",
     "rollup-plugin-visualizer": "^5.9.0",
     "sass": "^1.57.1",
     "unplugin-vue-components": "^0.23.0",
