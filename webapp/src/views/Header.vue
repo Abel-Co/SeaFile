@@ -73,7 +73,6 @@ const doLogout = () => {
     negativeText: '取消',
     onPositiveClick: () => {
       localStorage.removeItem('subject')
-      // userStore.logout().then(() => {
       message.success('成功退出登录')
       router.replace({
         name: 'Login',
@@ -81,7 +80,6 @@ const doLogout = () => {
           redirect: route.fullPath,
         },
       }).finally(() => location.reload())
-      // })
     },
     onNegativeClick: () => {
     },
@@ -122,7 +120,7 @@ const iconList = [
 ]
 const avatarOptions = [
   {
-    label: '个人设置',
+    label: '个人中心',
     key: 1,
   },
   {
@@ -135,7 +133,7 @@ const avatarOptions = [
 const avatarSelect = (key) => {
   switch (key) {
     case 1:
-      router.push({ name: 'Setting' })
+      router.push({ name: 'Settings' })
       break
     case 2:
       doLogout()

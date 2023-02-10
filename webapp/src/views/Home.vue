@@ -1,9 +1,4 @@
 <template>
-  <!--  <div class="header">
-      <div class="img">
-        <span>Abel</span>
-      </div>
-    </div>-->
   <Header />
   <div class="wrapper">
     <a href="#/" @click="q=''">
@@ -14,15 +9,11 @@
     </div>
     <button class="search-btn" type="button" @click="search">搜 索</button>
     <!--    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>-->
-    <!--    <span>选择的值为: {{ checked }}</span>-->
     <div style="width:1200px;height: 20px;margin: 13px auto;">
       <button class="iconfont" @click="downloadAllChecked()" v-show="checked.length > 0"
               style="float: left; color:white; padding: 0 15px; border: 0; background-color: #06a7ff; height: 32px;
               font-family: SFUIText,PingFangSC-Regular,Helvetica Neue,Helvetica,Arial,sans-serif;
               border-radius: 15px; ">
-        <!--        <svg class="icon" aria-hidden="true">-->
-        <!--          <use :xlink:href="icon({kind:'Folder'})"></use>-->
-        <!--        </svg>-->
         &#xe66c;
         下载选中的
       </button>
@@ -55,12 +46,16 @@
           </li>
           <li>
             <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File'">&#xe66c;</span>
-            <span class="iconfont" @click="openx11(item)" v-visible="true"
-                  style="color: gray; font-size: 17px">&#xe64c;</span>
+            <span class="iconfont" @click="openx11(item)" v-visible="true" style="color: gray; font-size: 17px">&#xe64c;</span>
             <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder'">&#xe6e3;</span>
             <span class="iconfont" @click="remove(item)" v-visible="true">&#xe6b4;</span>
           </li>
-          <li :title="item.path">{{ item.path }}</li>
+          <li>
+            <n-tooltip trigger="hover">
+              <template #trigger>{{ item.path }}</template>
+              {{ item.path }}
+            </n-tooltip>
+          </li>
           <li>{{ ('' + item.size).byteToText() }}</li>
           <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
           <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>

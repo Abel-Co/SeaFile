@@ -26,7 +26,7 @@ export default defineConfig(({ command, mode }) => {
         'json-bigint': 'https://cdn.jsdelivr.net/npm/json-bigint@1.0.0/+esm',
         '_': 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/+esm',
         // 'vee-validate': 'https://cdn.jsdelivr.net/npm/vee-validate@4.7.3/+esm',  // 失败：不报错，不出结果
-        'naive-ui': 'https://cdn.jsdelivr.net/npm/naive-ui@2.34.3/+esm',         // 失败：不报错，页面不显示
+        // 'naive-ui': 'https://cdn.jsdelivr.net/npm/naive-ui@2.34.3/+esm',         // 失败：不报错，页面不显示
         // 'vditor': 'https://cdn.jsdelivr.net/npm/vditor@3.9.0/+esm',              // 失败：Failed to fetch dynamically imported module
         // 'vue3-promise-dialog': 'https://cdn.jsdelivr.net/npm/vue3-promise-dialog@0.3.4/+esm',  // 不可用：组件所在页面失败
         // 'vue3-video-play': 'https://cdn.jsdelivr.net/npm/vue3-video-play@1.3.1-beta.6/+esm'    // 不可用：组件所在页面失败

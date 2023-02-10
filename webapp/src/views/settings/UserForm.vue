@@ -20,6 +20,7 @@
         <input type="radio" v-model.trim="user.status" value="1" style="width: 38px; margin-right:5px;">启用
         <input type="radio" v-model.trim="user.status" value="419" style="width: 38px; margin-right:5px;">停用
       </p>
+      <p>使用邮箱获取头像</p>
       <button @click="closeDialog()" class="btn yes">YES</button>
       <button @click="closeDialog(false)" class="btn cancel">NO</button>
     </div>
