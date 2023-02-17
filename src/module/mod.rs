@@ -5,6 +5,7 @@ pub mod init;
 pub mod samba;
 pub mod user;
 pub mod auth;
+pub mod daisy;
 
 pub mod router {
     use actix_web::dev::HttpServiceFactory;

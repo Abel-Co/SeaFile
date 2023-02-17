@@ -1,4 +1,8 @@
 
+#### 旭日图
+- https://blog.51cto.com/u_15477294/4892889
+- https://blog.csdn.net/ansheng02/article/details/121869963
+
 #### 系统平台检测
 - https://cloud.tencent.com/developer/article/1538300
 - navigator.userAgentData 仅适用于 Chrome 

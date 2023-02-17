@@ -4,6 +4,13 @@ use crate::module::{auth, samba, user};
 use crate::module::user::Users;
 
 /**
+ * 特定用户
+ */
+pub async fn get(id: i64) -> Option<Users> {
+    user::dao::get(id).await
+}
+
+/**
  * 用户列表
  */
 pub async fn list() -> Vec<Users> {

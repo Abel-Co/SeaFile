@@ -27,15 +27,15 @@
   </div>
 </template>
 
-<!--<script>
+<script>
 import { closeDialog } from "vue3-promise-dialog"
 
 document.addEventListener('keydown', (e) => {
-  if (e.keyCode === 27 && document.getElementsByClassName('user&#45;&#45;dialog').length > 0) {
+  if (e.keyCode === 27 && document.getElementsByClassName('user--dialog').length > 0) {
     closeDialog(false)
   }
 })
-</script>-->
+</script>
 <script setup>
 import { closeDialog } from "vue3-promise-dialog"
 

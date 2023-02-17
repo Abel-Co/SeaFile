@@ -1,5 +1,5 @@
 <template>
-  <Header :page="'setting'"/>
+  <Header :header-left="'show'"/>
   <div class="Layout">
     <n-space vertical>
       <n-card size="small" :bordered="false">
@@ -32,22 +32,22 @@
 import { onMounted, reactive, ref } from 'vue'
 import { post } from "../../utils/request"
 import { useRouter } from "vue-router"
-import manageRoute from "./dynamicRoute.js"
+import manageRoute from "../admin/dynamicRoute.js"
 import Header from "../Header.vue"
 
 const navsidebar = reactive([
-  { path: '/settings/users', name: 'Users', title: '基础信息', icon: 'person', icon_margin_top: '-28.3px', active: 0 },
+  { path: '/personal/profile', name: 'Profile', title: '基础信息', icon: 'person', icon_margin_top: '-28.3px', active: 0 },
   {
-    path: '/settings/password', name: 'Password', title: '更新密码',
+    path: '/personal/password', name: 'Password', title: '更新密码',
     icon: 'outline-security-safe', icon_margin_top: '-28.3px', active: 0
   }
 ])
 
 if ('admin') {
   const router = useRouter()
-  router.addRoute('Settings', manageRoute)
+  router.addRoute('Admin', manageRoute)
   navsidebar.push({
-    path: '/settings/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px', active: 0
+    path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px', active: 0
   })
 }
 
@@ -81,7 +81,7 @@ onMounted(() => {
 .Layout {
   margin: auto;
   font-size: 22px;
-  max-width: 1200px;
+  max-width: 1300px;
 
   &-sidebar {
     width: 19%;
@@ -93,6 +93,7 @@ onMounted(() => {
     }
 
     .n-anchor:not(.n-anchor--block):not(.n-anchor--show-rail) > .n-anchor-link {
+      padding-top: 1px;
       padding-left: 7px;
     }
 

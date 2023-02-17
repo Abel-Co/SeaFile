@@ -3,7 +3,7 @@
     <!--左侧Logo-->
     <div class="layout-header-left">
       <!-- Logo -->
-      <div class="header" v-show="page">
+      <div class="header" v-show="headerLeft">
         <a href="#/">
           <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
         </a>
@@ -62,7 +62,7 @@ const dialog = useDialog()
 const router = useRouter()
 const route = useRoute()
 
-defineProps({page: String})
+defineProps({ headerLeft: String })
 
 // 退出登录
 const doLogout = () => {
@@ -90,8 +90,7 @@ const state = shallowRef({ username: 'Abel' || '', fullscreenIcon: FullscreenOut
 
 // 切换全屏图标
 const toggleFullscreenIcon = () =>
-    (state.fullscreenIcon =
-        document.fullscreenElement !== null ? FullscreenExitOutlined : FullscreenOutlined)
+    (state.fullscreenIcon = document.fullscreenElement !== null ? FullscreenExitOutlined : FullscreenOutlined)
 
 // 监听全屏切换事件
 document.addEventListener('fullscreenchange', toggleFullscreenIcon)

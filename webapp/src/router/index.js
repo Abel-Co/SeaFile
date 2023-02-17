@@ -11,16 +11,16 @@ const routes = [
   { path: '/edit', name: 'Edit', component: () => import('../views/Show.vue') },
   { path: '/play', name: 'Play', component: () => import('../views/Play.vue') },
   {
-    path: '/settings', name: 'Settings', component: () => import('../views/settings/Index.vue'),
+    path: '/personal', name: 'Personal', component: () => import('../views/personal/Index.vue'),
     children: [
-      { path: 'password', name: 'Password', component: () => import('../views/settings/Passwd.vue') },
+      { path: 'profile', name: 'Profile', component: () => import('../views/personal/Profile.vue') },
+      { path: 'password', name: 'Password', component: () => import('../views/personal/Password.vue') },
     ]
   },
+  {
+    path: '/admin', name: 'Admin',
+  }
 ]
-
-// export default createRouter({
-//   history: createWebHashHistory(), routes
-// })
 
 const router = createRouter({
   history: createWebHashHistory(), routes

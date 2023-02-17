@@ -9,6 +9,15 @@ use crate::module::{auth, user};
 use crate::module::user::{Users, UserType};
 
 /**
+ * 查当前用户
+ */
+#[get("/self")]
+pub async fn get(jwt: JwtToken) -> impl Responder {
+    let user = user::bs::get(jwt.sub).await;
+    HttpResponse::Ok().json(user)
+}
+
+/**
  * 用户列表
  */
 #[get("/user")]

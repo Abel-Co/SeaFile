@@ -61,6 +61,7 @@ create table users
     user_type  varchar(50)                        ,
     status     integer                            ,
     usage      bigint       default 0     not null,
+    quota      bigint       default 10240 not null ,
     created_at timestamptz  default now() not null,
     updated_at timestamptz  default now() not null
 );
@@ -73,9 +74,10 @@ comment on column users.username    is '账号';
 comment on column users.password    is '密码';
 comment on column users.email       is '邮箱';
 comment on column users.phone       is '电话';
-comment on column users.avatar      is '头像';
+comment on column users.avatar      is '头像：email、http:xxx';
 comment on column users.user_type   is '用户类型：admin, user';
 comment on column users.status      is '状态: 1.正常; 419.冻结';
+comment on column users.quota       is '配额：单位GB，默认10TB=10240GB';
 comment on column users.usage       is '存储使用量';
 comment on column users.created_at  is '创建时间';
 comment on column users.updated_at  is '更新时间';

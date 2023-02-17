@@ -44,7 +44,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { openDialog, DialogWrapper } from 'vue3-promise-dialog'
-import UserForm from './UserForm.vue'
+import UserForm from '../personal/Profile.vue'
 import { get, post, put } from "../../utils/request"
 
 const list = reactive([])
