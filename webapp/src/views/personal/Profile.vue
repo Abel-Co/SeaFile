@@ -1,8 +1,8 @@
 <template>
   <!--  账号，密码，邮箱，手机号，使用邮箱获取头像，用户属性（用户、管理员）-->
-  <n-form ref="formRef" :model="model" :rules="rules" >
+  <n-form ref="formRef" :model="model" :rules="rules">
     <n-image preview-disabled width="260" :style="{float: 'right', borderRadius: '50%', marginRight: '10%'}"
-        src="https://www.gravatar.com/avatar/0694061944a30a821c3541cc288aa01a?d=identicon&s=870"
+             src="https://www.gravatar.com/avatar/0694061944a30a821c3541cc288aa01a?d=identicon&s=870"
     />
     <n-form-item path="username" label="账号" :style="{maxWidth: '320px'}">
       <n-input v-model:value="model.username" @keydown.enter.prevent :disabled="true"/>
@@ -24,7 +24,7 @@
     <n-col :span="24"></n-col>
     <n-col :span="24">
       <div style="display: flex; justify-content: flex-start">
-        <n-button :disabled="model.age === null" round type="primary" @click="handleValidateButtonClick">
+        <n-button round type="primary" @click="submit">
           保存
         </n-button>
       </div>
@@ -37,15 +37,14 @@
 <script setup>
 import { computed, reactive, ref } from "vue"
 import { useMessage } from "naive-ui"
+import { get, put } from '../../utils/request'
 
 const formRef = ref(null)
 const message = useMessage()
+const model = reactive({})
 
-const model = reactive({
-  username: 'Abel',
-  phone: '13154828702',
-  email: 'abel@126.com',
-  avatar: 'https://xxx',
+get('/seafile/user').then(resp => {
+  Object.assign(model, resp.data)
 })
 
 const urlAvatar = computed(() => {
@@ -71,15 +70,12 @@ const rules = {
   }],
 }
 
-const handleValidateButtonClick = (e) => {
+const submit = e => {
   e.preventDefault()
-  formRef.value?.validate((errors) => {
-    if (!errors) {
-      message.success("验证成功")
-    } else {
-      console.log(errors)
-      message.error("验证失败")
-    }
+  formRef.value?.validate(err => {
+    !err && put('/seafile/user/self', model).then(resp => {
+      message.success("保存成功")
+    })
   })
 }
 </script>

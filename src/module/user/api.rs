@@ -6,21 +6,39 @@ use actix_web_lab::extract::Path;
 
 use crate::boot::middleware::JwtToken;
 use crate::module::{auth, user};
-use crate::module::user::{Users, UserType};
+use crate::module::user::{Password, Users, UserType};
 
+/// 用户接口
 /**
- * 查当前用户
+ * 当前用户
  */
-#[get("/self")]
+#[get("/user")]
 pub async fn get(jwt: JwtToken) -> impl Responder {
     let user = user::bs::get(jwt.sub).await;
     HttpResponse::Ok().json(user)
 }
 
 /**
+ * 更新用户
+ */
+#[put("/user/self")]
+pub async fn put(user: Json<Users>, jwt: JwtToken) -> impl Responder {
+    // log::info!(">>> {:?} => {:?}: {:?}", jwt.sub, id.0, user.0);
+    let _ = user::bs::update(jwt.sub, user.0).await;
+    HttpResponse::Ok().json("Ok")
+}
+
+#[put("/user/pwd")]
+pub async fn pwd(pwd: Json<Password>, jwt: JwtToken) -> impl Responder {
+    let cnt = user::bs::update_pwd(jwt.sub, &pwd.old, &pwd.new).await;
+    HttpResponse::Ok().json(cnt)
+}
+
+/// 管理员接口
+/**
  * 用户列表
  */
-#[get("/user")]
+#[get("/user/list")]
 pub async fn list(jwt: JwtToken) -> impl Responder {
     if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
         if subject.user_type == UserType::Admin {   // 验证管理员权限
@@ -60,4 +78,3 @@ pub async fn update(id: Path<i64>, user: Json<Users>, jwt: JwtToken) -> impl Res
     }
     HttpResponse::Ok()
 }
-

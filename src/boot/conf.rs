@@ -17,6 +17,7 @@ pub struct Conf {
 pub struct Server {
     pub port: u32,
     pub env: Option<String>,
+    pub context_path: String,
 }
 
 #[derive(Debug, Deserialize)]

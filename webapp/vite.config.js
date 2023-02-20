@@ -53,7 +53,8 @@ export default defineConfig(({ command, mode }) => {
       strictPort: false,  // false: 端口被占用则尝试下一个可用端口
       proxy: {
         // '^/.*': 'http://172.17.16.165:8080',
-        '^/(search|index|list|show|visit|download|login|user).*': 'http://127.0.0.1:8080',
+        '^/seafile/.*': 'http://127.0.0.1:8080',
+        // '^/(search|index|list|show|visit|download|login|user).*': 'http://127.0.0.1:8080',
       }
     }
   }

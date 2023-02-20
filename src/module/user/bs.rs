@@ -41,6 +41,7 @@ pub async fn create(mut user: Users) -> Result<u64, String> {
 pub async fn update(user_id: i64, mut user: Users) -> u64 {
     if let Some(db_user) = user::dao::get(user_id).await {
         user.username = db_user.username;   // username => smb account 创建后不可更改
+        user.quota = db_user.quota;
         if let Some(_password) = &user.password.clone() {
             user.password = Some(auth::passaes(&_password));
             if user.password != db_user.password {
@@ -49,6 +50,21 @@ pub async fn update(user_id: i64, mut user: Users) -> u64 {
             }
         }
         return user::dao::update(&user).await;
+    }
+    0
+}
+
+/**
+ * 修改密码
+ */
+pub async fn update_pwd(user_id: i64, old: &str, new: &str) -> u64 {
+    if let Some(mut db_user) = get(user_id).await {
+        if db_user.password == Some(auth::passaes(old)) {
+            db_user.password = Some(auth::passaes(new));
+            let account = db_user.username.as_ref().unwrap();
+            let _ = samba::modify_password(account, new).await;
+            return user::dao::update(&db_user).await;
+        }
     }
     0
 }

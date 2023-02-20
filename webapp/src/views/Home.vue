@@ -81,7 +81,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import Header from './Header.vue'
 import { get } from '../utils/request'
-import { useRoute, useRouter } from "vue-router"
+import { useRouter } from "vue-router"
 
 const q = ref(null)
 const qh = ref(null)
@@ -127,11 +127,11 @@ function show(item, query) {
   (async () => {
     list.length = 0
     if (item) {
-      get(`/list/${item.id}`).then(resp => {
+      get(`/seafile/list/${item.id}`).then(resp => {
         list.push(...resp.data)
       })
     } else if (query) {
-      get(`/search/${query}`).then(resp => {
+      get(`/seafile/search/${query}`).then(resp => {
         list.push(...resp.data)
       })
     }
@@ -229,7 +229,7 @@ const openx11 = (item) => {
 
 const refresh = (item) => {
   (async () => {
-    get(`/index/${item.id}/${item.name}`).then(resp => {
+    get(`/seafile/index/${item.id}/${item.name}`).then(resp => {
       alert('操作成功')
     })
   })()

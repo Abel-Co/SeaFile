@@ -41,7 +41,7 @@ async function handleSubmit() {
   const result = await userForm.value.validate()
   // console.log(result.valid, result)
   if (result.valid) {
-    post('/login', user).then(resp => {
+    post('/seafile/login', user).then(resp => {
       localStorage.subject = JSON.stringify(resp.data)
       router.push({ name: 'Home' })
     }).catch(e => {

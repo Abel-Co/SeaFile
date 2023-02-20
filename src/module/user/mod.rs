@@ -26,6 +26,7 @@ pub struct Users {
     // 类型：User、Admin
     pub user_type: UserType,
     pub usage: Option<u64>,
+    pub quota: Option<u64>,
     pub created_at: Option<TimestampZ>,
     pub updated_at: Option<TimestampZ>,
 }
@@ -54,7 +55,7 @@ impl Users {
 
 #[derive(Debug, Validate, Serialize, Deserialize)]
 pub struct Password {
-    pub id: i64,
+    pub id: Option<i64>,
     pub new: String,
     pub old: String,
 }

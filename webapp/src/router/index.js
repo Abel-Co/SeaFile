@@ -12,6 +12,7 @@ const routes = [
   { path: '/play', name: 'Play', component: () => import('../views/Play.vue') },
   {
     path: '/personal', name: 'Personal', component: () => import('../views/personal/Index.vue'),
+    redirect: '/personal/profile',
     children: [
       { path: 'profile', name: 'Profile', component: () => import('../views/personal/Profile.vue') },
       { path: 'password', name: 'Password', component: () => import('../views/personal/Password.vue') },
