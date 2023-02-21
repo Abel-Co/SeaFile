@@ -8,11 +8,11 @@ watch_path: /home
 jwt:
   key: 0xa06f853898a9dd4f32441a56879c52878f96c42730ed31c50e00
 white_list:
-  /login:
+  /seafile/login:
     - POST
-  /show/*: [ GET ]
-  /visit/*: [ GET ]
-  /download/*: [ GET ]
+  /seafile/show/*: [ GET ]
+  /seafile/visit/*: [ GET ]
+  /seafile/download/*: [ GET ]
   /: [ GET ]
   /assets/*: [ GET ]
   /favicon.ico: [ GET ]

@@ -34,7 +34,7 @@ const rPasswordFormItemRef = ref(null)
 const rPasswordFormItemOldRef = ref(null)
 const oldStatus = ref(true)
 const message = useMessage()
-const model = reactive({ old: '654321', new: '123456', reenteredPassword: '123456' })
+const model = reactive({ old: '', new: '', reenteredPassword: '' })
 
 function validatePasswordStartWith(rule, value) {
   return !!model.new && model.new.startsWith(value) && model.new.length >= value.length

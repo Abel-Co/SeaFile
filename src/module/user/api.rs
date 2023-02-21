@@ -14,16 +14,20 @@ use crate::module::user::{Password, Users, UserType};
  */
 #[get("/user")]
 pub async fn get(jwt: JwtToken) -> impl Responder {
-    let user = user::bs::get(jwt.sub).await;
-    HttpResponse::Ok().json(user)
+    if let Some(mut user) = user::bs::get(jwt.sub).await {
+        user.password = None;
+        return HttpResponse::Ok().json(user);
+    }
+    HttpResponse::Ok().json("none")
 }
 
 /**
  * 更新用户
  */
 #[put("/user/self")]
-pub async fn put(user: Json<Users>, jwt: JwtToken) -> impl Responder {
+pub async fn put(mut user: Json<Users>, jwt: JwtToken) -> impl Responder {
     // log::info!(">>> {:?} => {:?}: {:?}", jwt.sub, id.0, user.0);
+    user.password = None;
     let _ = user::bs::update(jwt.sub, user.0).await;
     HttpResponse::Ok().json("Ok")
 }

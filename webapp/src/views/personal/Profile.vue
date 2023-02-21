@@ -14,9 +14,9 @@
       <n-input v-model:value="model.email" @keydown.enter.prevent/>
     </n-form-item>
     <n-form-item path="avatar" label="用邮箱获取头像" :style="{maxWidth: '320px'}">
-      <n-switch v-model:value="model.avatar" checked-value="email" unchecked-value=""/>
+      <n-switch v-model:value="avatar" checked-value="email" unchecked-value=""/>
     </n-form-item>
-    <n-form-item v-if="urlAvatar" path="avatar" label="头像地址" :style="{width: '700px'}">
+    <n-form-item v-if="!avatar" path="avatar" label="头像地址" :style="{width: '700px'}">
       <n-input v-model:value="model.avatar" @keydown.enter.prevent/>
     </n-form-item>
   </n-form>
@@ -31,25 +31,19 @@
     </n-col>
   </n-row>
 
-  <pre>{{ JSON.stringify(model, null, 2) }}</pre>
+<!--  <pre> {{ avatar }} <br/> profile {{ JSON.stringify(model, null, 2) }}</pre>-->
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue"
+import { computed, onMounted, reactive, ref } from "vue"
 import { useMessage } from "naive-ui"
 import { get, put } from '../../utils/request'
 
 const formRef = ref(null)
 const message = useMessage()
+
+const avatar = ref('email')
 const model = reactive({})
-
-get('/seafile/user').then(resp => {
-  Object.assign(model, resp.data)
-})
-
-const urlAvatar = computed(() => {
-  return !model.avatar || !model.avatar.startsWith('email')
-})
 
 const rules = {
   /*username: [{
@@ -70,12 +64,25 @@ const rules = {
   }],
 }
 
+onMounted(() => {
+  get('/seafile/user').then(resp => {
+    if (resp.data.avatar === 'email') {
+      avatar.value = resp.data.avatar
+      resp.data.avatar = ''
+    } else avatar.value = ''
+    Object.assign(model, resp.data)
+  })
+})
+
 const submit = e => {
   e.preventDefault()
   formRef.value?.validate(err => {
-    !err && put('/seafile/user/self', model).then(resp => {
-      message.success("保存成功")
-    })
+    if (!err) {
+      avatar.value && (model.avatar = avatar.value)
+      put('/seafile/user/self', model).then(resp => {
+        message.success("保存成功")
+      })
+    }
   })
 }
 </script>
