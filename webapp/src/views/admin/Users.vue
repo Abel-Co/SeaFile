@@ -48,7 +48,7 @@ import UserForm from '../personal/Profile.vue'
 import { get, post, put } from "../../utils/request"
 
 const list = reactive([])
-get('/seafile/user/list').then(resp => list.push(...resp.data))
+get('/user/list').then(resp => list.push(...resp.data))
 
 const user_template = { user_type: 'User', status: 1, usage: 0 }
 let _user = Object.assign({}, user_template)

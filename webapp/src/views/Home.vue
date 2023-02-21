@@ -127,11 +127,11 @@ function show(item, query) {
   (async () => {
     list.length = 0
     if (item) {
-      get(`/seafile/list/${item.id}`).then(resp => {
+      get(`/list/${item.id}`).then(resp => {
         list.push(...resp.data)
       })
     } else if (query) {
-      get(`/seafile/search/${query}`).then(resp => {
+      get(`/search/${query}`).then(resp => {
         list.push(...resp.data)
       })
     }
@@ -229,7 +229,7 @@ const openx11 = (item) => {
 
 const refresh = (item) => {
   (async () => {
-    get(`/seafile/index/${item.id}/${item.name}`).then(resp => {
+    get(`/index/${item.id}/${item.name}`).then(resp => {
       alert('操作成功')
     })
   })()

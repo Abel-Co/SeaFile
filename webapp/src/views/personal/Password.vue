@@ -96,7 +96,7 @@ const rules = {
 const submit = e => {
   e.preventDefault()
   formRef.value?.validate(err => {
-    !err && put('/seafile/user/pwd', model).then(resp => {
+    !err && put('/user/pwd', model).then(resp => {
       if (resp.data) {
         Object.assign(model, { old: '', new: '', reenteredPassword: '' })
         message.success("更新成功")

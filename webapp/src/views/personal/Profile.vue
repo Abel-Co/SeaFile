@@ -65,7 +65,7 @@ const rules = {
 }
 
 onMounted(() => {
-  get('/seafile/user').then(resp => {
+  get('/user').then(resp => {
     if (resp.data.avatar === 'email') {
       avatar.value = resp.data.avatar
       resp.data.avatar = ''
@@ -79,7 +79,7 @@ const submit = e => {
   formRef.value?.validate(err => {
     if (!err) {
       avatar.value && (model.avatar = avatar.value)
-      put('/seafile/user/self', model).then(resp => {
+      put('/user/self', model).then(resp => {
         message.success("保存成功")
       })
     }

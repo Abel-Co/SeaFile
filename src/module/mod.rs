@@ -1,8 +1,6 @@
 use actix_web::dev::HttpServiceFactory;
 use actix_web::web;
 
-use crate::boot::global;
-
 pub mod utils;
 pub mod ifile;
 pub mod filesystem;
@@ -13,7 +11,7 @@ pub mod auth;
 pub mod daisy;
 
 pub fn api_routes() -> impl HttpServiceFactory {
-    web::scope(&global().server.context_path)   // xxx or ""
+    web::scope("")   // xxx or ""
         .service(ifile::api::index)
         .service(ifile::api::search)
         .service(ifile::api::list)

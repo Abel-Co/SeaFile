@@ -1,6 +1,5 @@
 server:
   port: 8080
-  context_path: seafile
 postgres:
   dsn: postgres://postgres:postgres@172.17.16.110:5432/postgres
   min: 3
@@ -9,11 +8,11 @@ watch_path: /Users/Abel/Downloads
 jwt:
   key: 0xa06f853898a9dd4f32441a56879c52878f96c42730ed31c50e00
 white_list:
-  /seafile/login:
+  /login:
     - POST
-  /seafile/show/*: [ GET ]
-  /seafile/visit/*: [ GET ]
-  /seafile/download/*: [ GET ]
+  /show/*: [ GET ]
+  /visit/*: [ GET ]
+  /download/*: [ GET ]
   /: [ GET ]
   /assets/*: [ GET ]
   /favicon.ico: [ GET ]
