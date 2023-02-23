@@ -89,8 +89,8 @@ steps:
     when:
       branch: [apr, test01, dev01]
       # event: push
-    depends_on:
-      - rebuild
+#    depends_on:
+#      - rebuild
   - name: 发布应用
     image: alpine/helm
     pull: if-not-exists
