@@ -9,64 +9,64 @@ trigger:
   # environment: stating production
 
 steps:
-#  - name: restore
-#    image: synchrofood/drone-volume-cache
-#    pull: if-not-exists
-#    volumes:
-#    - name: cache
-#      path: /cache
-#    settings:
-#      restore: true
-#      mount:
-#        - ./target
-#        - ./webapp/node_modules
-#    when:
-#      branch: [ apr, test01, dev01 ]
-#    depends_on:
-#      - clone
-#  - name: 编译前端
-#    image: auraco/node:alpine
-#    commands:
-#      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
-#      - cd webapp && yarn install && yarn build
-#    when:
-#      branch: [apr, test01, dev01]
-#      # event: push
-#    depends_on:
-#      - restore
-#  - name: 编译后端
-#    image: auraco/rust:alpine
-#    commands:
-#      - mkdir -p target/.cargo
-#      - ln -s /drone/src/target/.cargo /root/.cargo
-#      - export CARGO_HOME=~/.cargo
-#      - echo '[source.crates-io]' > ~/.cargo/config
-#      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
-##      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
-#      - cargo build --release
-#      - cp target/release/seafile .
-#      - strip seafile && upx -9 seafile
-#    when:
-#      branch: [apr, test01, dev01]
-#      # event: push
-#    depends_on:
-#      - restore
-#  - name: rebuild
-#    image: synchrofood/drone-volume-cache
-#    pull: if-not-exists
-#    volumes:
-#      - name: cache
-#        path: /cache
-#    settings:
-#      rebuild: true
-#      mount:
-#        - ./target
-#        - ./webapp/node_modules
-#    when:
-#      branch: [ apr, test01, dev01 ]
-#    depends_on:
-#      - 编译前端
-#      - 编译后端
+  - name: restore
+    image: synchrofood/drone-volume-cache
+    pull: if-not-exists
+    volumes:
+    - name: cache
+      path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./target
+        - ./webapp/node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+    depends_on:
+      - clone
+  - name: 编译前端
+    image: auraco/node:alpine
+    commands:
+      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
+      - cd webapp && yarn install && yarn build
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+    depends_on:
+      - restore
+  - name: 编译后端
+    image: auraco/rust:alpine
+    commands:
+      - mkdir -p target/.cargo
+      - ln -s /drone/src/target/.cargo /root/.cargo
+      - export CARGO_HOME=~/.cargo
+      - echo '[source.crates-io]' > ~/.cargo/config
+      - echo 'registry = "git://mirrors.ustc.edu.cn/crates.io-index"' >> ~/.cargo/config
+#      - export CARGO_HTTP_MULTIPLEXING=false    # https://blog.csdn.net/s_lisheng/article/details/110371060
+      - cargo build --release
+      - cp target/release/seafile .
+      - strip seafile && upx -9 seafile
+    when:
+      branch: [apr, test01, dev01]
+      # event: push
+    depends_on:
+      - restore
+  - name: rebuild
+    image: synchrofood/drone-volume-cache
+    pull: if-not-exists
+    volumes:
+      - name: cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./target
+        - ./webapp/node_modules
+    when:
+      branch: [ apr, test01, dev01 ]
+    depends_on:
+      - 编译前端
+      - 编译后端
   - name: 构建镜像
     image: docker
     pull: if-not-exists
@@ -79,18 +79,17 @@ steps:
     commands:
       - env=`echo ${DRONE_BRANCH} | tr -d '0-9'`
       - cp profiles/$env/* ./
-#      - tar zcvf app.tar.gz dist seafile scripts config.yaml
-#      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
+      - tar zcvf app.tar.gz dist seafile scripts config.yaml
+      - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
       - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
-#      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
+      - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
       - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
-      - echo $dockerconfig
       - docker push $repo && docker rmi $repo
     when:
       branch: [apr, test01, dev01]
       # event: push
-#    depends_on:
-#      - rebuild
+    depends_on:
+      - rebuild
   - name: 发布应用
     image: alpine/helm
     pull: if-not-exists
