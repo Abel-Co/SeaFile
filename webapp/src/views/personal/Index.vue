@@ -22,7 +22,7 @@
       </n-anchor>
     </div>
     <div class="Layout-main">
-      <router-view :user="model"/>
+      <router-view/>
     </div>
   </div>
 </template>
@@ -32,7 +32,7 @@ import { computed, onMounted, reactive } from 'vue'
 import { useRouter } from "vue-router"
 import Header from "../Header.vue"
 import { get } from "../../utils/request"
-import md5 from 'js-md5'
+import md5 from 'md5'
 
 const router = useRouter()
 const model = reactive({ username: '', email: '', user_type: '' })
