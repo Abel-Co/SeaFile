@@ -23,6 +23,11 @@
 - Internet（是的，界面服务使用了CDN资源，这意味着，作为发起请求的客户机，需要接入互联网，而非只需要内网。如确实希望剔除对公网的依赖，需要从源码自行编译，并移除CDN相关配置）
 - PostgreSQL，当前仅支持 PG 数据库。
 
+## Screenshots
+| ![Profile](docs/assets/profile.png) | ![Password.png](docs/assets/password.png) | ![Avatar_Options](docs/assets/avatar_options.png) |
+|:-----------------------------------:|:-----------------------------------------:|:--------------------------------------------------:|
+|   ![Users](docs/assets/users.png)   ||
+
 ## 注意
 - 账号密码：
   - 密码采用了可还原的加密算法来存储。
@@ -92,11 +97,9 @@ docker run \
 
 ![img_2.png](docs/assets/img_2.png)
 
-##### 下图：B站视频，无声、点击可播放。
-
 <a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img_3.png](docs/assets/img_3.png)</a>
 
-## 关于直接本地smb打开
+## 关于直接以本地smb打开
 ![smb-local.png](docs/assets/smb-local.png)
 - macOS
 
@@ -110,20 +113,15 @@ docker run \
 
   开发中，初期主要支持 ArchLinux 的 dolphin 。
 
-## Screenshots
-| ![Profile](docs/assets/profile.png) | ![Password.png](docs/assets/password.png) | ![Avatar_Options](docs/assets/avatar_options.png) |
-|:-----------------------------------:|:-----------------------------------------:|:--------------------------------------------------:|
-|   ![Users](docs/assets/users.png)   ||
-
 
 ## 迭代计划
-| 序号  |                   功能                   | 进展  |
+| 序号  |                   功能                   | 状态  |
 |:---:|:--------------------------------------:|:---:|
 |  1  | 大范围的在线预览功能（txt、pdf、md、html、java、js、rs） | ... |
 |  2  |      在线文档功能（markdown、onlyoffice）       | ... |
 |  3  |               图片轮播功能（相册）               | ... |
 |  4  |                 视频播放功能                 | OK  |
-|  5  |                 多用户功能                  | ... |
+|  5  |                 多用户功能                  | OK  |
 |  6  |              单一来源的索引维护并行化              | ... |
 |  7  |        页面点过一个跳转链接后，总是滚到最上面（问题）         | OK  |
 |  8  |        优化前端 history 功能，使前进/后退可用        | OK  |
@@ -134,17 +132,17 @@ docker run \
 | 13  |          从浏览器打开finder本地smb路径           | ... |
 | 14  |               文件大小显示格式化                | OK  |
 | 15  |                文件类型图标完善                | OK  |
-| 16  |           挂载 pv /etc/seafile           | ...  |
-| 17  |     生成配置 /etc/seafile/seafile.yaml     | ...  |
-| 18  |               最佳实践（架构图）                | ...  |
+| 16  |           挂载 pv /etc/seafile           | ... |
+| 17  |     生成配置 /etc/seafile/seafile.yaml     | ... |
+| 18  |               最佳实践（架构图）                | ... |
 | 19  |        支援 k8s pod 动态增减时，smb账户重建        | OK  |
-| 20  |         支援 k8s 部署，从环境变量解析配置功能          | ...  |
-| 21  |                  页面上传                  | ...  |
-| 22  |                 用户旭日图                  | ...  |
-| 23  |                 系统旭日图                  | ...  |
-| 24  |     对图片、html，增加“合并打开”(iframe做单页渲染)     | ...  |
+| 20  |         支援 k8s 部署，从环境变量解析配置功能          | ... |
+| 21  |                  页面上传                  | ... |
+| 22  |                 用户旭日图                  | ... |
+| 23  |                 系统旭日图                  | ... |
+| 24  |     对图片、html，增加“合并打开”(iframe做单页渲染)     | ... |
 
-- 来源：FS事件、巡视校准
+[//]: # (- 来源：FS事件、巡视校准)
 
 
 
