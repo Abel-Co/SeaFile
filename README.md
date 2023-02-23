@@ -4,17 +4,16 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;将文件拖入共享目录，之后便可在页面高效检索。服务监控文件系统，自动维护索引，索引基于DB。所说“海量”，要自备超大容量存储，像作者这里用的是ceph；并当检索效率不足时，自行另建高性能数据库。因此，理论上，只要中间件性能足够，就可支持无限量文件检索。
 
+##### ____\_下图：B站视频，无声、点击可播放。
 <a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img.png](docs/assets/img.png)</a>
 
 ## 优势
-- 使用原生共享目录，直接操作文件。
-- 用户界面，立即可搜索。
-- 检索的是DB，而非磁盘目录，性能更好。
-- 每次搜索、浏览，会对索引进行异步巡视校准。 （当文件被其他途径删除，而未感知到时，索引便残留了，并可被检索到，此时再次检索，会获得校准后的结果）
+- 使用smb挂载，无需取回本地，可直接操作文件。
+- 实时维护索引，smb中 '增/改' 档案，页面可立即检索。
 
 ## 特点
-- 不同于其他私有云软件的需要先建平台，再上传数据，才能被软件管理。
-- SeaFile可以先存在数据，再搭建平台，服务启动时会对目标目录构建索引。
+- 不需要先建平台，从页面上传数据，才能被软件管理。
+- SeaFile可对已知目录构建索引（首次启动，构建全部索引，后续实时自动维护）。
 - 索引实时更新，类似 windows 上的 everything。
 
 ## 环境
@@ -26,10 +25,10 @@
 
 ## 注意
 - 账号密码：
-  - 采用了可还原的加密算法进行存储。
-  - 原因是，当基于k8s进行部署时，在发生调度时，需在新的容器中重建smb账号信息，此时需知道账号密码。
+  - 密码采用了可还原的加密算法来存储。
+  - 原因是，当基于k8s进行部署时，在发生调度时，需在新的容器中重建smb账号信息，此时需知道原始账号密码。
 - 资源固定搜索路径：
-  - /home/{account}/xxx 
+  - /home/{account}/xxx
 
 ## 构建
 ```shell
@@ -93,7 +92,7 @@ docker run \
 
 ![img_2.png](docs/assets/img_2.png)
 
-##### 演示，下图：B站视频，无声、点击可播放。
+##### 下图：B站视频，无声、点击可播放。
 
 <a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img_3.png](docs/assets/img_3.png)</a>
 
@@ -110,6 +109,12 @@ docker run \
 - Linux
 
   开发中，初期主要支持 ArchLinux 的 dolphin 。
+
+## Screenshots
+| ![Profile](docs/assets/profile.png) | ![Password.png](docs/assets/password.png) | ![Avatar_Options](docs/assets/avatar_options.png) |
+|:-----------------------------------:|:-----------------------------------------:|:--------------------------------------------------:|
+|   ![Users](docs/assets/users.png)   ||
+
 
 ## 迭代计划
 | 序号  |                   功能                   | 进展  |
