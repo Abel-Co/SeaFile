@@ -3,7 +3,7 @@
     <!--左侧Logo-->
     <div class="layout-header-left">
       <!-- Logo -->
-      <div class="header" v-show="headerLeft">
+      <div class="logo" v-show="headerLeft">
         <a href="#/">
           <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
         </a>
@@ -12,8 +12,7 @@
     </div>
     <!--右侧用户-->
     <div class="layout-header-right">
-      <div class="layout-header-trigger layout-header-trigger-min"
-           v-for="item in iconList" :key="item.icon.name">
+      <div class="layout-header-trigger layout-header-trigger-min" v-for="item in iconList" :key="item.icon.name">
         <n-tooltip placement="bottom">
           <template #trigger>
             <n-icon size="18">
@@ -36,7 +35,7 @@
       </div>
       <!-- 个人中心 -->
       <div class="layout-header-trigger layout-header-trigger-min">
-        <n-dropdown trigger="hover" @select="avatarSelect" :options="avatarOptions">
+        <n-dropdown trigger="hover" :options="avatarOptions">
           <div class="avatar">
             <n-avatar round>
               {{ state.username }}
@@ -52,17 +51,95 @@
 </template>
 
 <script setup>
-import { shallowRef } from 'vue'
+import { onMounted, reactive, shallowRef, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDialog, useMessage } from 'naive-ui'
 import { GithubOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@vicons/antd'
+import { get } from "../utils/request"
 
 const message = useMessage()
 const dialog = useDialog()
 const router = useRouter()
 const route = useRoute()
 
-defineProps({ headerLeft: String })
+const model = reactive({ username: '', email: '', user_type: '' })
+const props = defineProps({ user: Object, headerLeft: String })
+props.user && watch(props.user, () => {
+  Object.assign(model, props.user)
+})
+
+const account = JSON.parse(localStorage.getItem('subject'))?.account
+const state = shallowRef({
+  username: account?.slice(0, 4)?.firstUpperCase() || 'Abel',
+  fullscreenIcon: FullscreenOutlined,
+})
+
+// 切换全屏图标
+const toggleFullscreenIcon = () =>
+    (state.fullscreenIcon = document.fullscreenElement !== null ? FullscreenExitOutlined : FullscreenOutlined)
+
+// 监听全屏切换事件
+document.addEventListener('fullscreenchange', toggleFullscreenIcon)
+
+// 全屏切换
+const toggleFullScreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen()
+  }
+}
+
+// 图标列表
+const iconList = [
+  {
+    tips: 'Github',
+    icon: GithubOutlined,
+    event: {
+      click: () => window.open('https://github.com/Abel-Co/SeaFile'),
+    },
+  }
+]
+
+// // 头像下拉菜单. @select="avatarOptions" :options="avatarOptions(null)"
+// const _avatarOptions = key => {
+//   return key ? key() : [
+//     { label: '个人中心', key: () => router.push({ name: 'Personal' }) },
+//     { label: '退出登录', key: () => doLogout() },
+//   ]
+// }
+// 头像下拉菜单, 需去除：@select="avatarOptions"
+const avatarOptions = [
+  { label: '个人中心', key: 1, props: { onClick: () => router.push({ name: 'Personal' }) } },
+  { label: '退出登录', key: 3, props: { onClick: () => doLogout() } },
+]
+
+watch(model, () => {
+  if (model.user_type === 'Admin') {
+    // if (avatarOptions.findIndex(value => value.key === 2) < 0) {
+    const avatarOptionsAdmin = [
+      { type: 'divider', key: 'd1' },
+      { label: '管理面板', key: 2, props: { onClick: () => router.push({ name: 'Admin' }) } },
+      { type: 'divider', key: 'd1' },
+    ]
+    avatarOptions.splice(avatarOptions.length - 1, 0, ...avatarOptionsAdmin)
+  }
+  // }
+})
+
+onMounted(() => {
+  // const user = JSONBigInt.parse(localStorage.getItem('user'))
+  // if (user) {
+  //   Object.assign(model, user)  // 来自localStorage的user,会触发两次 watch(model).
+  // } else {
+  if (!props.user) {
+    get('/user').then(resp => {
+      Object.assign(model, resp.data)
+      // localStorage.setItem('user', JSONBigInt.stringify(resp.data)) // 写入localStorage,将更易于仿冒
+    })
+  }
+  // }
+})
 
 // 退出登录
 const doLogout = () => {
@@ -81,63 +158,8 @@ const doLogout = () => {
         },
       }).finally(() => location.reload())
     },
-    onNegativeClick: () => {
-    },
+    onNegativeClick: () => _,
   })
-}
-
-const state = shallowRef({ username: 'Abel' || '', fullscreenIcon: FullscreenOutlined, })
-
-// 切换全屏图标
-const toggleFullscreenIcon = () =>
-    (state.fullscreenIcon = document.fullscreenElement !== null ? FullscreenExitOutlined : FullscreenOutlined)
-
-// 监听全屏切换事件
-document.addEventListener('fullscreenchange', toggleFullscreenIcon)
-
-// 全屏切换
-const toggleFullScreen = () => {
-  console.log('toggleFullScreen')
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen()
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen()
-    }
-  }
-}
-
-// 图标列表
-const iconList = [
-  {
-    icon: GithubOutlined,
-    tips: 'Github',
-    event: {
-      click: () => window.open('https://github.com/Abel-Co/SeaFile'),
-    },
-  }
-]
-const avatarOptions = [
-  {
-    label: '个人中心',
-    key: 1,
-  },
-  {
-    label: '退出登录',
-    key: 2,
-  },
-]
-
-// 头像下拉菜单
-const avatarSelect = (key) => {
-  switch (key) {
-    case 1:
-      router.push({ name: 'Settings' })
-      break
-    case 2:
-      doLogout()
-      break
-  }
 }
 </script>
 
@@ -165,11 +187,10 @@ const avatarSelect = (key) => {
       line-height: 64px;
       overflow: hidden;
       white-space: nowrap;
-      padding-left: 10px;
+      margin-left: 5px;
 
       img {
         width: auto;
-        height: 32px;
         margin-right: 10px;
       }
 
@@ -200,6 +221,10 @@ const avatarSelect = (key) => {
       display: flex;
       align-items: center;
       height: 64px;
+
+      .n-avatar {
+        background-color: blueviolet;
+      }
     }
 
     > * {

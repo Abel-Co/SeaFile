@@ -93,6 +93,8 @@ docker run \
 
 ![img_2.png](docs/assets/img_2.png)
 
+##### 演示，下图：B站视频，无声、点击可播放。
+
 <a href="https://www.bilibili.com/video/BV1rN4y177Li?share_source=copy_web&vd_source=1a48a07ee07e3015bd38436d9885f537" target="_blank">![img_3.png](docs/assets/img_3.png)</a>
 
 ## 关于直接本地smb打开
@@ -135,6 +137,7 @@ docker run \
 | 21  |                  页面上传                  | ...  |
 | 22  |                 用户旭日图                  | ...  |
 | 23  |                 系统旭日图                  | ...  |
+| 24  |     对图片、html，增加“合并打开”(iframe做单页渲染)     | ...  |
 
 - 来源：FS事件、巡视校准
 

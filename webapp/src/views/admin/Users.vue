@@ -1,192 +1,146 @@
 <template>
-  <div class="">
-    <button @click="manage_user">添加用户</button>
-    <ul class="table">
-      <li class="thead">
-        <ul class="tr clearfix">
-          <li>
-            <!-- <input type="checkbox" v-model="checkedAll"> -->
-          </li>
-          <li>用户名</li>
-          <li>电子邮件地址</li>
-          <li>手机号</li>
-          <li>使用量</li>
-          <li>创建时间</li>
-          <li>上次登录</li>
-          <li>修改</li>
-        </ul>
-      </li>
-      <li class="tbody">
-        <ul class="tr clearfix" v-for="item in list" :key="item.id">
-          <li>
-            <!-- <input type="checkbox" :value="item.id" v-model="item.checked"> -->
-          </li>
-          <li>{{ item.username }}</li>
-          <li>{{ item.email }}</li>
-          <li>{{ item.phone }}</li>
-          <li>{{ ('' + item.size).byteToText() }}</li>
-          <li>{{ new Date(item.created_at).format("yyyy-MM-dd") }}</li>
-          <li>{{ new Date(item.logged_at).format("yyyy-MM-dd") }}</li>
-          <li>
-            <a href="#" @click.prevent="manage_user(item)">
-              <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-modify"></use>
-              </svg>
-            </a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-  <DialogWrapper :transition-attrs="{name: 'dialog'}"/>
+  <!-- 用户信息列表 -->
+  <n-space vertical>
+    <n-space :style="{float: 'right'}">
+      <n-button type="info" ghost @click="manage_user">添加用户</n-button>
+    </n-space>
+    <n-data-table :columns="columns" :data="data" striped size="small" :bordered="false" single-column/>
+  </n-space>
+  <!-- 用户信息模态框 -->
+  <n-modal v-model:show="showModal" preset="dialog" title="Dialog" :style="{width: 'auto'}"
+           :on-after-leave="onAfterLeave">
+    <template #header>
+      <div>{{ title }}</div>
+    </template>
+    <n-form ref="formRef" :model="model" :rules="rules">
+      <n-form-item path="username" first label="账号（大小字母、数字、下划线 3~16 位）" :style="{maxWidth: '320px'}">
+        <n-input v-model:value="model.username" @keydown.enter.prevent :disabled="!!model.id"/>
+      </n-form-item>
+      <n-form-item path="password" label="密码（6~24 个字符）" :style="{maxWidth: '320px'}">
+        <n-input v-model:value="model.password" type="password" @keydown.enter.prevent/>
+      </n-form-item>
+      <n-form-item path="phone" label="电话" :style="{maxWidth: '320px'}">
+        <n-input v-model:value="model.phone" @keydown.enter.prevent/>
+      </n-form-item>
+      <n-form-item path="email" label="邮箱" :style="{width: '390px'}">
+        <n-input v-model:value="model.email" @keydown.enter.prevent/>
+      </n-form-item>
+      <n-form-item path="avatar" label="用邮箱获取头像" :style="{maxWidth: '320px'}">
+        <n-switch v-model:value="avatar" checked-value="email" unchecked-value=""/>
+      </n-form-item>
+      <n-form-item v-if="!avatar" path="avatar" label="头像地址" :style="{width: '450px'}">
+        <n-input v-model:value="model.avatar" @keydown.enter.prevent/>
+      </n-form-item>
+    </n-form>
+    <template #action>
+      <n-button type="primary" @click="save_user">保存</n-button>
+    </template>
+  </n-modal>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
-import { openDialog, DialogWrapper } from 'vue3-promise-dialog'
-import UserForm from '../personal/Profile.vue'
+import { h, reactive, ref } from "vue"
 import { get, post, put } from "../../utils/request"
+import { NButton } from "naive-ui"
 
-const list = reactive([])
-get('/user/list').then(resp => list.push(...resp.data))
-
+const formRef = ref(null)
+const showModal = ref(false)
 const user_template = { user_type: 'User', status: 1, usage: 0 }
-let _user = Object.assign({}, user_template)
+const title = ref('')
+const model = ref({ avatar: '' })
+const onAfterLeave = () => model.value = {}
+const avatar = ref('')
 
-async function manage_user(user) {
-  user.id || (user = _user)
-  const title = user.id ? '更新用户' : '添加用户'
-  const result = await openDialog(UserForm, { text: title, user })
-  if (result) {
-    (user.id ? put(`/user/${user.id}`, user) : post('/user', user)).catch(_ => _)
-    user.id || (_user = Object.assign({}, user_template))
+const manage_user = user => {
+  title.value = user.id ? '更新用户' : '添加用户'
+  Object.assign(model.value, user.id ? user : user_template)
+  model.value.id ? delete rules.username : Object.assign(rules, rule_username)
+  // Object.assign(model.value, {
+  //   username: 'Tuzi', email: 'tutuzi@126.com', phone: '13846879587', password: '123456', avatar: 'email'
+  // })
+  if (model.value.avatar === 'email') {
+    avatar.value = model.value.avatar
+    model.value.avatar = ''
+  } else avatar.value = ''
+  showModal.value = true
+}
+
+const save_user = () => {
+  formRef.value?.validate(err => {
+    if (!err) {
+      const user = model.value
+      avatar.value && (user.avatar = avatar.value);
+      (user.id ? put(`/user/${user.id}`, user) : post('/user', user)).catch(_ => _)
+      showModal.value = false
+    }
+  })
+}
+
+const columns = [
+  { type: "selection" },
+  { title: "用户名", key: "username", align: 'center' },
+  { title: "电子邮件地址", key: "email", align: 'center' },
+  { title: "手机号", key: "phone", align: 'center' },
+  { title: "使用量", key: "_usage", align: 'right' },
+  { title: "创建时间", key: "_created_at", align: 'center' },
+  { title: "上次登录", key: "_logged_at", align: 'center' },
+  {
+    title: "操作", key: "action", align: 'center', render(row) {
+      return h(NButton, { strong: true, size: 'tiny', onClick: () => manage_user(row) }, { default: () => "Edit" })
+    }
   }
+]
+
+const data = reactive([])
+get('/user/list').then(resp => {
+  resp.data.map(v => {
+    v.key = v.id.toString()
+    v._usage = v.usage?.toString().byteToText()
+    v._created_at = new Date(v.created_at).format("yyyy-MM-dd")
+    v._logged_at = new Date(v.created_at).format("yyyy-MM-dd")
+  })
+  data.push(...resp.data)
+})
+
+const rules = reactive({
+  // username: [],
+  password: [{
+    required: true,
+    validator: (rule, v) => !v || /^\w{6,24}$/.test(v),
+    message: '密码错误',
+    trigger: ['blur', 'input']
+  }],
+  phone: [{
+    validator: (rule, v) => !v || /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/.test(v),
+    message: '电话错误',
+    trigger: ['blur', 'input']
+  }],
+  email: [{
+    validator: (rule, v) => !v || /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}/.test(v.toUpperCase()),
+    message: '邮箱错误',
+    trigger: ['blur', 'input']
+  }],
+})
+const rule_username = {
+  username: [
+    {
+      required: true,
+      validator: (rule, v) => /^[a-zA-Z0-9_]{3,16}$/.test(v),
+      message: '账号错误',
+      trigger: ['blur', 'input']
+    }, {
+      asyncValidator: (rule, v) => {
+        return new Promise((resolve, reject) => {
+          get(`/user/check/${v}`).then(resp =>
+              resp.data ? reject('Already exist') : resolve())
+        })
+      },
+      message: '账号已存在',
+      trigger: ['blur', 'input']
+    }
+  ]
 }
 </script>
-
-<style lang="scss" scoped>
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-/*li { border: 1px solid black; }*/
-
-/* 表格基本样式规范 */
-.table {
-  width: 100%;
-  margin: 0 auto;
-
-  .tr {
-    display: flex;
-    vertical-align: middle;
-
-    li {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-
-  /* 行--设置行高 */
-  .thead .tr {
-    background-color: #008080;
-    color: #fff;
-    font-size: 15px;
-    height: 36px;
-    line-height: 39px;
-  }
-
-  .tbody {
-    .tr {
-      background-color: #fff;
-      color: #333;
-      font-size: 14px;
-      height: 36px;
-      line-height: 38px;
-    }
-
-    .tr:hover {
-      background-color: rgb(248 249 250);
-    }
-
-    .tr:not(:first-child) {
-      border-top: 1px solid rgb(246 247 249);
-    }
-  }
-
-  /* 列--设计列宽 */
-  .thead, .tbody {
-    li {
-      text-align: center;
-      //text-indent: 1em;
-      //padding: 0 18px 0 0;
-    }
-
-    li:first-child {
-      width: 0;
-    }
-
-    li:nth-child(2) {
-      width: 19%;
-    }
-
-    li:nth-child(3) {
-      width: 27%;
-    }
-
-    li:nth-child(4) {
-      width: 13%;
-    }
-
-    li:nth-child(5) {
-      width: 15%;
-    }
-
-    li:nth-child(6) {
-      width: 18%;
-    }
-
-    li:nth-child(7) {
-      //width: 12%;
-      width: 0;
-    }
-
-    li:last-child {
-      width: 8%;
-
-      span {
-        cursor: pointer;
-      }
-    }
-  }
-}
-</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

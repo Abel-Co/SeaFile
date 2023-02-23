@@ -27,6 +27,16 @@ String.prototype.byteToText = function () {
   return (this / Math.pow(k, i)).toPrecision(3) + " " + sizes[i]
 }
 
+String.prototype.firstUpperCase = function () {
+  return this.charAt(0).toUpperCase() + this.slice(1)
+}
+
+/*String.prototype.firstUpperCase = function () {
+  return this.replace(/\b(\w)(\w*)/g, function ($0, $1, $2) {
+    return $1.toUpperCase() + $2.toLowerCase()
+  })
+}*/
+
 const datetimeFormats = {
   'en-US': {
     short: {

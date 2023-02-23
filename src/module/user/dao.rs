@@ -44,6 +44,15 @@ pub async fn get_by_username(username: &str) -> Option<Users> {
     // Some(Users { id: 123456, status: Some(1), username: Some(String::from("abel")), password: Some("123456".to_string()), ..Default::default() })
 }
 
+/**
+ * 按 username 获取用户 忽略大小写
+ */
+pub async fn get_by_username_ignore_case(username: &str) -> Vec<Users> {
+    RB.fetch("select * from users where username ilike $1 ;", vec![Bson::String(username.to_string())]).await.unwrap()
+
+    // RB.fetch_by_wrapper(RB.new_wrapper().eq("username", username)).await.unwrap()
+}
+
 /// 模拟创建账号
 #[allow(unused)]
 async fn test_create() -> Option<Users> {

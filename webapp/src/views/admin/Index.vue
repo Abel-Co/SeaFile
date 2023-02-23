@@ -22,13 +22,13 @@
       </n-anchor>
     </div>
     <div class="Layout-main">
-      <router-view :user="model"/>
+      <router-view/>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import { useRouter } from "vue-router"
 import Header from "../Header.vue"
 import { get } from "../../utils/request"
@@ -38,32 +38,47 @@ const router = useRouter()
 const model = reactive({ username: '', email: '', user_type: '' })
 const avatar = computed(() => `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`)
 
-const nav_sidebar = reactive([
-  {
-    path: '/personal/profile', name: 'Profile', title: '基础信息', icon: 'person',
-    icon_margin_top: '-28.3px', active: 0
-  }, {
-    path: '/personal/password', name: 'Password', title: '更新密码', icon: 'outline-security-safe',
-    icon_margin_top: '-28.3px', active: 0
-  }/*, {
-    path: '/personal/usage', name: 'Usage', title: '用量分析', icon: '分析',
-    icon_margin_top: '-28.3px', active: 0
-  }*/
-])
+router.afterEach((to, from, next) => {
+  const path_hash = location.hash.slice(1)
+  nav_sidebar.forEach(v => path_hash === v.path && (v.active = 1))
+})
+
+const nav_sidebar = reactive([])
 
 const clickLink = item => {
   item.active = 1
   nav_sidebar.forEach(v => v.name === item.name || (v.active = 0))
 }
 
-onMounted(() => {
-  {
-    get('/user').then(resp => {
-      Object.assign(model, resp.data)
-    })
+watch(model, () => {
+  if (model.user_type === 'Admin') {
+    const routes = [
+      /*{
+        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'users', icon_margin_top: '-29.3px',
+        active: 0, component: () => import('./Storage.vue'),
+        beforeEnter: (to, from, next) => {
+          if ('admin') next()
+        }
+      }, */{
+        path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px',
+        active: 0, component: () => import('./Users.vue'),
+        beforeEnter: (to, from, next) => {
+          if ('admin') next()
+        }
+      }
+    ]
+    routes.forEach(v => router.addRoute('Admin', v))
+    nav_sidebar.push(...routes)
+    // 进入默认页
+    router.push({ path: "/admin/users" })
   }
-  const path_hash = location.hash.slice(1)
-  nav_sidebar.forEach(v => path_hash === v.path && (v.active = 1))
+})
+
+onMounted(() => {
+  // person info
+  get('/user').then(resp => {
+    Object.assign(model, resp.data)
+  })
 })
 </script>
 

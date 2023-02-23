@@ -68,3 +68,17 @@ pub async fn update_pwd(user_id: i64, old: &str, new: &str) -> u64 {
     }
     0
 }
+
+/**
+ * 按 username 获取用户
+ */
+pub async fn get_by_username(username: &str) -> Option<Users> {
+    user::dao::get_by_username(username).await
+}
+
+/**
+ * 按 username 获取用户 忽略大小写
+ */
+pub async fn get_by_username_ignore_case(username: &str) -> Vec<Users> {
+    user::dao::get_by_username_ignore_case(username).await
+}

@@ -19,7 +19,7 @@ const routes = [
     ]
   },
   {
-    path: '/admin', name: 'Admin',
+    path: '/admin', name: 'Admin', component: () => import('../views/admin/Index.vue')
   }
 ]
 

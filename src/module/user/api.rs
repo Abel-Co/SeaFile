@@ -82,3 +82,17 @@ pub async fn update(id: Path<i64>, user: Json<Users>, jwt: JwtToken) -> impl Res
     }
     HttpResponse::Ok()
 }
+
+/**
+ * 检查用户
+ */
+#[get("/user/check/{username}")]
+pub async fn user_check(username: Path<String>, jwt: JwtToken) -> impl Responder {
+    if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
+        if subject.user_type == UserType::Admin {   // 验证管理员权限
+            let data = user::bs::get_by_username_ignore_case(&username.0).await;
+            return HttpResponse::Ok().json(data.len());
+        }
+    }
+    HttpResponse::BadRequest().json("权限不足")
+}

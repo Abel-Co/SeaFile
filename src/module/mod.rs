@@ -25,6 +25,7 @@ pub fn api_routes() -> impl HttpServiceFactory {
         .service(user::api::list)
         .service(user::api::create)
         .service(user::api::update)
+        .service(user::api::user_check)
 }
 
 pub async fn start() {

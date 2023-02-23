@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue"
+import { onMounted, reactive, ref } from "vue"
 import { useMessage } from "naive-ui"
 import { get, put } from '../../utils/request'
 
@@ -46,12 +46,6 @@ const avatar = ref('email')
 const model = reactive({})
 
 const rules = {
-  /*username: [{
-    required: true,
-    validator: v => /^[a-zA-Z0-9_]{3,16}$/.test(v),
-    message: '账号错误',
-    trigger: ['blur', 'input']
-  }],*/
   phone: [{
     validator: (rule, v) => /^1(3\d|4[5-9]|5[0-35-9]|6[2567]|7[0-8]|8\d|9[0-35-9])\d{8}$/.test(v),
     message: '电话错误',
