@@ -200,6 +200,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@baikbingo/cache@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@baikbingo/cache/-/cache-1.0.5.tgz#06a4a45098c57b2f80be9e4768914aa75de8249e"
+  integrity sha512-7NrJkA0OrWWmFoBZg/dXJj5VMaeDI1zcRqN2a95X8wibKxlGBU/MkpGFU6tAk/87IViAbKijMr8ZWBbtQUVM3A==
+
 "@css-render/plugin-bem@^0.15.10":
   version "0.15.12"
   resolved "https://registry.yarnpkg.com/@css-render/plugin-bem/-/plugin-bem-0.15.12.tgz#cd88e46a388e4786436bd622414da0aa6019af3b"

@@ -28,15 +28,20 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, watch } from 'vue'
+import { computed, onMounted, reactive, watch, ref } from 'vue'
 import { useRouter } from "vue-router"
 import Header from "../Header.vue"
 import { get } from "../../utils/request"
 import md5 from 'md5'
+import { async_avatar } from "../../utils/avatar"
 
 const router = useRouter()
-const model = reactive({ username: '', email: '', user_type: '' })
-const avatar = computed(() => `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`)
+
+const avatar = ref('')
+const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
+const avatar_url = computed(() => model.avatar === 'email' ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
+
+watch(avatar_url, () => async_avatar(model.username, avatar_url.value, (imgUrl) => avatar.value = imgUrl))
 
 router.afterEach((to, from, next) => {
   const path_hash = location.hash.slice(1)

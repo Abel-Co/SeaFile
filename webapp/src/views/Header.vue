@@ -37,11 +37,11 @@
       <div class="layout-header-trigger layout-header-trigger-min">
         <n-dropdown trigger="hover" :options="avatarOptions">
           <div class="avatar">
-            <n-avatar round>
-              {{ state.username }}
-              <template #icon>
-                <!-- <UserOutlined/> -->
-              </template>
+            <n-avatar round :src="avatar">
+              <!-- {{ state.username }} -->
+              <!-- <template #icon> -->
+              <!--  &lt;!&ndash; <UserOutlined/> &ndash;&gt; -->
+              <!-- </template> -->
             </n-avatar>
           </div>
         </n-dropdown>
@@ -51,22 +51,28 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, shallowRef, watch } from 'vue'
+import { computed, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDialog, useMessage } from 'naive-ui'
 import { GithubOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@vicons/antd'
 import { get } from "../utils/request"
+import md5 from "md5"
+import { async_avatar } from "../utils/avatar"
 
 const message = useMessage()
 const dialog = useDialog()
 const router = useRouter()
 const route = useRoute()
 
-const model = reactive({ username: '', email: '', user_type: '' })
+const avatar = ref('')
+const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
 const props = defineProps({ user: Object, headerLeft: String })
 props.user && watch(props.user, () => {
   Object.assign(model, props.user)
 })
+const avatar_url = computed(() => model.avatar === 'email' ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
+
+watch(avatar_url, () => async_avatar(model.username, avatar_url.value, (imgUrl) => avatar.value = imgUrl))
 
 const account = JSON.parse(localStorage.getItem('subject'))?.account
 const state = shallowRef({
@@ -222,9 +228,7 @@ const doLogout = () => {
       align-items: center;
       height: 64px;
 
-      .n-avatar {
-        background-color: blueviolet;
-      }
+      //.n-avatar {background-color: blueviolet;     }
     }
 
     > * {

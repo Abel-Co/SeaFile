@@ -1,9 +1,7 @@
 <template>
   <!--  账号，密码，邮箱，手机号，使用邮箱获取头像，用户属性（用户、管理员）-->
   <n-form ref="formRef" :model="model" :rules="rules">
-    <n-image preview-disabled width="260" :style="{float: 'right', borderRadius: '50%', marginRight: '10%'}"
-             src="https://www.gravatar.com/avatar/0694061944a30a821c3541cc288aa01a?d=identicon&s=870"
-    />
+    <n-image width="260" :style="{float: 'right', borderRadius: '50%', marginRight: '10%'}" :src="avatar"/>
     <n-form-item path="username" label="账号" :style="{maxWidth: '320px'}">
       <n-input v-model:value="model.username" @keydown.enter.prevent :disabled="true"/>
     </n-form-item>
@@ -14,9 +12,9 @@
       <n-input v-model:value="model.email" @keydown.enter.prevent/>
     </n-form-item>
     <n-form-item path="avatar" label="用邮箱获取头像" :style="{maxWidth: '320px'}">
-      <n-switch v-model:value="avatar" checked-value="email" unchecked-value=""/>
+      <n-switch v-model:value="avatar_switch" checked-value="email" unchecked-value=""/>
     </n-form-item>
-    <n-form-item v-if="!avatar" path="avatar" label="头像地址" :style="{width: '700px'}">
+    <n-form-item v-if="!avatar_switch" path="avatar" label="头像地址" :style="{width: '700px'}">
       <n-input v-model:value="model.avatar" @keydown.enter.prevent/>
     </n-form-item>
   </n-form>
@@ -31,19 +29,25 @@
     </n-col>
   </n-row>
 
-<!--  <pre> {{ avatar }} <br/> profile {{ JSON.stringify(model, null, 2) }}</pre>-->
+  <!--  <pre> {{ avatar }} <br/> profile {{ JSON.stringify(model, null, 2) }}</pre>-->
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from "vue"
+import { computed, onMounted, reactive, ref, watch } from "vue"
 import { useMessage } from "naive-ui"
 import { get, put } from '../../utils/request'
+import md5 from "md5"
+import { async_avatar } from "../../utils/avatar"
 
 const formRef = ref(null)
 const message = useMessage()
 
-const avatar = ref('email')
-const model = reactive({})
+const avatar = ref('')
+const model = reactive({ username: '', email: '' })
+const avatar_switch = ref('email')
+const avatar_url = computed(() => avatar_switch.value === 'email' ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
+
+watch(avatar_url, () => async_avatar(model.username, avatar_url.value, (imgUrl) => avatar.value = imgUrl))
 
 const rules = {
   phone: [{
@@ -61,9 +65,9 @@ const rules = {
 onMounted(() => {
   get('/user').then(resp => {
     if (resp.data.avatar === 'email') {
-      avatar.value = resp.data.avatar
+      avatar_switch.value = resp.data.avatar
       resp.data.avatar = ''
-    } else avatar.value = ''
+    } else avatar_switch.value = ''
     Object.assign(model, resp.data)
   })
 })
