@@ -16,6 +16,7 @@ const routes = [
     children: [
       { path: 'profile', name: 'Profile', component: () => import('../views/personal/Profile.vue') },
       { path: 'password', name: 'Password', component: () => import('../views/personal/Password.vue') },
+      { path: 'usage', name: 'Usage', component: () => import('../views/personal/Usage.vue') },
     ]
   },
   {

@@ -45,10 +45,10 @@ const nav_sidebar = reactive([
   }, {
     path: '/personal/password', name: 'Password', title: '更新密码', icon: 'outline-security-safe',
     icon_margin_top: '-28.3px', active: 0
-  }/*, {
-    path: '/personal/usage', name: 'Usage', title: '用量分析', icon: '分析',
+  }, {
+    path: '/personal/usage', name: 'Usage', title: '用量分析', icon: 'analysis',
     icon_margin_top: '-28.3px', active: 0
-  }*/
+  }
 ])
 
 const clickLink = item => {
