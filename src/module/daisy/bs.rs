@@ -6,7 +6,7 @@ use itertools::Itertools;
 
 use crate::module::daisy::{Daisy, dao};
 
-pub async fn daisy_user(id: i64, level: isize) -> Option<Vec<Rc<RefCell<Daisy>>>> {
+pub async fn daisy_sunburst(id: i64, level: isize) -> Option<Vec<Rc<RefCell<Daisy>>>> {
     let list = vec![Rc::new(RefCell::new(Daisy { id, level: Some(level), ..Default::default() }))];
     let mut p = list.to_owned();
     for _ in 0..5 {
@@ -21,11 +21,13 @@ pub async fn daisy_user(id: i64, level: isize) -> Option<Vec<Rc<RefCell<Daisy>>>
 
 async fn cycle_proxy(ids: Vec<i64>, p: &Vec<Rc<RefCell<Daisy>>>) -> Vec<Rc<RefCell<Daisy>>> {
     let daisy = dao::get(&ids).await;
+    log::debug!(">>>>>> ids: {:?}, daisy: {:?}", &ids, &daisy);
     let r_map = group_by_parent(&daisy);
     p.iter().for_each(|x| {
         if let Some(vec) = r_map.get(&get_id(x)) {
             let p_level = get_level(x);
             let children = vec.iter().map(|x| fix_level(x.clone(), p_level)).collect();
+            log::debug!(">>>>>> ids: {:?}, children: {:?}", &ids, &children);
             x.replace(x.take().set_children(Some(children)));
         }
     });

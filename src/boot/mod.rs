@@ -20,8 +20,8 @@ pub fn app_env() -> &'static Arc<String> {
 }
 
 pub fn get_config_path() -> String {
-    if app_env().as_str() == "local" {
-        return format!("profiles/{}/", "local");
+    if app_env().len() > 0 {
+        return format!("profiles/{}/", app_env());
     }
     return "./".to_string();
 }

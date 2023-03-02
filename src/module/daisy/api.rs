@@ -16,7 +16,7 @@ pub async fn user(id: Path<i64>, jwt: JwtToken) -> impl Responder {
     if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
         let path = format!("{}/{}", HOME.as_str(), subject.username.as_ref().unwrap());
         let (file, level) = daisy_base(id.0, &path).await;
-        let list = daisy::bs::daisy_user(file.id, level).await;
+        let list = daisy::bs::daisy_sunburst(file.id, level).await;
         return HttpResponse::Ok().json(list);
     }
     return HttpResponse::BadRequest().json("未知用户");
@@ -43,7 +43,7 @@ pub async fn system(id: Path<i64>, jwt: JwtToken) -> impl Responder {
         if subject.user_type == UserType::Admin {   // 验证管理员权限
             let path = format!("{}", HOME.as_str());
             let (file, level) = daisy_base(id.0, &path).await;
-            let list = daisy::bs::daisy_user(file.id, level).await;
+            let list = daisy::bs::daisy_sunburst(file.id, level).await;
             return HttpResponse::Ok().json(list);
         }
     }

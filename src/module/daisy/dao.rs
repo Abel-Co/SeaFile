@@ -7,7 +7,7 @@ use crate::boot::c::RB;
 use crate::module::daisy::Daisy;
 
 pub async fn get(ids: &Vec<i64>) -> Vec<Rc<RefCell<Daisy>>> {
-    let ids = ids.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("");
+    let ids = ids.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",");
     let sql = format!("select id, name, size as value, parent from files where parent in ({})", ids);
     RB.fetch(sql.as_str(), vec![]).await.unwrap()
 }
