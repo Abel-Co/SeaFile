@@ -1,4 +1,5 @@
 use std::env;
+use std::path::Path;
 use std::sync::Arc;
 
 use log4rs::config::RawConfig;
@@ -20,7 +21,7 @@ pub fn app_env() -> &'static Arc<String> {
 }
 
 pub fn get_config_path() -> String {
-    if app_env().len() > 0 {
+    if Path::new("./profiles").exists() {
         return format!("profiles/{}/", app_env());
     }
     return "./".to_string();
