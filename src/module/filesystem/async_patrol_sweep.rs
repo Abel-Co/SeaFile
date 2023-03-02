@@ -11,10 +11,16 @@ use crate::module::ifile::Files;
 
 static ONCE: OnceCell<(Sender<Vec<Files>>, Receiver<Vec<Files>>)> = OnceCell::new();
 
+/**
+ * 索引巡检-入队列
+ */
 pub async fn async_patrol(_files: &Vec<Files>) {
     let _ = ONCE.get().unwrap().0.send(_files.to_vec()).await;
 }
 
+/**
+ * 索引巡检-队列消费
+ */
 pub async fn async_patrol_watch() {
     let _ = ONCE.set(async_channel::bounded(1 << 16));  // 65536*2
     thread::spawn(move || {

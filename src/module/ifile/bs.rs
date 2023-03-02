@@ -1,14 +1,18 @@
-use std::fs;
+use std::{fs, thread};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+use futures::executor::block_on;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
+use crate::boot::c::HOME;
+use crate::boot::global;
 use crate::module::{auth, filesystem};
 use crate::module::ifile;
-use crate::module::ifile::Files;
+use crate::module::ifile::{dao, Files};
 
 pub async fn get(id: i64) -> Option<Files> {
     match ifile::dao::get(id).await {
@@ -20,24 +24,50 @@ pub async fn get(id: i64) -> Option<Files> {
     }
 }
 
+pub async fn check_path(path: &str) -> Option<Files> {
+    dao::get_by_path(path).await
+}
+
+/**
+ * 档案搜索
+ */
 pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
-    let account = auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
-    let files = ifile::dao::search(&format!("/home/{}", account), query).await;
-    ifile::desensitize_sort(files).await
+    match auth::bs::get_subject(user_id).await {
+        Some(subject) => {
+            let (account, home_path) = (subject.username.unwrap(), global().watch_path.as_str());
+            let files = ifile::dao::search(&format!("{}/{}", home_path, account), query).await;
+            calc_folders(&files).await;
+            ifile::desensitize_sort(files).await
+        }
+        None => vec![]
+    }
 }
 
+/**
+ * 目录树浏览
+ */
 pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
-    let account = &auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
-    let path = &format!("/home/{}", account);
-    let files = if parent == 0 {
-        let _file = ifile::dao::get_by_path(path).await.unwrap();
-        ifile::dao::list(path, _file.id).await
-    } else {
-        ifile::dao::list(path, parent).await
-    };
-    ifile::desensitize_sort(files).await
+    match auth::bs::get_subject(user_id).await {
+        Some(subject) => {
+            let path = &*format!("{}/{}", HOME.as_str(), subject.username.unwrap());
+            let files = if parent == 0 {
+                match dao::get_by_path(path).await {
+                    Some(file) => dao::list(path, file.id).await, // path也需限制, 防水平越权
+                    None => vec![]
+                }
+            } else {
+                dao::list(path, parent).await   // path也需限制, 防水平越权
+            };
+            calc_folders(&files).await;
+            ifile::desensitize_sort(files).await
+        }
+        None => vec![]
+    }
 }
 
+/**
+ * 读取文件content
+ */
 pub async fn show(id: i64) -> String {
     match ifile::dao::get(id).await {
         Some(_file) => {
@@ -52,9 +82,9 @@ pub async fn show(id: i64) -> String {
 }
 
 pub async fn save_or_update(kind: CreateKind, path: &str) {
-    match ifile::dao::check(path).await {
-        Some(_file) => ifile::dao::update(_file.id, Files::new(format!("{:?}", kind), path).await).await,
-        None => ifile::dao::save(Files::new(format!("{:?}", kind), path).await).await
+    match dao::get_by_path(path).await {
+        Some(file) => dao::update(file.id, Files::new(format!("{:?}", kind), path).await).await,
+        None => dao::save(Files::new(format!("{:?}", kind), path).await).await
     };
 }
 
@@ -77,6 +107,9 @@ pub async fn delete_file(path: &str) {
     fs::remove_dir_all(path).expect("删除失败");
 }
 
+/**
+ * 建立索引
+ */
 pub async fn index(path: &str) {
     let path = String::from(path);
     tokio::spawn(async move {
@@ -108,12 +141,45 @@ pub async fn index(path: &str) {
     });
 }
 
+/**
+ * C端触发-刷新索引
+ */
 pub async fn reindex(user_id: i64, id: i64) {
     if let Some(_file) = ifile::dao::get(id).await {
         let account = auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
-        let path = &format!("/home/{}", account);
+        let home_path = global().watch_path.as_str();
+        let path = &format!("{}/{}", home_path, account);
         if _file.path.starts_with(path) {
             index(_file.path.as_str()).await
         }
     }
+}
+
+/**
+ * 校正目录(size)
+ * 建议在：进入 登录、个人中心 后，预热触发
+ */
+pub async fn calc_folder(account: &str) {
+    let path = format!("{}/{}", HOME.as_str(), account);
+    thread::spawn(move || {
+        block_on(async {
+            let path: &str = path.as_str();
+            for depth in dao::folder_depth_desc(path).await {
+                let _ = dao::write_folder_size(depth.ids).await;
+            }
+        });
+    });
+}
+
+pub async fn calc_folders(folders: &Vec<Files>) {
+    let folders = folders.par_iter().filter(|x| x.kind == "Folder").map(|x| x.clone()).collect();
+    thread::spawn(move || {
+        block_on(async {
+            let mut folders: Vec<Files> = folders;
+            folders.sort_by(|a, b| b.path.len().cmp(&a.path.len()));
+            for folder in folders {
+                let _ = dao::write_folder_size(folder.id.to_string()).await;
+            }
+        });
+    });
 }

@@ -31,6 +31,15 @@
       <n-form-item v-if="!avatar" path="avatar" label="头像地址" :style="{width: '450px'}">
         <n-input v-model:value="model.avatar" @keydown.enter.prevent/>
       </n-form-item>
+<!--      <p>
+        用户属性：
+        <input type="radio" v-model.trim="user.user_type" value="User" style="width: 17px; margin-right:14px;">普通用户
+        <input type="radio" v-model.trim="user.user_type" value="Admin" style="width: 38px; margin-right:5px;">管理员
+      </p>
+      <p>用户状态：
+        <input type="radio" v-model.trim="user.status" value="1" style="width: 38px; margin-right:5px;">启用
+        <input type="radio" v-model.trim="user.status" value="419" style="width: 38px; margin-right:5px;">停用
+      </p>-->
     </n-form>
     <template #action>
       <n-button type="primary" @click="save_user">保存</n-button>

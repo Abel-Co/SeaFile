@@ -1,90 +1,95 @@
 <template>
-  <div class="l">
-    <div class="login-rg">
-      <h2 class="label">修改密码</h2>
-      <div class="login--inputs">
-        <form @keydown.enter="handleSubmit">
-          <ul>
-            <li>
-              <!-- v-validate="'required'" -->
-              <label for="">旧密码</label>
-              <Input style="border-radius: 2px;"
-                          v-model.trim="user.username" name="username" data-vv-as="账号"
-                          :placeholder="'请输入账号'" key="login-username"
-              ></Input>
-            </li>
-            <li>
-              <label for="">新密码</label>
-              <Input
-                  v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
-                  :placeholder="'请输入密码'" key="login-password"
-              ></Input>
-              <label for="">确认新密码</label>
-              <Input
-                  v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
-                  :placeholder="'请输入密码'" key="login-password"
-              ></Input>
-            </li>
-          </ul>
-        </form>
-      </div>
-      <Button class="login--btn" themes="primary" @click="" text="更新密码"></Button>
-<!--      <comp-button class="login&#45;&#45;btn" themes="cancel" @click="" text="取消"></comp-button>-->
-    </div>
-  </div>
+  <n-space>
+    <n-space :item-style="{width:'600px',height:'500px'}">
+      <v-chart class="chart" :option="option" autoresize @click="click_sunburst"/>
+    </n-space>
+    <!--    <n-space @click="change1">Data1</n-space>-->
+    <!--    <n-space @click="change2">Data2</n-space>-->
+    <!--    <n-space @click="change3">Data3</n-space>-->
+  </n-space>
+  <!--  <pre>{{ JSON.stringify(model, null, 2) }}</pre>-->
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { post } from "../../utils/request"
-import { useRouter, useRoute } from "vue-router"
+import { reactive, ref } from "vue"
+import { use } from 'echarts/core'
+import { SunburstChart } from 'echarts/charts'
+import { CanvasRenderer } from 'echarts/renderers'
+import { TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
+import VChart, { THEME_KEY } from 'vue-echarts'
+import { get } from '../../utils/request'
+import JSONBigInt from "json-bigint"
 
-const router = useRouter()
+use([CanvasRenderer, SunburstChart, TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent])
 
-const user = reactive({ username: 'xugy', password: '123456' })
+// const data = reactive([])
+const data1 = [{name:'Flora',itemStyle:{color:'#da0d68'},children:[{name:'Black Tea',value:1,itemStyle:{color:'#975e6d'}},{name:'Floral',itemStyle:{color:'#e0719c'},children:[{name:'Chamomile',value:1,itemStyle:{color:'#f99e1c'}},{name:'Rose',value:1,itemStyle:{color:'#ef5a78'}},{name:'Jasmine',value:1,itemStyle:{color:'#f7f1bd'}}]}]},{name:'Fruity',itemStyle:{color:'#da1d23'},children:[{name:'Berry',itemStyle:{color:'#dd4c51'},children:[{name:'Blackberry',value:1,itemStyle:{color:'#3e0317'}},{name:'Raspberry',value:1,itemStyle:{color:'#e62969'}},{name:'Blueberry',value:1,itemStyle:{color:'#6569b0'}},{name:'Strawberry',value:1,itemStyle:{color:'#ef2d36'}}]},{name:'Dried Fruit',itemStyle:{color:'#c94a44'},children:[{name:'Raisin',value:1,itemStyle:{color:'#b53b54'}},{name:'Prune',value:1,itemStyle:{color:'#a5446f'}}]},{name:'Other Fruit',itemStyle:{color:'#dd4c51'},children:[{name:'Coconut',value:1,itemStyle:{color:'#f2684b'}},{name:'Cherry',value:1,itemStyle:{color:'#e73451'}},{name:'Pomegranate',value:1,itemStyle:{color:'#e65656'}},{name:'Pineapple',value:1,itemStyle:{color:'#f89a1c'}},{name:'Grape',value:1,itemStyle:{color:'#aeb92c'}},{name:'Apple',value:1,itemStyle:{color:'#4eb849'}},{name:'Peach',value:1,itemStyle:{color:'#f68a5c'}},{name:'Pear',value:1,itemStyle:{color:'#baa635'}}]},{name:'Citrus Fruit',itemStyle:{color:'#f7a128'},children:[{name:'Grapefruit',value:1,itemStyle:{color:'#f26355'}},{name:'Orange',value:1,itemStyle:{color:'#e2631e'}},{name:'Lemon',value:1,itemStyle:{color:'#fde404'}},{name:'Lime',value:1,itemStyle:{color:'#7eb138'}}]}]},{name:'Sour/\nFermented',itemStyle:{color:'#ebb40f'},children:[{name:'Sour',itemStyle:{color:'#e1c315'},children:[{name:'Sour Aromatics',value:1,itemStyle:{color:'#9ea718'}},{name:'Acetic Acid',value:1,itemStyle:{color:'#94a76f'}},{name:'Butyric Acid',value:1,itemStyle:{color:'#d0b24f'}},{name:'Isovaleric Acid',value:1,itemStyle:{color:'#8eb646'}},{name:'Citric Acid',value:1,itemStyle:{color:'#faef07'}},{name:'Malic Acid',value:1,itemStyle:{color:'#c1ba07'}}]},{name:'Alcohol/\nFremented',itemStyle:{color:'#b09733'},children:[{name:'Winey',value:1,itemStyle:{color:'#8f1c53'}},{name:'Whiskey',value:1,itemStyle:{color:'#b34039'}},{name:'Fremented',value:1,itemStyle:{color:'#ba9232'}},{name:'Overripe',value:1,itemStyle:{color:'#8b6439'}}]}]},{name:'Green/\nVegetative',itemStyle:{color:'#187a2f'},children:[{name:'Olive Oil',value:1,itemStyle:{color:'#a2b029'}},{name:'Raw',value:1,itemStyle:{color:'#718933'}},{name:'Green/\nVegetative',itemStyle:{color:'#3aa255'},children:[{name:'Under-ripe',value:1,itemStyle:{color:'#a2bb2b'}},{name:'Peapod',value:1,itemStyle:{color:'#62aa3c'}},{name:'Fresh',value:1,itemStyle:{color:'#03a653'}},{name:'Dark Green',value:1,itemStyle:{color:'#038549'}},{name:'Vegetative',value:1,itemStyle:{color:'#28b44b'}},{name:'Hay-like',value:1,itemStyle:{color:'#a3a830'}},{name:'Herb-like',value:1,itemStyle:{color:'#7ac141'}}]},{name:'Beany',value:1,itemStyle:{color:'#5e9a80'}}]},{name:'Other',itemStyle:{color:'#0aa3b5'},children:[{name:'Papery/Musty',itemStyle:{color:'#9db2b7'},children:[{name:'Stale',value:1,itemStyle:{color:'#8b8c90'}},{name:'Cardboard',value:1,itemStyle:{color:'#beb276'}},{name:'Papery',value:1,itemStyle:{color:'#fefef4'}},{name:'Woody',value:1,itemStyle:{color:'#744e03'}},{name:'Moldy/Damp',value:1,itemStyle:{color:'#a3a36f'}},{name:'Musty/Dusty',value:1,itemStyle:{color:'#c9b583'}},{name:'Musty/Earthy',value:1,itemStyle:{color:'#978847'}},{name:'Animalic',value:1,itemStyle:{color:'#9d977f'}},{name:'Meaty Brothy',value:1,itemStyle:{color:'#cc7b6a'}},{name:'Phenolic',value:1,itemStyle:{color:'#db646a'}}]},{name:'Chemical',itemStyle:{color:'#76c0cb'},children:[{name:'Bitter',value:1,itemStyle:{color:'#80a89d'}},{name:'Salty',value:1,itemStyle:{color:'#def2fd'}},{name:'Medicinal',value:1,itemStyle:{color:'#7a9bae'}},{name:'Petroleum',value:1,itemStyle:{color:'#039fb8'}},{name:'Skunky',value:1,itemStyle:{color:'#5e777b'}},{name:'Rubber',value:1,itemStyle:{color:'#120c0c'}}]}]},{name:'Roasted',itemStyle:{color:'#c94930'},children:[{name:'Pipe Tobacco',value:1,itemStyle:{color:'#caa465'}},{name:'Tobacco',value:1,itemStyle:{color:'#dfbd7e'}},{name:'Burnt',itemStyle:{color:'#be8663'},children:[{name:'Acrid',value:1,itemStyle:{color:'#b9a449'}},{name:'Ashy',value:1,itemStyle:{color:'#899893'}},{name:'Smoky',value:1,itemStyle:{color:'#a1743b'}},{name:'Brown, Roast',value:1,itemStyle:{color:'#894810'}}]},{name:'Cereal',itemStyle:{color:'#ddaf61'},children:[{name:'Grain',value:1,itemStyle:{color:'#b7906f'}},{name:'Malt',value:1,itemStyle:{color:'#eb9d5f'}}]}]},{name:'Spices',itemStyle:{color:'#ad213e'},children:[{name:'Pungent',value:1,itemStyle:{color:'#794752'}},{name:'Pepper',value:1,itemStyle:{color:'#cc3d41'}},{name:'Brown Spice',itemStyle:{color:'#b14d57'},children:[{name:'Anise',value:1,itemStyle:{color:'#c78936'}},{name:'Nutmeg',value:1,itemStyle:{color:'#8c292c'}},{name:'Cinnamon',value:1,itemStyle:{color:'#e5762e'}},{name:'Clove',value:1,itemStyle:{color:'#a16c5a'}}]}]},{name:'Nutty/\nCocoa',itemStyle:{color:'#a87b64'},children:[{name:'Nutty',itemStyle:{color:'#c78869'},children:[{name:'Peanuts',value:1,itemStyle:{color:'#d4ad12'}},{name:'Hazelnut',value:1,itemStyle:{color:'#9d5433'}},{name:'Almond',value:1,itemStyle:{color:'#c89f83'}}]},{name:'Cocoa',itemStyle:{color:'#bb764c'},children:[{name:'Chocolate',value:1,itemStyle:{color:'#692a19'}},{name:'Dark Chocolate',value:1,itemStyle:{color:'#470604'}}]}]},{name:'Sweet',itemStyle:{color:'#e65832'},children:[{name:'Brown Sugar',itemStyle:{color:'#d45a59'},children:[{name:'Molasses',value:1,itemStyle:{color:'#310d0f'}},{name:'Maple Syrup',value:1,itemStyle:{color:'#ae341f'}},{name:'Caramelized',value:1,itemStyle:{color:'#d78823'}},{name:'Honey',value:1,itemStyle:{color:'#da5c1f'}}]},{name:'Vanilla',value:1,itemStyle:{color:'#f89a80'}},{name:'Vanillin',value:1,itemStyle:{color:'#f37674'}},{name:'Overall Sweet',value:1,itemStyle:{color:'#e75b68'}},{name:'Sweet Aromatics',value:1,itemStyle:{color:'#d0545f'}}]}];
+const data2 = [{name:'Grandpa', value: 60, itemStyle:{color:'none'} }, {value: 260, name: 'Uncle Leo',children:[{name:'Cousin Jack',value:122,children:[{name:'Direct',value:160}]}]}, { value: 360, name: 'Direct', children: [{ value: 350, name: 'Email', children: [{ value: 340, name: 'Ad Networks', children: [{ value: 330, name: 'Vnameeo Ads', children: [{ value: 320, name: 'Search Engines', children: [{ value: 270, name: 'Search Engines', children: [{ value: 260, name: 'Direct', children: [{ value: 250, name: 'Email', children: [{ value: 240, name: 'Ad Networks', children: [{ value: 230, name: 'Vnameeo Ads', children: [{ value: 220, name: 'Search Engines', children: [{ value: 210, name: 'Search Engines', children: [{ value: 200, name: 'Search Engines' }] }] }] }] }] }] }] }] }] }] }] }] }]
+const data3 = [{name:'Grandpa',children:[{name:'Uncle Leo',value:15,children:[{name:'Cousin Jack',value:2},{name:'Cousin Mary',value:5,children:[{name:'Jackson',value:2}]},{name:'Cousin Ben',value:4}]},{name:'Father',value:10,children:[{name:'Me',value:5},{name:'Brother Peter',value:1}]}]},{name:'Nancy',children:[{name:'Uncle Nike',children:[{name:'Cousin Betty',value:1},{name:'Cousin Jenny',value:2}]}]}]
+// docs: const datax = [{value:total-(sum(第一层value)),itemStyle:{color:'none'}}, { id: 123, path: '/home/abel/xxx', name: 'abc.txt', value: 60, smaller: true/false(<1%), kind:'Folder/File', itemStyle: { color: 'File? #7F7F7F' }, children: [] }]
+const data = ref([])
+data.value = data3
+const change1 = () => data.value = data1
+const change2 = () => data.value = data2
+const change3 = () => data.value = data3
 
+get('/daisy/system/0').then(resp => {
+  console.log(resp.data)
+  // data.value = JSON.parse(JSONBigInt.stringify(resp.data))
+})
+
+const levels = [];
+// levels.push({ r0: `0%`, r: `10%` })
+// levels.push({ r0: `14%`, r: `40%` })
+/* data1、data3 */ levels.push({ r0: `19.7%`, r: `38.525%` }, { r0: `38.525%`, r: `57.35%` }, { r0: `57.35%`, r: `76.175%` }, { r0: `76.175%`, r: `95%` })
+// for (let i = 0; i < 5; i++) {
+//   const o = 14, p = 12, x = o + i * p, y = x + p
+//   levels.push({ r0: `${x}%`, r: `${y}%` })
+// }
+// console.log(JSON.stringify(levels))
+// const o2 = parseInt(levels[levels.length-1].r.replace("%", ''))
+// for (let i = 0; i < 8; i++) {
+//   const o = o2, p = 2, x = o + i * p, y = x + p
+//   levels.push({ r0: `${x}%`, r: `${y}%` })
+// }
+// console.log(JSON.stringify(levels))
+
+const option = reactive({
+  backgroundColor: "rgba(255,255,255,0)",
+  // toolbox: { feature: { /*saveAsImage: {},*/ }, },
+  series: {
+    type: "sunburst",
+    radius: [0, '98%'],
+    data: data,
+    // sort: "desc",
+    emphasis: { focus: "none", },
+    label: { show: false },
+    levels: [{label: { rotate: 0 }}, ...levels],
+  },
+})
+// level0: {r0:'10%', r:'10%', itemStyle:{r0:0, r:20, name:'Hello'}}
+const click_sunburst = params => {
+  console.log(params)
+}
 </script>
 
-<style lang="scss" scoped>
-.login {
-  position: fixed;
-  //-webkit-transform: translateX(-50%) translateY(-50%);
-  //border-radius: 28px;
-  //background: #FFFFFF url('../assets/logo.svg') no-repeat center center;
-  background-size: cover;
 
-  .login-rg {
-    width: 400px;
-    margin: 73px auto auto;
 
-    img {
-      width: 97px;
-      height: 32px;
-      margin: 7px 0;
-    }
 
-    .label {
-      font-size: 34px;
-      line-height: 20px;
-      margin-bottom: 20px;
-    }
-  }
-}
 
-.login--inputs {
-  width: 356px;
-  li {
-    margin-top: 20px;
-  }
-}
-.login--btn {
-  width: 100px;
-  height: 36px;
-  font-size: 14px;
-  margin-top: 20px;
-  margin-left: 50px;
-  display: inline-block;
-  border-radius: 6px;
-}
-</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

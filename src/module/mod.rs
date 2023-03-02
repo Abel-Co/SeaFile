@@ -26,9 +26,11 @@ pub fn api_routes() -> impl HttpServiceFactory {
         .service(user::api::create)
         .service(user::api::update)
         .service(user::api::user_check)
+        .service(daisy::api::user)
+        .service(daisy::api::system)
 }
 
 pub async fn start() {
     samba::init_smb_account().await;    // 1.初始化 Smb账户
-    init::daemon().await                // 2.初始化 后台守护服务
+    init::daemon().await;                // 2.初始化 后台守护服务
 }

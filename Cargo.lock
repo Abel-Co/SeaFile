@@ -231,7 +231,7 @@ dependencies = [
  "generic-array",
  "hmac",
  "http",
- "itertools 0.10.3",
+ "itertools 0.10.5",
  "local-channel",
  "mime",
  "once_cell",
@@ -1492,9 +1492,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.10.3"
+version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9a9d19fa1e79b6215ff29b9d6880b706147f16e9b1dbb1e4e5947b5b02bc5e3"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
 dependencies = [
  "either",
 ]
@@ -2491,6 +2491,7 @@ dependencies = [
  "ctr",
  "futures",
  "hex",
+ "itertools 0.10.5",
  "jsonwebtoken",
  "lazy_static",
  "log",
@@ -2749,7 +2750,7 @@ version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4b7922be017ee70900be125523f38bdd644f4f06a1b16e8fa5a8ee8c34bffd4"
 dependencies = [
- "itertools 0.10.3",
+ "itertools 0.10.5",
  "nom 7.1.1",
  "unicode_categories",
 ]

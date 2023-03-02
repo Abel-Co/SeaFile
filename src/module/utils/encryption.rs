@@ -40,7 +40,7 @@ pub fn unaes(ciphertext: &str) -> String {
 
 // -------------------------------------------------------------------------------------------------
 #[cfg(test)]
-mod test_encryption {
+pub mod test_encryption {
     use aes::cipher::{KeyIvInit, StreamCipher, StreamCipherSeek};
 
     use crate::module::utils::encryption::{aes, unaes};

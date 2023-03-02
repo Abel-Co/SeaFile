@@ -1,4 +1,16 @@
 
+#### 校正目录体积
+- // 不能全表整体一批进行，因同一批，可能具有层级关系.
+- // (若一定要考虑批量方案，则要为当前目录，统计'后代'全部'文件'，而不能是'子代'的'目录+文件')
+- // ('子代'是通过parent_id串连，'后代'是通过path like /xx/% 串连，单条最优耗时分别为：4ms、253ms)
+- 发生登录时，校正一次用户级全量：
+  ```sql
+  select * from files where kind = 'Folder' and path like '/Users/Abel/%' order by length(path) desc;
+  select coalesce(sum(size),0) from files where parent = 472308060426211328; -- {id}
+  ```
+- 每1.5分钟，加一条任务锁，向上统计一次，updated_at 在 1分钟内数据。 
+- 分页：可以考虑使用 id > {id}，**但要确保'结果集'ID也是单调递增的**，因'雪花'主键是单调递增的，>{id}能尽可能搂取到新生成记录，避免遗漏.
+
 #### 旭日图
 - https://www.runoob.com/echarts/echarts-sunburst.html
   - https://www.runoob.com/try/try.php?filename=tryecharts_sunburst7

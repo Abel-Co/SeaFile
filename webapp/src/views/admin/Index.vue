@@ -58,15 +58,15 @@ const clickLink = item => {
 watch(model, () => {
   if (model.user_type === 'Admin') {
     const routes = [
-      /*{
-        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'users', icon_margin_top: '-29.3px',
-        active: 0, component: () => import('./Storage.vue'),
+      {
+        path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px',
+        active: 0, component: () => import('./Users.vue'),
         beforeEnter: (to, from, next) => {
           if ('admin') next()
         }
-      }, */{
-        path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px',
-        active: 0, component: () => import('./Users.vue'),
+      }, {
+        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'users', icon_margin_top: '-29.3px',
+        active: 0, component: () => import('./Storage.vue'),
         beforeEnter: (to, from, next) => {
           if ('admin') next()
         }

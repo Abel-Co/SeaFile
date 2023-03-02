@@ -26,7 +26,7 @@
 ## Screenshots
 | ![Profile](docs/assets/profile.png) | ![Password.png](docs/assets/password.png) | ![Avatar_Options](docs/assets/avatar_options.png) |
 |:-----------------------------------:|:-----------------------------------------:|:--------------------------------------------------:|
-|   ![Users](docs/assets/users.png)   ||
+|   ![Users](docs/assets/users.png)   |   ![Sunburst](docs/assets/sunburst.png)   |
 
 ## 注意
 - 账号密码：
@@ -138,9 +138,10 @@ docker run \
 | 19  |        支援 k8s pod 动态增减时，smb账户重建        | OK  |
 | 20  |         支援 k8s 部署，从环境变量解析配置功能          | ... |
 | 21  |                  页面上传                  | ... |
-| 22  |                 用户旭日图                  | ... |
-| 23  |                 系统旭日图                  | ... |
+| 22  |                 用户旭日图                  | OK |
+| 23  |                 系统旭日图                  | OK |
 | 24  |     对图片、html，增加“合并打开”(iframe做单页渲染)     | ... |
+| 25  |             登录页面向NaiveUI美化             | ... |
 
 [//]: # (- 来源：FS事件、巡视校准)
 

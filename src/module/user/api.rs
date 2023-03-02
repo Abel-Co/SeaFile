@@ -1,6 +1,4 @@
-use actix_web::{HttpResponse, Responder};
-#[allow(unused)]
-use actix_web::{delete, get, post, put};
+use actix_web::{get, HttpResponse, post, put, Responder};
 use actix_web::web::Json;
 use actix_web_lab::extract::Path;
 

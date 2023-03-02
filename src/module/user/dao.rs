@@ -1,10 +1,8 @@
 use rbatis::crud::{CRUD, Skip};
-use rbatis::snowflake::new_snowflake_id;
 use rbson::Bson;
 
 use crate::boot::c::RB;
-use crate::module::auth;
-use crate::module::user::{Users, UserType};
+use crate::module::user::{Users};
 
 /**
  * 用户列表
@@ -53,31 +51,42 @@ pub async fn get_by_username_ignore_case(username: &str) -> Vec<Users> {
     // RB.fetch_by_wrapper(RB.new_wrapper().eq("username", username)).await.unwrap()
 }
 
-/// 模拟创建账号
-#[allow(unused)]
-async fn test_create() -> Option<Users> {
-    let user = Users {
-        id: Some(new_snowflake_id()),
-        username: Some("abel".to_string()),
-        password: Some(auth::passhash("123456")),
-        user_type: UserType::Admin,
-        status: Some(1),
-        ..Default::default()
-    };
-    let rb_resp = RB.save(&user, &[Skip::Value(Bson::Null)]).await;
-    let _ = rb_resp.unwrap().rows_affected;
+#[cfg(test)]
+pub mod user_dao_test {
+    use rbatis::crud::{CRUD, Skip};
+    use rbatis::snowflake::new_snowflake_id;
+    use rbson::Bson;
 
-    let user = Users {
-        id: Some(new_snowflake_id()),
-        username: Some("xugy".to_string()),
-        password: Some("123456".to_string()),
-        user_type: UserType::User,
-        status: Some(1),
-        ..Default::default()
-    };
-    let rb_resp = RB.save(&user, &[Skip::Value(Bson::Null)]).await;
-    let _ = rb_resp.unwrap().rows_affected;
+    use crate::boot::c::RB;
+    use crate::module::auth;
+    use crate::module::user::{Users, UserType};
 
-    Some(user)
+    /// 模拟创建账号
+    #[allow(unused)]
+    async fn test_create() -> Option<Users> {
+        let user = Users {
+            id: Some(new_snowflake_id()),
+            username: Some("abel".to_string()),
+            password: Some(auth::passhash("123456")),
+            user_type: UserType::Admin,
+            status: Some(1),
+            ..Default::default()
+        };
+        let rb_resp = RB.save(&user, &[Skip::Value(Bson::Null)]).await;
+        let _ = rb_resp.unwrap().rows_affected;
+
+        let user = Users {
+            id: Some(new_snowflake_id()),
+            username: Some("xugy".to_string()),
+            password: Some("123456".to_string()),
+            user_type: UserType::User,
+            status: Some(1),
+            ..Default::default()
+        };
+        let rb_resp = RB.save(&user, &[Skip::Value(Bson::Null)]).await;
+        let _ = rb_resp.unwrap().rows_affected;
+
+        Some(user)
+    }
 }
 

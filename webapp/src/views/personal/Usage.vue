@@ -1,14 +1,11 @@
 <template>
   <n-space>
     <n-space :item-style="{width:'600px',height:'500px'}">
-      <v-chart class="chart" :option="option" autoresize/>
+      <v-chart class="chart" :option="option" autoresize @click="click_sunburst"/>
     </n-space>
-    <n-space @click="change1">
-      Hello
-    </n-space>
-    <n-space @click="change2">
-      World
-    </n-space>
+<!--    <n-space @click="change1">Data1</n-space>-->
+<!--    <n-space @click="change2">Data2</n-space>-->
+<!--    <n-space @click="change3">Data3</n-space>-->
   </n-space>
   <!--  <pre>{{ JSON.stringify(model, null, 2) }}</pre>-->
 </template>
@@ -21,18 +18,30 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { get } from '../../utils/request'
+import JSONBigInt from "json-bigint"
 
 use([CanvasRenderer, SunburstChart, TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent])
 
-const data = reactive([])
-const data1 = [{label:'Flora',itemStyle:{color:'#da0d68'},children:[{label:'Black Tea',value:1,itemStyle:{color:'#975e6d'}},{label:'Floral',itemStyle:{color:'#e0719c'},children:[{label:'Chamomile',value:1,itemStyle:{color:'#f99e1c'}},{label:'Rose',value:1,itemStyle:{color:'#ef5a78'}},{label:'Jasmine',value:1,itemStyle:{color:'#f7f1bd'}}]}]},{label:'Fruity',itemStyle:{color:'#da1d23'},children:[{label:'Berry',itemStyle:{color:'#dd4c51'},children:[{label:'Blackberry',value:1,itemStyle:{color:'#3e0317'}},{label:'Raspberry',value:1,itemStyle:{color:'#e62969'}},{label:'Blueberry',value:1,itemStyle:{color:'#6569b0'}},{label:'Strawberry',value:1,itemStyle:{color:'#ef2d36'}}]},{label:'Dried Fruit',itemStyle:{color:'#c94a44'},children:[{label:'Raisin',value:1,itemStyle:{color:'#b53b54'}},{label:'Prune',value:1,itemStyle:{color:'#a5446f'}}]},{label:'Other Fruit',itemStyle:{color:'#dd4c51'},children:[{label:'Coconut',value:1,itemStyle:{color:'#f2684b'}},{label:'Cherry',value:1,itemStyle:{color:'#e73451'}},{label:'Pomegranate',value:1,itemStyle:{color:'#e65656'}},{label:'Pineapple',value:1,itemStyle:{color:'#f89a1c'}},{label:'Grape',value:1,itemStyle:{color:'#aeb92c'}},{label:'Apple',value:1,itemStyle:{color:'#4eb849'}},{label:'Peach',value:1,itemStyle:{color:'#f68a5c'}},{label:'Pear',value:1,itemStyle:{color:'#baa635'}}]},{label:'Citrus Fruit',itemStyle:{color:'#f7a128'},children:[{label:'Grapefruit',value:1,itemStyle:{color:'#f26355'}},{label:'Orange',value:1,itemStyle:{color:'#e2631e'}},{label:'Lemon',value:1,itemStyle:{color:'#fde404'}},{label:'Lime',value:1,itemStyle:{color:'#7eb138'}}]}]},{label:'Sour/\nFermented',itemStyle:{color:'#ebb40f'},children:[{label:'Sour',itemStyle:{color:'#e1c315'},children:[{label:'Sour Aromatics',value:1,itemStyle:{color:'#9ea718'}},{label:'Acetic Acid',value:1,itemStyle:{color:'#94a76f'}},{label:'Butyric Acid',value:1,itemStyle:{color:'#d0b24f'}},{label:'Isovaleric Acid',value:1,itemStyle:{color:'#8eb646'}},{label:'Citric Acid',value:1,itemStyle:{color:'#faef07'}},{label:'Malic Acid',value:1,itemStyle:{color:'#c1ba07'}}]},{label:'Alcohol/\nFremented',itemStyle:{color:'#b09733'},children:[{label:'Winey',value:1,itemStyle:{color:'#8f1c53'}},{label:'Whiskey',value:1,itemStyle:{color:'#b34039'}},{label:'Fremented',value:1,itemStyle:{color:'#ba9232'}},{label:'Overripe',value:1,itemStyle:{color:'#8b6439'}}]}]},{label:'Green/\nVegetative',itemStyle:{color:'#187a2f'},children:[{label:'Olive Oil',value:1,itemStyle:{color:'#a2b029'}},{label:'Raw',value:1,itemStyle:{color:'#718933'}},{label:'Green/\nVegetative',itemStyle:{color:'#3aa255'},children:[{label:'Under-ripe',value:1,itemStyle:{color:'#a2bb2b'}},{label:'Peapod',value:1,itemStyle:{color:'#62aa3c'}},{label:'Fresh',value:1,itemStyle:{color:'#03a653'}},{label:'Dark Green',value:1,itemStyle:{color:'#038549'}},{label:'Vegetative',value:1,itemStyle:{color:'#28b44b'}},{label:'Hay-like',value:1,itemStyle:{color:'#a3a830'}},{label:'Herb-like',value:1,itemStyle:{color:'#7ac141'}}]},{label:'Beany',value:1,itemStyle:{color:'#5e9a80'}}]},{label:'Other',itemStyle:{color:'#0aa3b5'},children:[{label:'Papery/Musty',itemStyle:{color:'#9db2b7'},children:[{label:'Stale',value:1,itemStyle:{color:'#8b8c90'}},{label:'Cardboard',value:1,itemStyle:{color:'#beb276'}},{label:'Papery',value:1,itemStyle:{color:'#fefef4'}},{label:'Woody',value:1,itemStyle:{color:'#744e03'}},{label:'Moldy/Damp',value:1,itemStyle:{color:'#a3a36f'}},{label:'Musty/Dusty',value:1,itemStyle:{color:'#c9b583'}},{label:'Musty/Earthy',value:1,itemStyle:{color:'#978847'}},{label:'Animalic',value:1,itemStyle:{color:'#9d977f'}},{label:'Meaty Brothy',value:1,itemStyle:{color:'#cc7b6a'}},{label:'Phenolic',value:1,itemStyle:{color:'#db646a'}}]},{label:'Chemical',itemStyle:{color:'#76c0cb'},children:[{label:'Bitter',value:1,itemStyle:{color:'#80a89d'}},{label:'Salty',value:1,itemStyle:{color:'#def2fd'}},{label:'Medicinal',value:1,itemStyle:{color:'#7a9bae'}},{label:'Petroleum',value:1,itemStyle:{color:'#039fb8'}},{label:'Skunky',value:1,itemStyle:{color:'#5e777b'}},{label:'Rubber',value:1,itemStyle:{color:'#120c0c'}}]}]},{label:'Roasted',itemStyle:{color:'#c94930'},children:[{label:'Pipe Tobacco',value:1,itemStyle:{color:'#caa465'}},{label:'Tobacco',value:1,itemStyle:{color:'#dfbd7e'}},{label:'Burnt',itemStyle:{color:'#be8663'},children:[{label:'Acrid',value:1,itemStyle:{color:'#b9a449'}},{label:'Ashy',value:1,itemStyle:{color:'#899893'}},{label:'Smoky',value:1,itemStyle:{color:'#a1743b'}},{label:'Brown, Roast',value:1,itemStyle:{color:'#894810'}}]},{label:'Cereal',itemStyle:{color:'#ddaf61'},children:[{label:'Grain',value:1,itemStyle:{color:'#b7906f'}},{label:'Malt',value:1,itemStyle:{color:'#eb9d5f'}}]}]},{label:'Spices',itemStyle:{color:'#ad213e'},children:[{label:'Pungent',value:1,itemStyle:{color:'#794752'}},{label:'Pepper',value:1,itemStyle:{color:'#cc3d41'}},{label:'Brown Spice',itemStyle:{color:'#b14d57'},children:[{label:'Anise',value:1,itemStyle:{color:'#c78936'}},{label:'Nutmeg',value:1,itemStyle:{color:'#8c292c'}},{label:'Cinnamon',value:1,itemStyle:{color:'#e5762e'}},{label:'Clove',value:1,itemStyle:{color:'#a16c5a'}}]}]},{label:'Nutty/\nCocoa',itemStyle:{color:'#a87b64'},children:[{label:'Nutty',itemStyle:{color:'#c78869'},children:[{label:'Peanuts',value:1,itemStyle:{color:'#d4ad12'}},{label:'Hazelnut',value:1,itemStyle:{color:'#9d5433'}},{label:'Almond',value:1,itemStyle:{color:'#c89f83'}}]},{label:'Cocoa',itemStyle:{color:'#bb764c'},children:[{label:'Chocolate',value:1,itemStyle:{color:'#692a19'}},{label:'Dark Chocolate',value:1,itemStyle:{color:'#470604'}}]}]},{label:'Sweet',itemStyle:{color:'#e65832'},children:[{label:'Brown Sugar',itemStyle:{color:'#d45a59'},children:[{label:'Molasses',value:1,itemStyle:{color:'#310d0f'}},{label:'Maple Syrup',value:1,itemStyle:{color:'#ae341f'}},{label:'Caramelized',value:1,itemStyle:{color:'#d78823'}},{label:'Honey',value:1,itemStyle:{color:'#da5c1f'}}]},{label:'Vanilla',value:1,itemStyle:{color:'#f89a80'}},{label:'Vanillin',value:1,itemStyle:{color:'#f37674'}},{label:'Overall Sweet',value:1,itemStyle:{color:'#e75b68'}},{label:'Sweet Aromatics',value:1,itemStyle:{color:'#d0545f'}}]}];
-const data2 = [{ value: 60, id: 'Direct', itemStyle: { color: 'none' } }, {value: 260, id: 'Direct'}, {value: 160, id: 'Direct'}, { value: 360, id: 'Direct', children: [{ value: 350, id: 'Email', children: [{ value: 340, id: 'Ad Networks', children: [{ value: 330, id: 'Video Ads', children: [{ value: 320, id: 'Search Engines', children: [{ value: 270, id: 'Search Engines', children: [{ value: 260, id: 'Direct', children: [{ value: 250, id: 'Email', children: [{ value: 240, id: 'Ad Networks', children: [{ value: 230, id: 'Video Ads', children: [{ value: 220, id: 'Search Engines', children: [{ value: 210, id: 'Search Engines', children: [{ value: 200, id: 'Search Engines' }] }] }] }] }] }] }] }] }] }] }] }] }]
-// docs: const data2 = [{value:total-(sum(第一层value)),itemStyle:{color:'none'}}, { id: 123, path: '/home/abel/xxx', value: 60, label: 'abc.txt', kind:'Folder/File', itemStyle: { color: 'File? #7F7F7F' }, children: [] }]
-data.push(...data2)
-const change1 = () => data.splice(0, 10000, ...data1)
-const change2 = () => data.splice(0, 10000, ...data2)
+// const data = reactive([])
+const data1 = [{name:'Flora',itemStyle:{color:'#da0d68'},children:[{name:'Black Tea',value:1,itemStyle:{color:'#975e6d'}},{name:'Floral',itemStyle:{color:'#e0719c'},children:[{name:'Chamomile',value:1,itemStyle:{color:'#f99e1c'}},{name:'Rose',value:1,itemStyle:{color:'#ef5a78'}},{name:'Jasmine',value:1,itemStyle:{color:'#f7f1bd'}}]}]},{name:'Fruity',itemStyle:{color:'#da1d23'},children:[{name:'Berry',itemStyle:{color:'#dd4c51'},children:[{name:'Blackberry',value:1,itemStyle:{color:'#3e0317'}},{name:'Raspberry',value:1,itemStyle:{color:'#e62969'}},{name:'Blueberry',value:1,itemStyle:{color:'#6569b0'}},{name:'Strawberry',value:1,itemStyle:{color:'#ef2d36'}}]},{name:'Dried Fruit',itemStyle:{color:'#c94a44'},children:[{name:'Raisin',value:1,itemStyle:{color:'#b53b54'}},{name:'Prune',value:1,itemStyle:{color:'#a5446f'}}]},{name:'Other Fruit',itemStyle:{color:'#dd4c51'},children:[{name:'Coconut',value:1,itemStyle:{color:'#f2684b'}},{name:'Cherry',value:1,itemStyle:{color:'#e73451'}},{name:'Pomegranate',value:1,itemStyle:{color:'#e65656'}},{name:'Pineapple',value:1,itemStyle:{color:'#f89a1c'}},{name:'Grape',value:1,itemStyle:{color:'#aeb92c'}},{name:'Apple',value:1,itemStyle:{color:'#4eb849'}},{name:'Peach',value:1,itemStyle:{color:'#f68a5c'}},{name:'Pear',value:1,itemStyle:{color:'#baa635'}}]},{name:'Citrus Fruit',itemStyle:{color:'#f7a128'},children:[{name:'Grapefruit',value:1,itemStyle:{color:'#f26355'}},{name:'Orange',value:1,itemStyle:{color:'#e2631e'}},{name:'Lemon',value:1,itemStyle:{color:'#fde404'}},{name:'Lime',value:1,itemStyle:{color:'#7eb138'}}]}]},{name:'Sour/\nFermented',itemStyle:{color:'#ebb40f'},children:[{name:'Sour',itemStyle:{color:'#e1c315'},children:[{name:'Sour Aromatics',value:1,itemStyle:{color:'#9ea718'}},{name:'Acetic Acid',value:1,itemStyle:{color:'#94a76f'}},{name:'Butyric Acid',value:1,itemStyle:{color:'#d0b24f'}},{name:'Isovaleric Acid',value:1,itemStyle:{color:'#8eb646'}},{name:'Citric Acid',value:1,itemStyle:{color:'#faef07'}},{name:'Malic Acid',value:1,itemStyle:{color:'#c1ba07'}}]},{name:'Alcohol/\nFremented',itemStyle:{color:'#b09733'},children:[{name:'Winey',value:1,itemStyle:{color:'#8f1c53'}},{name:'Whiskey',value:1,itemStyle:{color:'#b34039'}},{name:'Fremented',value:1,itemStyle:{color:'#ba9232'}},{name:'Overripe',value:1,itemStyle:{color:'#8b6439'}}]}]},{name:'Green/\nVegetative',itemStyle:{color:'#187a2f'},children:[{name:'Olive Oil',value:1,itemStyle:{color:'#a2b029'}},{name:'Raw',value:1,itemStyle:{color:'#718933'}},{name:'Green/\nVegetative',itemStyle:{color:'#3aa255'},children:[{name:'Under-ripe',value:1,itemStyle:{color:'#a2bb2b'}},{name:'Peapod',value:1,itemStyle:{color:'#62aa3c'}},{name:'Fresh',value:1,itemStyle:{color:'#03a653'}},{name:'Dark Green',value:1,itemStyle:{color:'#038549'}},{name:'Vegetative',value:1,itemStyle:{color:'#28b44b'}},{name:'Hay-like',value:1,itemStyle:{color:'#a3a830'}},{name:'Herb-like',value:1,itemStyle:{color:'#7ac141'}}]},{name:'Beany',value:1,itemStyle:{color:'#5e9a80'}}]},{name:'Other',itemStyle:{color:'#0aa3b5'},children:[{name:'Papery/Musty',itemStyle:{color:'#9db2b7'},children:[{name:'Stale',value:1,itemStyle:{color:'#8b8c90'}},{name:'Cardboard',value:1,itemStyle:{color:'#beb276'}},{name:'Papery',value:1,itemStyle:{color:'#fefef4'}},{name:'Woody',value:1,itemStyle:{color:'#744e03'}},{name:'Moldy/Damp',value:1,itemStyle:{color:'#a3a36f'}},{name:'Musty/Dusty',value:1,itemStyle:{color:'#c9b583'}},{name:'Musty/Earthy',value:1,itemStyle:{color:'#978847'}},{name:'Animalic',value:1,itemStyle:{color:'#9d977f'}},{name:'Meaty Brothy',value:1,itemStyle:{color:'#cc7b6a'}},{name:'Phenolic',value:1,itemStyle:{color:'#db646a'}}]},{name:'Chemical',itemStyle:{color:'#76c0cb'},children:[{name:'Bitter',value:1,itemStyle:{color:'#80a89d'}},{name:'Salty',value:1,itemStyle:{color:'#def2fd'}},{name:'Medicinal',value:1,itemStyle:{color:'#7a9bae'}},{name:'Petroleum',value:1,itemStyle:{color:'#039fb8'}},{name:'Skunky',value:1,itemStyle:{color:'#5e777b'}},{name:'Rubber',value:1,itemStyle:{color:'#120c0c'}}]}]},{name:'Roasted',itemStyle:{color:'#c94930'},children:[{name:'Pipe Tobacco',value:1,itemStyle:{color:'#caa465'}},{name:'Tobacco',value:1,itemStyle:{color:'#dfbd7e'}},{name:'Burnt',itemStyle:{color:'#be8663'},children:[{name:'Acrid',value:1,itemStyle:{color:'#b9a449'}},{name:'Ashy',value:1,itemStyle:{color:'#899893'}},{name:'Smoky',value:1,itemStyle:{color:'#a1743b'}},{name:'Brown, Roast',value:1,itemStyle:{color:'#894810'}}]},{name:'Cereal',itemStyle:{color:'#ddaf61'},children:[{name:'Grain',value:1,itemStyle:{color:'#b7906f'}},{name:'Malt',value:1,itemStyle:{color:'#eb9d5f'}}]}]},{name:'Spices',itemStyle:{color:'#ad213e'},children:[{name:'Pungent',value:1,itemStyle:{color:'#794752'}},{name:'Pepper',value:1,itemStyle:{color:'#cc3d41'}},{name:'Brown Spice',itemStyle:{color:'#b14d57'},children:[{name:'Anise',value:1,itemStyle:{color:'#c78936'}},{name:'Nutmeg',value:1,itemStyle:{color:'#8c292c'}},{name:'Cinnamon',value:1,itemStyle:{color:'#e5762e'}},{name:'Clove',value:1,itemStyle:{color:'#a16c5a'}}]}]},{name:'Nutty/\nCocoa',itemStyle:{color:'#a87b64'},children:[{name:'Nutty',itemStyle:{color:'#c78869'},children:[{name:'Peanuts',value:1,itemStyle:{color:'#d4ad12'}},{name:'Hazelnut',value:1,itemStyle:{color:'#9d5433'}},{name:'Almond',value:1,itemStyle:{color:'#c89f83'}}]},{name:'Cocoa',itemStyle:{color:'#bb764c'},children:[{name:'Chocolate',value:1,itemStyle:{color:'#692a19'}},{name:'Dark Chocolate',value:1,itemStyle:{color:'#470604'}}]}]},{name:'Sweet',itemStyle:{color:'#e65832'},children:[{name:'Brown Sugar',itemStyle:{color:'#d45a59'},children:[{name:'Molasses',value:1,itemStyle:{color:'#310d0f'}},{name:'Maple Syrup',value:1,itemStyle:{color:'#ae341f'}},{name:'Caramelized',value:1,itemStyle:{color:'#d78823'}},{name:'Honey',value:1,itemStyle:{color:'#da5c1f'}}]},{name:'Vanilla',value:1,itemStyle:{color:'#f89a80'}},{name:'Vanillin',value:1,itemStyle:{color:'#f37674'}},{name:'Overall Sweet',value:1,itemStyle:{color:'#e75b68'}},{name:'Sweet Aromatics',value:1,itemStyle:{color:'#d0545f'}}]}];
+const data2 = [{name:'Grandpa', value: 60, itemStyle:{color:'none'} }, {value: 260, name: 'Uncle Leo',children:[{name:'Cousin Jack',value:122,children:[{name:'Direct',value:160}]}]}, { value: 360, name: 'Direct', children: [{ value: 350, name: 'Email', children: [{ value: 340, name: 'Ad Networks', children: [{ value: 330, name: 'Vnameeo Ads', children: [{ value: 320, name: 'Search Engines', children: [{ value: 270, name: 'Search Engines', children: [{ value: 260, name: 'Direct', children: [{ value: 250, name: 'Email', children: [{ value: 240, name: 'Ad Networks', children: [{ value: 230, name: 'Vnameeo Ads', children: [{ value: 220, name: 'Search Engines', children: [{ value: 210, name: 'Search Engines', children: [{ value: 200, name: 'Search Engines' }] }] }] }] }] }] }] }] }] }] }] }] }]
+const data3 = [{name:'Grandpa',children:[{name:'Uncle Leo',value:15,children:[{name:'Cousin Jack',value:2},{name:'Cousin Mary',value:5,children:[{name:'Jackson',value:2}]},{name:'Cousin Ben',value:4}]},{name:'Father',value:10,children:[{name:'Me',value:5},{name:'Brother Peter',value:1}]}]},{name:'Nancy',children:[{name:'Uncle Nike',children:[{name:'Cousin Betty',value:1},{name:'Cousin Jenny',value:2}]}]}]
+// docs: const datax = [{value:total-(sum(第一层value)),itemStyle:{color:'none'}}, { id: 123, path: '/home/abel/xxx', name: 'abc.txt', value: 60, smaller: true/false(<1%), kind:'Folder/File', itemStyle: { color: 'File? #7F7F7F' }, children: [] }]
+const data = ref([])
+// data.value = data3
+const change1 = () => data.value = data1
+const change2 = () => data.value = data2
+const change3 = () => data.value = data3
+
+get('/daisy/user/0').then(resp => {
+  console.log(resp.data)
+  data.value = JSON.parse(JSONBigInt.stringify(resp.data))
+})
 
 const levels = [];
+// levels.push({ r0: `0%`, r: `10%` })
+// levels.push({ r0: `14%`, r: `40%` })
+/* data1、data3 */ levels.push({ r0: `19.7%`, r: `38.525%` }, { r0: `38.525%`, r: `57.35%` }, { r0: `57.35%`, r: `76.175%` }, { r0: `76.175%`, r: `95%` })
 // for (let i = 0; i < 5; i++) {
 //   const o = 14, p = 12, x = o + i * p, y = x + p
 //   levels.push({ r0: `${x}%`, r: `${y}%` })
@@ -45,25 +54,23 @@ const levels = [];
 // }
 // console.log(JSON.stringify(levels))
 
-// levels.push({r0:'14%', r: '26%'})
-const level = {r0: '14%', r: '26%'};for (let i = 0; i< 13; i++) {levels.push(level)}
-
 const option = reactive({
   backgroundColor: "rgba(255,255,255,0)",
-  toolbox: {
-    feature: {
-      // saveAsImage: {},
-    },
-  },
+  // toolbox: { feature: { /*saveAsImage: {},*/ }, },
   series: {
     type: "sunburst",
+    radius: [0, '98%'],
     data: data,
-    sort: "value",
+    // sort: "desc",
     emphasis: { focus: "none", },
     label: { show: false },
-    levels: [{r0: 0, r:'14%'}, ...levels],
+    levels: [{label: { rotate: 0 }}, ...levels],
   },
 })
+// level0: {r0:'10%', r:'10%', itemStyle:{r0:0, r:20, name:'Hello'}}
+const click_sunburst = params => {
+  console.log(params)
+}
 </script>
 
 

@@ -6,16 +6,14 @@
         <Form @keydown.enter="handleSubmit" ref="userForm">
           <ul>
             <li>
-              <Input
-                  v-model.trim="user.username" name="username" data-vv-as="账号"
-                  rules="account" :placeholder="'请输入账号'" key="login-username" :errors="errors"
-              />
+              <!-- rules="account" -->
+              <Input v-model.trim="user.username" name="username" data-vv-as="账号"
+                   :placeholder="'请输入账号'" key="login-username" :errors="errors"/>
             </li>
             <li>
-              <Input
-                  v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
-                  rules="account" :placeholder="'请输入密码'" key="login-password" :errors="errors"
-              />
+              <!-- rules="account" -->
+              <Input v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
+                  :placeholder="'请输入密码'" key="login-password" :errors="errors"/>
             </li>
           </ul>
         </Form>
@@ -35,7 +33,7 @@ const router = useRouter()
 const errors = reactive({})
 const userForm = ref(null)
 
-const user = reactive({ username: 'xugy', password: '123456' })
+const user = reactive({ username: 'abel', password: '123456' })
 
 async function handleSubmit() {
   const result = await userForm.value.validate()

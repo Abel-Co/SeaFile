@@ -9,6 +9,7 @@ use notify::EventKind::{Create, Modify, Remove};
 
 use crate::module::ifile;
 
+// 创建监听器
 fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
     let (mut tx, rx) = channel(1<<16); // 65536*2
     // Automatically select the best implementation for your platform.
@@ -21,6 +22,9 @@ fn async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Resul
     Ok((watcher, rx))
 }
 
+/**
+ * 文件系统监听
+ */
 pub async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
     let (mut watcher, mut rx) = async_watcher()?;
     watcher.watch(path.as_ref(), RecursiveMode::Recursive)?;

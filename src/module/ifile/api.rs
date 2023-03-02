@@ -1,11 +1,9 @@
 use actix_files::NamedFile;
-use actix_web::{error, HttpResponse, Responder, Result};
-#[allow(unused)]
-use actix_web::{delete, get, post, put};
+use actix_web::{error, get, HttpResponse, Responder, Result};
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
 use actix_web_lab::extract::Path;
-use crate::boot::middleware::JwtToken;
 
+use crate::boot::middleware::JwtToken;
 use crate::module::ifile;
 
 /**
@@ -53,11 +51,11 @@ pub async fn visit(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
         // Some(_file) => NamedFile::open_async(_file.path).await,  // txt、html 匀可，唯 pdf 仍下载
         Some(_file) => {
             let file = NamedFile::open_async(_file.path).await?;
-            Ok(file.set_content_disposition(ContentDisposition{
+            Ok(file.set_content_disposition(ContentDisposition {
                 disposition: DispositionType::Inline,
-                parameters: vec![DispositionParam::Filename(_file.name)]
+                parameters: vec![DispositionParam::Filename(_file.name)],
             }))
-        },
+        }
         None => NamedFile::open_async("").await
     }
 }

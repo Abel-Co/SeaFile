@@ -6,14 +6,15 @@ use notify::event::CreateKind;
 use once_cell::sync::OnceCell;
 use rbatis::core::db::DBPoolOptions;
 use rbatis::rbatis::Rbatis;
-
 use regex::Regex;
+
 use crate::boot::global;
 use crate::module::ifile;
 
 lazy_static! {
     pub static ref RB: Rbatis = Rbatis::new();
     pub static ref RE: Regex = Regex::new(r"(?x)//(.+):(?P<anchor>[^@\s]+)@").unwrap();
+    pub static ref HOME: String = global().watch_path.as_str().to_string();
 }
 
 /// 脱敏处理
@@ -26,7 +27,7 @@ fn desensitive(input: &str) -> String {
 }
 
 pub async fn init_rbatis() {
-    if let Some(db) = &crate::boot::global().postgres {
+    if let Some(db) = &global().postgres {
         let db_pool_options = DBPoolOptions {
             max_connections: db.max,
             min_connections: db.min,
@@ -49,7 +50,7 @@ pub async fn init_db_schema() {
     }
     // let files: i64 = RB.fetch("select count(*) from files;", vec![]).await.unwrap();
     // if files < 2 {
-    let root_path = ifile::dao::check(global().watch_path.as_str()).await;
+    let root_path = ifile::bs::check_path(global().watch_path.as_str()).await;
     if let None = root_path {
         // 3.初始建立索引
         let watch_path = global().watch_path.as_str();
@@ -57,12 +58,11 @@ pub async fn init_db_schema() {
     }
 }
 
-
 // Rbatis new_addition ------------------------------------------------------
 pub static RB_OLD: OnceCell<Arc<Rbatis>> = OnceCell::new();
 
 pub async fn init_rbatis_old() {
-    if let Some(db) = &crate::boot::global().postgres {
+    if let Some(db) = &global().postgres {
         let rbatis = Rbatis::new();
         let db_pool_options = DBPoolOptions {
             max_connections: db.max,
@@ -84,7 +84,7 @@ pub fn is_with_list(req: &ServiceRequest) -> bool {
     // Some({"/login": {"POST": 1}, "/category/warehouse": {"GET": 1}, "/userdocs/warehouse": {"GET": 1}})
     static WHITELIST_MAP: OnceCell<Arc<HashMap<String, HashMap<String, i8>>>> = OnceCell::new();
     let whitelist_map = WHITELIST_MAP.get_or_init(|| {
-        let conf_white_list = crate::boot::global().white_list.clone();
+        let conf_white_list = global().white_list.clone();
         Arc::new(conf_white_list.into_iter().map(|(path, methods)|
             (path, methods.into_iter().map(|method| (method, 1)).collect())).collect())
     });

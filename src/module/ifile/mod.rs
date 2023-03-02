@@ -39,7 +39,7 @@ impl Files {
             id: new_snowflake_id(),
             path: path.to_string(),
             name: _file_name.to_string(),
-            parent: dao::check(parent_path).await.map_or(0, |p_file| p_file.id),
+            parent: dao::get_by_path(parent_path).await.map_or(0, |p_file| p_file.id),
             size: fs::metadata(path).map_or(0, |meta| meta.len()),
             kind,
             crc: crc_utils::crc_i64(path),
@@ -55,6 +55,7 @@ lazy_static! {
     );
 }
 
+/// 为免乱序，简单做个排序
 impl Ord for Files {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.kind == "Folder" && other.kind != "Folder" {
@@ -108,4 +109,11 @@ async fn desensitize_sort(mut files: Vec<Files>) -> Vec<Files> {
     files.par_iter_mut().for_each(|x| x.path = x.path[6..].to_string()); // 脱敏
     files.par_sort_by(|a, b| a.cmp(&b));    // 排序
     files
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+pub struct Depth {
+    pub len: u64,
+    pub cnt: u64,
+    pub ids: String,
 }
