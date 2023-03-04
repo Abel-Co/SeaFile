@@ -17,7 +17,6 @@ type Aes128Ctr64LE = ctr::Ctr64LE<aes::Aes128>;
 
 lazy_static! {
     pub static ref KEY: String = String::from("BBBBBBBBBBBBBBBB");
-    // static ref iv = [0x24; 16];
 }
 
 // key: &String
@@ -37,6 +36,8 @@ pub fn unaes(ciphertext: &str) -> String {
     buf.chunks_mut(3).for_each(|chunk| cipher.apply_keystream(chunk));
     String::from_utf8_lossy(&buf).to_string()
 }
+
+// pub fn rng
 
 // -------------------------------------------------------------------------------------------------
 #[cfg(test)]
