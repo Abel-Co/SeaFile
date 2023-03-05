@@ -65,7 +65,6 @@ create table users
     created_at timestamptz  default now() not null,
     updated_at timestamptz  default now() not null
 );
-
 create trigger users_timestamp before update on users for each row execute procedure upd_timestamp();
 create index idx_username on users (username);
 comment on table  users             is '用户表';
@@ -81,3 +80,15 @@ comment on column users.quota       is '配额：单位GB，默认初始1GB';
 comment on column users.usage       is '存储使用量';
 comment on column users.created_at  is '创建时间';
 comment on column users.updated_at  is '更新时间';
+
+drop table if exists aes;
+create table aes (
+    id bigint not null primary key,
+    name varchar(100) unique not null,
+    key varchar(500) not null ,
+    ext varchar(500) not null ,
+    created_at timestamptz default now() not null ,
+    updated_at timestamptz default now() not null
+);
+create trigger aes_timestamp before update on aes for each row execute procedure upd_timestamp();
+create index idx_name on aes (name);
