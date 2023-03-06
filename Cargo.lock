@@ -2497,7 +2497,6 @@ dependencies = [
  "crc 3.0.0",
  "ctr",
  "futures",
- "hex",
  "itertools 0.10.5",
  "jsonwebtoken",
  "lazy_static",

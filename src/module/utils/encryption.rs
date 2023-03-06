@@ -12,93 +12,43 @@
 // }
 
 use aes::cipher::{KeyIvInit, StreamCipher};
+use base64::{Engine as _, engine::general_purpose};
 
 type Aes128Ctr64LE = ctr::Ctr64LE<aes::Aes128>;
 
 lazy_static! {
-    pub static ref KEY: String = String::from("BBBBBBBBBBBBBBBB");
+    pub static ref KEY: Vec<u8> = general_purpose::STANDARD.decode("QR5aWivlbewl+9mGtCs3zA==").unwrap();
+    pub static ref IV: Vec<u8> = general_purpose::STANDARD.decode("NsKGlMazY0gjMkcVaAdJRg==").unwrap();
 }
 
-// key: &String
 pub fn aes(plaintext: &str) -> String {
-    let iv = [0x24; 16];
     let mut buf = plaintext.as_bytes().to_vec();
-    let mut cipher = Aes128Ctr64LE::new(KEY.as_bytes().into(), &iv.into());
-    cipher.apply_keystream(&mut buf); // 完成加密
-    hex::encode(buf)
+    let mut cipher = Aes128Ctr64LE::new((&KEY[..]).into(), (&IV[..]).into());
+    cipher.apply_keystream(&mut buf);   // 完成加密
+    general_purpose::STANDARD.encode(buf)
 }
 
-// key: &String
 pub fn unaes(ciphertext: &str) -> String {
-    let iv = [0x24; 16];
-    let mut buf = hex::decode(ciphertext).unwrap();
-    let mut cipher = Aes128Ctr64LE::new(KEY.as_bytes().into(), &iv.into());
+    let mut buf = general_purpose::STANDARD.decode(ciphertext).unwrap();
+    let mut cipher = Aes128Ctr64LE::new((&KEY[..]).into(), (&IV[..]).into());
     buf.chunks_mut(3).for_each(|chunk| cipher.apply_keystream(chunk));
     String::from_utf8_lossy(&buf).to_string()
 }
 
-// pub fn rng
-
-// -------------------------------------------------------------------------------------------------
 #[cfg(test)]
 pub mod test_encryption {
-    use aes::cipher::{KeyIvInit, StreamCipher, StreamCipherSeek};
-
-    use crate::module::utils::encryption::{aes, unaes};
-
-    type Aes128Ctr64LE = ctr::Ctr64LE<aes::Aes128>;
+    use crate::module::utils::debug_aes::{aes, unaes};
 
     #[test]
-    #[allow(unused)]
-    fn test_aes_unaes() {
-        let key = String::from_utf8_lossy(&[0x42; 16]);
-        let key = key.as_ref();
-        let key = "BBBBBBBBBBBBBBBB".to_string();
+    fn test_the_new_aes_unaes() {
         let plaintext = "hello world! this is my plaintext.";
-        // let cipher = aes(&key, plaintext);
+        // let ciphertext = "940ac6da4641be05aa2665a736f36c9799b697554ba18bf1939725f0a75730422727";    // hex
+        let ciphertext = "lArG2kZBvgWqJmWnNvNsl5m2l1VLoYvxk5cl8KdXMEInJw==";    // base64
+
         let cipher = aes(plaintext);
         println!(">>> cipher: {:?}", cipher);
 
-        let ciphertext = "3357121ebb5a29468bd861467596ce3da59bdee42dcc0614dea955368d8a5dc0cad4";
-        // let plaintext = unaes(&key, ciphertext);
         let plaintext = unaes(ciphertext);
         println!(">>> plaintext: {:?}", plaintext);
-    }
-
-    #[test]
-    fn test_aes_origin() {
-        let key = [0x42; 16];
-        let iv = [0x24; 16];
-        let plaintext = *b"hello world! this is my plaintext.";
-        let ciphertext = hex::decode("3357121ebb5a29468bd861467596ce3da59bdee42dcc0614dea955368d8a5dc0cad4").unwrap();
-
-        // encrypt in-place
-        let mut buf = plaintext.to_vec();
-        let mut cipher = Aes128Ctr64LE::new(&key.into(), &iv.into());
-        cipher.apply_keystream(&mut buf); // 完成加密
-        println!("{:?}, {:?}", (buf[..] == ciphertext[..]), buf);
-
-        // CTR mode can be used with streaming messages
-        let mut cipher = Aes128Ctr64LE::new(&key.into(), &iv.into());
-        for chunk in buf.chunks_mut(3) {
-            cipher.apply_keystream(chunk);
-        }
-        println!("{:?}, {:?}", (buf[..] == plaintext[..]), String::from_utf8_lossy(&buf));
-
-
-        // -----------------------------------------------------------------------------------------
-        // CTR mode supports seeking. The parameter is zero-based _bytes_ counter (not _blocks_).
-        cipher.seek(0u32);
-
-        // encrypt/decrypt from buffer to buffer
-        // buffer length must be equal to input length
-        let mut buf1 = [0u8; 34];
-        cipher.apply_keystream_b2b(&plaintext, &mut buf1).unwrap();
-        assert_eq!(buf1[..], ciphertext[..]);
-
-        let mut buf2 = [0u8; 34];
-        cipher.seek(0u32);
-        cipher.apply_keystream_b2b(&buf1, &mut buf2).unwrap();
-        assert_eq!(buf2[..], plaintext[..]);
     }
 }
