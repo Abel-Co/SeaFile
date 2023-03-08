@@ -2,8 +2,9 @@ use bcrypt::BcryptResult;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-use crate::boot::middleware::JwtToken;
 
+use crate::boot::middleware::JwtToken;
+use crate::module::user;
 use crate::module::utils::encryption;
 
 pub mod api;
@@ -61,4 +62,16 @@ pub fn passhash(pass: &str) -> String {
 
 pub fn passaes(pass: &str) -> String {
     encryption::aes(pass)
+}
+
+/// 1.初始化密码学组件
+pub async fn init_crypto_conf() {
+    encryption::init_aes_conf().await;
+}
+
+/// 2.创建初始账号（依赖 1）
+pub async fn init_naive_account() {
+    if user::bs::list().await.is_empty() {
+        user::bs::create_root().await;
+    }
 }

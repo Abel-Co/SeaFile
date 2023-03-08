@@ -11,28 +11,45 @@
 //     md5.result_str()
 // }
 
+use std::sync::Arc;
+
 use aes::cipher::{KeyIvInit, StreamCipher};
-use base64::{Engine as _, engine::general_purpose};
+use base64::{Engine as _, engine::general_purpose, engine::general_purpose::STANDARD as BASE64};
+use once_cell::sync::OnceCell;
+use rbatis::crud::{CRUD, Skip};
+use rbson::Bson;
+
+use crate::boot::c::RB;
+use crate::module::utils::{Base, BaseLabel};
+use crate::module::utils::BaseLabel::GLOBAL;
+
+pub static AES_CONF: OnceCell<Arc<(Vec<u8>, Vec<u8>)>> = OnceCell::new();
 
 type Aes128Ctr64LE = ctr::Ctr64LE<aes::Aes128>;
 
-lazy_static! {
-    pub static ref KEY: Vec<u8> = general_purpose::STANDARD.decode("QR5aWivlbewl+9mGtCs3zA==").unwrap();
-    pub static ref IV: Vec<u8> = general_purpose::STANDARD.decode("NsKGlMazY0gjMkcVaAdJRg==").unwrap();
-}
-
 pub fn aes(plaintext: &str) -> String {
     let mut buf = plaintext.as_bytes().to_vec();
-    let mut cipher = Aes128Ctr64LE::new((&KEY[..]).into(), (&IV[..]).into());
+    let (key, iv): &(Vec<u8>, Vec<u8>) = AES_CONF.get().unwrap();
+    let mut cipher = Aes128Ctr64LE::new(key[..].into(), iv[..].into());
     cipher.apply_keystream(&mut buf);   // 完成加密
-    general_purpose::STANDARD.encode(buf)
+    BASE64.encode(buf)
 }
 
 pub fn unaes(ciphertext: &str) -> String {
+    let (key, iv): &(Vec<u8>, Vec<u8>) = AES_CONF.get().unwrap();
+    let mut cipher = Aes128Ctr64LE::new(key[..].into(), iv[..].into());
     let mut buf = general_purpose::STANDARD.decode(ciphertext).unwrap();
-    let mut cipher = Aes128Ctr64LE::new((&KEY[..]).into(), (&IV[..]).into());
     buf.chunks_mut(3).for_each(|chunk| cipher.apply_keystream(chunk));
     String::from_utf8_lossy(&buf).to_string()
+}
+
+pub async fn init_aes_conf() {
+    if RB.fetch_count_by_wrapper::<Base>(RB.new_wrapper()).await.unwrap() == 0 {
+        RB.save(&Base::new(), &[Skip::Value(Bson::Null)]).await.unwrap().rows_affected;
+    }
+    let c = RB.fetch_by_column::<Base, BaseLabel>("name", GLOBAL).await.unwrap();
+    let key_iv = (BASE64.decode(c.key).unwrap(), BASE64.decode(c.iv).unwrap());
+    assert!(AES_CONF.set(Arc::new(key_iv)).is_ok())
 }
 
 #[cfg(test)]

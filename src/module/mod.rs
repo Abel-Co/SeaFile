@@ -31,6 +31,8 @@ pub fn api_routes() -> impl HttpServiceFactory {
 }
 
 pub async fn start() {
-    samba::init_smb_account().await;    // 1.初始化 Smb账户
-    init::daemon().await;                // 2.初始化 后台守护服务
+    auth::init_crypto_conf().await;     // 1.初始化密码学组件
+    auth::init_naive_account().await;   // 2.创建初始账号（依赖 1）
+    samba::init_smb_account().await;    // 3.初始化 Smb账户
+    init::daemon().await;               // 4.初始化 后台守护服务
 }

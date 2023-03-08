@@ -35,6 +35,16 @@ pub async fn create(mut user: Users) -> Result<u64, String> {
     Ok(rows_affected)
 }
 
+pub async fn create_root() -> u64 {
+    let user = Users {
+        id: Some(new_snowflake_id()),
+        username: Some("root".to_string()),
+        password: Some(auth::passaes("123456")),
+        ..Default::default()
+    };
+    user::dao::save(&user).await
+}
+
 /**
  * 更新用户
  */
