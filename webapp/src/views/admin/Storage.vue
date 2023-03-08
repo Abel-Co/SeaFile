@@ -34,8 +34,8 @@ const change2 = () => data.value = data2
 const change3 = () => data.value = data3
 
 get('/daisy/system/0').then(resp => {
-  console.log(resp.data)
-  // data.value = JSON.parse(JSONBigInt.stringify(resp.data))
+  // console.log(resp.data)
+  data.value = JSON.parse(JSONBigInt.stringify(resp.data))
 })
 
 const levels = [];

@@ -24,7 +24,6 @@
     "sass": "^1.57.1",
     "unplugin-vue-components": "^0.23.0",
     "vditor": "^3.9.0",
-    "vee-validate": "^4.7.3",
     "vfonts": "^0.0.3",
     "vite": "^4.0.0",
     "vite-plugin-compression": "^0.5.1",
