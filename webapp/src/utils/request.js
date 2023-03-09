@@ -44,7 +44,8 @@ export const put = (url, params = {}, options = {}) => {
 }
 
 export const del = (url, params = {}, options = {}) => {
-  return foxy(axios.delete, url, params, options)
+  // axios.delete content-type to send data: https://github.com/axios/axios/issues/1083
+  return foxy(axios.delete, url, { data: params }, options)
 }
 
 function foxy(f, url, params, options) {

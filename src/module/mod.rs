@@ -19,6 +19,7 @@ pub fn api_routes() -> impl HttpServiceFactory {
         .service(ifile::api::visit)
         .service(ifile::api::download)
         .service(auth::api::login)
+        .service(auth::api::login_check)
         .service(user::api::get)
         .service(user::api::put)
         .service(user::api::pwd)
@@ -26,6 +27,7 @@ pub fn api_routes() -> impl HttpServiceFactory {
         .service(user::api::create)
         .service(user::api::update)
         .service(user::api::user_check)
+        .service(user::api::delete)
         .service(daisy::api::user)
         .service(daisy::api::system)
 }

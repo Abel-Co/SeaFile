@@ -51,6 +51,13 @@ pub async fn get_by_username_ignore_case(username: &str) -> Vec<Users> {
     // RB.fetch_by_wrapper(RB.new_wrapper().eq("username", username)).await.unwrap()
 }
 
+/**
+ * 删除用户
+ */
+pub async fn delete(id: i64) -> u64 {
+    RB.remove_by_column::<Users, i64>("id", id).await.unwrap()
+}
+
 #[cfg(test)]
 pub mod user_dao_test {
     use rbatis::crud::{CRUD, Skip};

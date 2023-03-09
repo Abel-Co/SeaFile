@@ -65,7 +65,7 @@ watch(model, () => {
           if ('admin') next()
         }
       }, {
-        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'users', icon_margin_top: '-29.3px',
+        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'analysis', icon_margin_top: '-29.3px',
         active: 0, component: () => import('./Storage.vue'),
         beforeEnter: (to, from, next) => {
           if ('admin') next()

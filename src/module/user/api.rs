@@ -1,9 +1,10 @@
-use actix_web::{get, HttpResponse, post, put, Responder};
+use actix_web::{delete, get, HttpResponse, post, put, Responder};
 use actix_web::web::Json;
 use actix_web_lab::extract::Path;
 
 use crate::boot::middleware::JwtToken;
 use crate::module::{auth, user};
+use crate::module::auth::Login;
 use crate::module::user::{Password, Users, UserType};
 
 /// 用户接口
@@ -90,6 +91,21 @@ pub async fn user_check(username: Path<String>, jwt: JwtToken) -> impl Responder
         if subject.user_type == UserType::Admin {   // 验证管理员权限
             let data = user::bs::get_by_username_ignore_case(&username.0).await;
             return HttpResponse::Ok().json(data.len());
+        }
+    }
+    HttpResponse::BadRequest().json("权限不足")
+}
+
+/**
+ * 管理员删除用户
+ */
+#[delete("/user/{id}")]
+pub async fn delete(id: Path<i64>, login: Json<Login>, jwt: JwtToken) -> impl Responder {
+    if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
+        if subject.user_type == UserType::Admin     // 验证管理员权限
+            && login.verify_aes(subject.password.as_ref().unwrap()) {
+            let cnt = user::bs::delete(id.0).await;
+            return HttpResponse::Ok().json(cnt);
         }
     }
     HttpResponse::BadRequest().json("权限不足")

@@ -1,7 +1,7 @@
 use rbatis::snowflake::new_snowflake_id;
 
 use crate::module::{auth, samba, user};
-use crate::module::user::Users;
+use crate::module::user::{dao, Users};
 
 /**
  * 特定用户
@@ -91,4 +91,11 @@ pub async fn get_by_username(username: &str) -> Option<Users> {
  */
 pub async fn get_by_username_ignore_case(username: &str) -> Vec<Users> {
     user::dao::get_by_username_ignore_case(username).await
+}
+
+/**
+ * 删除用户-务必谨慎操作-校验好权限
+ */
+pub async fn delete(id: i64) -> u64 {
+    dao::delete(id).await
 }
