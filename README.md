@@ -24,9 +24,11 @@
 - PostgreSQL，当前仅支持 PG 数据库。
 
 ## Screenshots
-| ![Profile](docs/assets/profile.png) | ![Password.png](docs/assets/password.png) | ![Avatar_Options](docs/assets/avatar_options.png) |
-|:-----------------------------------:|:-----------------------------------------:|:--------------------------------------------------:|
-|   ![Users](docs/assets/users.png)   |   ![Sunburst](docs/assets/sunburst.png)   |
+|           ![Profile](docs/assets/profile.png)           |           ![Password.png](docs/assets/password.png)           | ![Avatar_Options](docs/assets/avatar_options.png) |
+|:-------------------------------------------------------:|:-------------------------------------------------------------:|:-------------------------------------------------:|
+|             ![Users](docs/assets/users.png)             |             ![Sunburst](docs/assets/sunburst.png)             |                                                   |
+| ![Seafile-Cpu-Usage](docs/assets/seafile-cpu-usage.png) | ![Seafile-Memory-Usage](docs/assets/seafile-memory-usage.png) |                                                   |
+
 
 ## 注意
 - 初始账号：
