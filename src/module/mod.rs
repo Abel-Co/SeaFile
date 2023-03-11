@@ -18,6 +18,7 @@ pub fn api_routes() -> impl HttpServiceFactory {
         .service(ifile::api::show)
         .service(ifile::api::visit)
         .service(ifile::api::download)
+        .service(ifile::api::backtrace)
         .service(auth::api::login)
         .service(auth::api::login_check)
         .service(user::api::get)

@@ -41,7 +41,7 @@
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
             <span>
-              <a href="#" @click.prevent="handle_click(item)">{{ item.name }}</a>
+              <a href="#" @click.prevent="click(item)">{{ item.name }}</a>
             </span>
           </li>
           <li>
@@ -78,20 +78,31 @@
 </template>
 
 <script>
-import { computed, reactive } from "vue"
+import { computed, reactive, ref } from "vue"
 import { get } from "../utils/request"
 import { useMessage } from "naive-ui"
 import { useRouter } from "vue-router"
+// import { createCache } from "@baikbingo/cache"
+// import JSONBigInt from "json-bigint"
 
 // 关于 list 相关内容的封装
 const listRelativeEffect = () => {
   const router = useRouter()
   const list = reactive([])
+  const q = ref(null)
   const folders = reactive({})
-  const handle_click = item => {
+  /*const folders = createCache({
+    databaseName: "folders",    // 数据库名称
+    tableName: "folders", // 表名
+    memory: true,   // 内存接管
+    version: 1      // 版本号
+  })*/
+  const click = item => {
     if (item.kind === 'Folder') {
+      const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
+      const to = `${path}/${item.name}`.replace('//', '/')
+      // folders.set(item.name, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))
       folders[item.name] = item
-      let to = `${location.hash.split('#').pop()}/${item.name}`.replace(/\?q=.*?\//, '').replace('//', '/')
       router.push({ path: `${to}` })
     } else if (item.kind === 'File') {
       // window["item"] = item
@@ -109,7 +120,12 @@ const listRelativeEffect = () => {
       }
     }
   }
-  return { list, folders, router, handle_click }
+  const search = () => {
+    q.value
+        ? router.push({ name: 'Home', query: { q: q.value } })
+        : router.push({ name: 'Home' })
+  }
+  return { list, folders, router, q, click, search }
 }
 
 // 关于 icon 相关内容的封装
@@ -211,14 +227,13 @@ const operateRelativeEffect = () => {
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Header from './Header.vue'
-import { get } from '../utils/request'
+import { get, post } from '../utils/request'
 
-const q = ref(null)
-const qh = ref(null)
+// const qh = reactive([])
 const count = ref(0)
 
 // 关于 list 相关内容的封装
-const { list, folders, router, handle_click } = listRelativeEffect()
+const { list, folders, router, q, click, search } = listRelativeEffect()
 
 // 关于 icon 相关内容的封装
 const { icon } = iconRelativeEffect()
@@ -231,36 +246,19 @@ const { openx11, refresh } = operateRelativeEffect()
 
 // beforeEach、afterEach 均可，此处采用 beforeEach 以尽早执行 IO 查询，提高人机交互速度
 router.beforeEach(async (to, from) => {
-  console.log('>>> beforeEach')
+  // console.log('>>> beforeEach', JSON.stringify(to))
   if (Object.keys(to.query).length === 0) {
-    let _item = folders[decodeURIComponent(to.path.split('/').pop())]
-    let item = _item ?? { kind: 'Folder', id: 0 }
-    show(item)
+    let name = decodeURIComponent(to.path.split('/').pop())
+    // folders.get(name).then(item => show(item ? JSONBigInt.parse(item) : { id: 0 }))
+    show(folders[name] ?? { id: 0 })
   } else {
     show(null, to.query["q"])
   }
 })
-router.afterEach(async (to, from) => {
-  console.log('>>> afterEach...', JSON.stringify(folders), to, from)
-})
-
-function search() {
-  qh.value = q.value
-  if (q.value) {
-    if (location.hash.split('#/').pop() === `?q=${q.value}`) {
-      show(null, q.value)
-    } else {
-      router.push({ path: '/', query: { q: q.value } })
-    }
-  } else {
-    router.push({ path: '/' })
-  }
-}
 
 function show(item, query) {
   (async () => {
     if (item) {
-      router.push({ name: 'Home', query: { q: 'mp4' } })
       get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
     } else if (query) {
       get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
@@ -269,9 +267,21 @@ function show(item, query) {
 }
 
 onMounted(() => {
-  if (location.hash.length > 2) router.push({ path: '/' })
-  else show({ kind: 'Folder', name: '', id: 0 })
-  // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
+  const path = location.hash.split('#/').pop()
+  if (path.startsWith('?q=')) {
+    show(null, path.split('?q=').pop())
+  } else if (path.length > 0) {
+    const name = path.split('/').pop()
+    // folders.get(name).then(item => item ? show(JSONBigInt.parse(item.value)) : router.push({name: 'Home'}))
+    folders[name] ? show(folders[name])     // 直接 load data
+        : post('/backtrace', { path }).then(({ data }) => { // 回溯式查找最长可访问路径
+          data ? ((folders[data.name] = data) && (router.push({ path: data.path })))
+              : router.push({ name: 'Home' })   // 否则，访问用户根路径
+        })
+  } else {
+    show({ id: 0 })
+  }
+  // console.log('>>> beforeEach', JSON.stringify(to))
 })
 
 
@@ -279,8 +289,8 @@ onMounted(() => {
 const input = ref(null)
 
 function reuse() {
-  q.value = qh.value
-  input.value.focus()
+  // q.value = qh.value
+  // input.value.focus()
 }
 
 const remove = (item) => {
