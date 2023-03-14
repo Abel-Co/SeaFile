@@ -1,51 +1,70 @@
 use actix_files::NamedFile;
-use actix_web::{error, HttpResponse, Responder, Result};
-#[allow(unused)]
-use actix_web::{delete, get, post, put};
+use actix_web::{error, get, post, HttpResponse, Responder, Result};
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
+use actix_web::web::Json;
 use actix_web_lab::extract::Path;
 
-use crate::module::ifile;
+use crate::boot::middleware::JwtToken;
+use crate::module::{auth, ifile};
+use crate::module::ifile::{Backtrace, bs};
 
+/**
+ * 目录树浏览
+ */
+#[get("/list/{parent}")]
+pub async fn list(Path(parent): Path<i64>, jwt: JwtToken) -> impl Responder {
+    let files = ifile::bs::list(jwt.sub, parent).await;
+    HttpResponse::Ok().json(files)
+}
+
+/**
+ * 构建索引
+ */
 #[get("/index/{id}/{_name}")]
-pub async fn index(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
-    ifile::bs::reindex(id).await;
+pub async fn index(Path((id, _name)): Path<(i64, String)>, jwt: JwtToken) -> impl Responder {
+    ifile::bs::reindex(jwt.sub, id).await;
     HttpResponse::Ok().json("Ok")
 }
 
-#[get("/search/{name}")]
-pub async fn search(Path(name): Path<String>) -> impl Responder {
-    let files = ifile::bs::search(&name).await;
+/**
+ * 文件搜索
+ */
+#[get("/search/{query}")]
+pub async fn search(Path(query): Path<String>, jwt: JwtToken) -> impl Responder {
+    let files = ifile::bs::search(jwt.sub, &query).await;
     HttpResponse::Ok().json(files)
 }
 
-#[get("/list/{parent}")]
-pub async fn list(Path(parent): Path<i64>) -> impl Responder {
-    let files = ifile::bs::list(parent).await;
-    HttpResponse::Ok().json(files)
-}
-
+/**
+ * 读取文件
+ */
 #[get("/show/{id}/{_name}")]
 pub async fn show(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     let content = ifile::bs::show(id).await;
     HttpResponse::Ok().json(content)
 }
 
+/**
+ * 原生访问
+ */
 #[get("/visit/{id}/{_name}")]
 pub async fn visit(Path((id, _name)): Path<(i64, String)>) -> impl Responder {
     match ifile::bs::get(id).await {
         // Some(_file) => NamedFile::open_async(_file.path).await,  // txt、html 匀可，唯 pdf 仍下载
         Some(_file) => {
             let file = NamedFile::open_async(_file.path).await?;
-            Ok(file.set_content_disposition(ContentDisposition{
+            Ok(file.set_content_disposition(ContentDisposition {
                 disposition: DispositionType::Inline,
-                parameters: vec![DispositionParam::Filename(_file.name)]
+                parameters: vec![DispositionParam::Filename(_file.name)],
             }))
-        },
+        }
         None => NamedFile::open_async("").await
     }
 }
 
+/**
+ * 下载档案
+ */
 #[get("/download/{id}/{_name}")]
 pub async fn download(Path((id, _name)): Path<(i64, String)>) -> Result<impl Responder> {
     match ifile::bs::get(id).await {
@@ -60,6 +79,18 @@ pub async fn download(Path((id, _name)): Path<(i64, String)>) -> Result<impl Res
         }
         None => Err(error::ErrorBadRequest("资源不存在！"))
     }
+}
+
+/**
+ * 回溯路径
+ */
+#[post("/backtrace")]
+pub async fn backtrace(trace: Json<Backtrace>, jwt: JwtToken) -> impl Responder {
+    if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
+        let file = bs::backtrace(&subject.username.unwrap(), trace.0.backtrace()).await;
+        return HttpResponse::Ok().json(file);
+    }
+    return HttpResponse::Ok().json("none")
 }
 
 

@@ -1,39 +1,38 @@
 <template>
-  <!--  <h1></h1>-->
+  <Header />
   <div class="wrapper">
-    <a href="#/">
+    <a href="#/" @click="q=''">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
     </a>
-    <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    <div class="search">
+      <input class="search-input" v-model="q" @keydown.enter="search" ref="input" v-focus/>
+    </div>
     <button class="search-btn" type="button" @click="search">搜 索</button>
-    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>
-    <!--    <span>选择的值为: {{ checked }}</span>-->
+    <!--    <h1><a href="#" target="_blank" @click.prevent="reuse">{{ qh }}</a></h1>-->
     <div style="width:1200px;height: 20px;margin: 13px auto;">
       <button class="iconfont" @click="downloadAllChecked()" v-show="checked.length > 0"
               style="float: left; color:white; padding: 0 15px; border: 0; background-color: #06a7ff; height: 32px;
               font-family: SFUIText,PingFangSC-Regular,Helvetica Neue,Helvetica,Arial,sans-serif;
               border-radius: 15px; ">
-        <!--        <svg class="icon" aria-hidden="true">-->
-        <!--          <use :xlink:href="icon({kind:'Folder'})"></use>-->
-        <!--        </svg>-->
         &#xe66c;
         下载选中的
       </button>
     </div>
     <ul class="table">
       <li class="thead">
-        <ul class="tr clearfix">
+        <ul class="tr">
           <li>
             <input type="checkbox" v-model="checkedAll">
           </li>
           <li>名字</li>
+          <li>操作</li>
           <li>路径</li>
           <li>大小</li>
           <li>修改时间</li>
         </ul>
       </li>
       <li class="tbody">
-        <ul class="tr clearfix" v-for="item in list" :key="item.id">
+        <ul class="tr" v-for="item in list" :key="item.id">
           <li>
             <input type="checkbox" :value="item.id" v-model="item.checked">
           </li>
@@ -41,18 +40,23 @@
             <svg class="icon" aria-hidden="true">
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
-            <span
-                style="width: 27.5%; position: absolute; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-              <a href="#" @click.prevent="handle_click(item)">{{ item.name }}</a>
+            <span>
+              <a href="#" @click.prevent="click(item)">{{ item.name }}</a>
             </span>
-            <span class="iconfont" @click="remove(item)" v-visible="!item.active">&#xe6b4;</span>
-            <span class="iconfont" @click="refresh(item)"
-                  v-visible="item.kind === 'Folder' && !item.active">&#xe6e3;</span>
-            <span class="iconfont" @click="download(item)"
-                  v-visible="item.kind === 'File' && !item.active">&#xe66c;</span>
           </li>
-          <li :title="item.path">{{ item.path }}</li>
-          <li>{{ byteToText(item.size) }}</li>
+          <li>
+            <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File'">&#xe66c;</span>
+            <span class="iconfont" @click="openx11(item)" v-visible="true" style="color: gray; font-size: 17px">&#xe64c;</span>
+            <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder'">&#xe6e3;</span>
+            <span class="iconfont" @click="remove(item)" v-visible="true">&#xe6b4;</span>
+          </li>
+          <li>
+            <n-tooltip trigger="hover">
+              <template #trigger>{{ item.path }}</template>
+              {{ item.path }}
+            </n-tooltip>
+          </li>
+          <li>{{ ('' + item.size).byteToText() }}</li>
           <!-- <li>{{ $d(new Date(item.updated_at), 'middle') }}</li> -->
           <li>{{ new Date(item.updated_at).format("yyyy-MM-dd hh:mm:ss") }}</li>
         </ul>
@@ -73,159 +77,224 @@
   </div>
 </template>
 
+<script>
+import { computed, reactive, ref } from "vue"
+import { get } from "../utils/request"
+import { useMessage } from "naive-ui"
+import { useRouter } from "vue-router"
+// import { createCache } from "@baikbingo/cache"
+// import JSONBigInt from "json-bigint"
+
+// 关于 list 相关内容的封装
+const listRelativeEffect = () => {
+  const router = useRouter()
+  const list = reactive([])
+  const q = ref(null)
+  const folders = reactive({})
+  /*const folders = createCache({
+    databaseName: "folders",    // 数据库名称
+    tableName: "folders", // 表名
+    memory: true,   // 内存接管
+    version: 1      // 版本号
+  })*/
+  const click = item => {
+    if (item.kind === 'Folder') {
+      const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
+      const to = `${path}/${item.name}`.replace('//', '/')
+      // folders.set(item.name, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))
+      folders[item.name] = item
+      router.push({ path: `${to}` })
+    } else if (item.kind === 'File') {
+      // window["item"] = item
+      let suffix = item.name.split('.').pop().toLowerCase()
+      switch (true) {
+        case /txt|md/.test(suffix):
+          window.open(`#/show?${item.id}=${item.name}`, '_blank')
+          break
+        case /mp4|mkv/.test(suffix):
+          window.open(`#/play?${item.id}=${item.name}`, '_blank')
+          break
+        default:
+          window.open(`${location.origin}/visit/${item.id}/${item.name}`, '_blank')
+          break
+      }
+    }
+  }
+  const search = () => {
+    q.value
+        ? router.push({ name: 'Home', query: { q: q.value } })
+        : router.push({ name: 'Home' })
+  }
+  return { list, folders, router, q, click, search }
+}
+
+// 关于 icon 相关内容的封装
+const iconRelativeEffect = () => {
+  const icons = {}
+  const icon_template = {
+    'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
+    'zip|rar|tar|gz|bz2|tgz': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
+    'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
+    'ds_store|localized': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
+    'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
+    'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
+    'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
+    'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
+    'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
+    'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
+    'sh': '#icon-a-kuozhanicon_huaban1fuben33', 'webp': '#icon-webp'
+  }
+  for (let key in icon_template) {
+    key.split('|').forEach(ic => {
+      icons[ic] = icon_template[key]
+    })
+  }
+  const icon = (item) => {
+    if (item.kind === 'Folder') {
+      return '#icon-folder'
+    } else {
+      let suffix = item.name.split('.').pop().toLowerCase()
+      if (suffix === 'toml' || suffix === 'lock') {
+        return icons[item.name.toLowerCase()]
+      }
+      return icons[suffix]
+    }
+  }
+  return { icon }
+}
+
+// 关于 download 相关内容的封装
+const downloadRelativeEffect = () => {
+  const { list } = listRelativeEffect()
+  const checked = computed(() => list.filter(item => item.checked))
+  const checkedAll = computed({
+    get() {
+      return list.length > 0 && checked.length === list.length
+    },
+    set(val) {
+      list.forEach(item => item.checked = val)
+    }
+  })
+  const downloadAllChecked = () => {
+    checked.value.forEach(item => {
+      download({ id: item.id.toString(), name: 'batch-download' })
+    })
+  }
+  const download = (item) => {
+    window.open(`${location.origin}/download/${item.id}/${item.name}`, '_blank')
+  }
+  return { checked, checkedAll, download, downloadAllChecked }
+}
+
+// 关于 operate 相关内容的封装
+const operateRelativeEffect = () => {
+  const message = useMessage()
+  const platform = (() => {
+    const userAgent = navigator.userAgent
+    if (userAgent.indexOf('Macintosh') || userAgent.indexOf('Mac OS') || userAgent.indexOf('OS X')) {
+      return 'macOS'
+    } else if (userAgent.indexOf('Windows')) {
+      return 'Windows'
+    } else if (userAgent.indexOf('Linux')) {
+      return 'Linux'
+    }
+  })()
+  const openx11 = (item) => {
+    switch (platform) {
+      case 'macOS':
+        window.open(`smb://${location.hostname}/${item.path}`)
+        break
+      case 'Windows': {
+        const path = item.kind === 'Folder' ? item.path : item.path.slice(0, item.path.lastIndexOf('/'))
+        window.open(`smb://${location.hostname}/${path}`)
+        break
+      }
+      case 'Linux':
+        // Arch、Fedora、Ubuntu、？
+        break
+    }
+  }
+  const refresh = (item) => {
+    (async () => {
+      get(`/index/${item.id}/${item.name}`).then(resp => {
+        message.success("操作成功")
+      })
+    })()
+  }
+  return { openx11, refresh }
+}
+</script>
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { get } from '../utils/request'
-import { useRoute, useRouter } from "vue-router"
+import Header from './Header.vue'
+import { get, post } from '../utils/request'
 
-const q = ref(null)
-const qh = ref(null)
+// const qh = reactive([])
 const count = ref(0)
-const input = ref(null)
-const root_id = ref(0)
-const list = reactive([])
-const folders = reactive({})
-const route = useRoute()
-const router = useRouter()
-const checked = computed(() => list.filter(item => item.checked))
-const checkedAll = computed({
-  get() {
-    return checked.value.length === list.length
-  },
-  set(val) {
-    list.forEach(item => item.checked = val)
-  }
-})
 
+// 关于 list 相关内容的封装
+const { list, folders, router, q, click, search } = listRelativeEffect()
+
+// 关于 icon 相关内容的封装
+const { icon } = iconRelativeEffect()
+
+// 关于 download 相关内容的封装
+const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEffect()
+
+// 关于 operate 相关内容的封装
+const { openx11, refresh } = operateRelativeEffect()
+
+// beforeEach、afterEach 均可，此处采用 beforeEach 以尽早执行 IO 查询，提高人机交互速度
 router.beforeEach(async (to, from) => {
-  let item = folders[decodeURIComponent(to.path.split('/').pop())] ?? { kind: 'Folder', name: '', id: 0 }
-  show_child(item)
-  // console.log(to)
-  // list.push(...[])
-})
-// router.beforeResolve(async () => {
-//   // list.push(...[])
-// })
-router.afterEach(async (to, from, failure) => {
-  // console.log(location.hash)
-  // console.log(route.query.id)
-})
-
-function search() {
-  qh.value = q.value
-  const search = async () => {
-    list.length = 0
-    if (q.value) {
-      get(`/search/${q.value}`).then((resp) => {
-        list.push(...resp.data)
-      })
-    } else {
-      show_child({ kind: 'Folder', id: 0 })
-    }
+  // console.log('>>> beforeEach', JSON.stringify(to))
+  if (Object.keys(to.query).length === 0) {
+    let name = decodeURIComponent(to.path.split('/').pop())
+    // folders.get(name).then(item => show(item ? JSONBigInt.parse(item) : { id: 0 }))
+    show(folders[name] ?? { id: 0 })
+  } else {
+    show(null, to.query["q"])
   }
-  search()
-  q.value = ''
-  input.value.focus()
-}
+})
 
-function show_child(item) {
+function show(item, query) {
   (async () => {
-    list.length = 0
-    get(`/list/${item.id}`).then((resp) => {
-      list.push(...resp.data)
-    })
-  })()
-}
-
-function handle_click(item) {
-  if (item.kind === 'Folder') {
-    folders[item.name] = item
-    let to = `${location.hash.split('#').pop()}/${item.name}`.replace('//', '/')
-    router.push({ path: `${to}` })
-  } else if (item.kind === 'File') {
-    // window["item"] = item
-    let fileExtension = item.name.split('.').pop().toLowerCase()
-    switch (true) {
-      case /txt|md/.test(fileExtension):
-        window.open(`#/show?${item.id}=${item.name}`, '_blank')
-        break
-      case /mp4|mkv/.test(fileExtension):
-        window.open(`#/play?${item.id}=${item.name}`, '_blank')
-        break
-      default:
-        window.open(`${location.origin}/visit/${item.id}/${item.name}`, '_blank')
-        break
+    if (item) {
+      get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
+    } else if (query) {
+      get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
     }
-  }
+  })()
 }
 
 onMounted(() => {
-  show_child({ kind: 'Folder', name: '', id: 0 })
-  // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
+  const path = location.hash.split('#/').pop()
+  if (path.startsWith('?q=')) {
+    show(null, path.split('?q=').pop())
+  } else if (path.length > 0) {
+    const name = path.split('/').pop()
+    // folders.get(name).then(item => item ? show(JSONBigInt.parse(item.value)) : router.push({name: 'Home'}))
+    folders[name] ? show(folders[name])     // 直接 load data
+        : post('/backtrace', { path: '/' + path }).then(({ data }) => { // 回溯式查找最长可访问路径
+          data ? ((folders[data.name] = data) && (router.push({ path: data.path })))
+              : router.push({ name: 'Home' })   // 否则，访问用户根路径
+        })
+  } else {
+    show({ id: 0 })
+  }
+  // console.log('>>> beforeEach', JSON.stringify(to))
 })
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+const input = ref(null)
+
 function reuse() {
-  q.value = qh.value
-  input.value.focus()
+  // q.value = qh.value
+  // input.value.focus()
 }
 
-function downloadAllChecked() {
-  checked.value.forEach(item => {
-    download({ id: item.id.toString(), name: 'batch-download' })
-  })
-}
-
-function byteToText(size) {
-  if (size === 0) return "0 B"
-  let k = 1024
-  let sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      i = Math.floor(Math.log(size) / Math.log(k))
-  return (size / Math.pow(k, i)).toPrecision(3) + " " + sizes[i]
-}
-
-const icons = {}
-const icon_template = {
-  'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
-  'zip|rar|tar|gz|bz2|tgz': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
-  'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
-  'ds_store|localized': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
-  'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
-  'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
-  'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
-  'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
-  'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
-  'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
-  'sh': '#icon-a-kuozhanicon_huaban1fuben33'
-}
-for (let key in icon_template) {
-  key.split('|').forEach((ic) => {
-    icons[ic] = icon_template[key]
-  })
-}
-
-const icon = (item) => {
-  if (item.kind === 'Folder') {
-    return '#icon-folder'
-  } else {
-    let fileExtension = item.name.split('.').pop().toLowerCase()
-    if (fileExtension === 'toml' || fileExtension === 'lock') {
-      return icons[item.name.toLowerCase()]
-    }
-    return icons[fileExtension]
-  }
-}
 const remove = (item) => {
   console.log(item)
-}
-const download = (item) => {
-  window.open(`${location.origin}/download/${item.id}/${item.name}`, '_blank')
-}
-const refresh = (item) => {
-  (async () => {
-    get(`/index/${item.id}/${item.name}`).then((resp) => {
-      alert('操作成功')
-    })
-  })()
 }
 
 window.onfocus = () => {
@@ -233,7 +302,7 @@ window.onfocus = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .wrapper {
   text-align: center;
   margin-top: 30px;
@@ -250,103 +319,157 @@ a {
   color: #42b983;
 }
 
-.search-input {
-  display: block;
-  margin: 20px auto;
-  width: 600px;
-  height: 30px;
-  font-size: 16px;
-}
-
 ul {
   list-style: none;
   padding: 0;
 }
 
+.header {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  padding: 6px;
+  box-sizing: border-box;
+
+  .img {
+    display: flex;
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+    margin-right: 16px;
+    border-radius: 50%;
+    background-color: blueviolet;
+
+    span {
+      color: #f8f9fa;
+      margin: auto;
+      font-size: 13px;
+      font-weight: var(--base-text-weight-semibold, 600);
+    }
+  }
+}
+
+//li { border: 1px solid black; }
 /* 表格基本样式规范 */
 .table {
   width: 1200px;
   margin: 0 auto;
   background-color: powderblue;
+
+  .tr {
+    display: flex;
+    vertical-align: middle;
+
+    li {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  /* 行--设置行高 */
+  .thead .tr {
+    background-color: #008080;
+    color: #fff;
+    font-size: 15px;
+    height: 36px;
+    line-height: 39px;
+  }
+
+  .tbody {
+    .tr {
+      background-color: #fff;
+      color: #333;
+      font-size: 14px;
+      height: 36px;
+      line-height: 38px;
+    }
+
+    .tr:hover {
+      background-color: rgb(248 249 250);
+    }
+
+    .tr:not(:first-child) {
+      border-top: 1px solid rgb(246 247 249);
+    }
+  }
+
+  /* 列--设计列宽 */
+  .thead, .tbody {
+    li {
+      text-align: center;
+    }
+
+    li:first-child {
+      min-width: 36px;
+    }
+
+    li:nth-child(2) {
+      width: 43%;
+      text-align: left;
+      padding-left: 8px;
+
+      span {
+        width: 24.6%;
+        position: absolute;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    li:nth-child(3) {
+      width: 7.2%;
+      padding: 0 8px;
+      cursor: pointer;
+
+      span {
+        margin: 2px;
+      }
+
+      span:nth-child(2) {
+        margin-left: 5px;
+      }
+    }
+
+    li:nth-child(4) {
+      width: 24%;
+      padding: 0 8px;
+      text-align: left;
+    }
+
+    li:nth-child(5) {
+      width: 6%;
+      text-align: right;
+      padding: 0 10px;
+    }
+
+    li:last-child {
+      width: 13%;
+    }
+  }
 }
 
-.table .tr {
+.search {
   display: flex;
-  vertical-align: middle;
+  margin: 20px auto;
+  width: 630px;
+  height: 38px;
+  border-radius: 20px;
+  border: 1px solid #CCD1DB;
+
+  &-input {
+    margin: auto;
+    width: 585px;
+    height: 33px;
+    border: 0;
+    outline: none;
+    font-size: 17px;
+  }
 }
 
-.table .tr li {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* 行--设置行高 */
-.table .thead .tr {
-  background-color: #008080;
-  color: #fff;
-  font-size: 15px;
-  height: 36px;
-  line-height: 39px;
-}
-
-.table .tbody .tr {
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
-  height: 36px;
-  line-height: 38px;
-}
-
-.table .tbody .tr:hover {
-  background-color: rgb(248 249 250);
-}
-
-.table .tbody .tr:not(:first-child) {
-  border-top: 1px solid rgb(246 247 249);
-}
-
-/*li { border: 1px solid black; }*/
-
-/* 列--设计列宽 */
-.table .thead li:first-child, .table .tbody li:first-child {
-  min-width: 36px;
-}
-
-.table .thead li:nth-child(2), .table .tbody li:nth-child(2) {
-  width: 54%;
-  text-align: left;
-  padding-left: 12px;
-}
-
-.table .thead li:nth-child(3), .table .tbody li:nth-child(3) {
-  width: 18%;
-}
-
-.table .thead li:nth-child(3) {
-  text-align: center;
-}
-
-.table .tbody li:nth-child(3) {
-  text-align: left;
-  text-indent: 1em;
-}
-
-.table .thead li:nth-child(4), .table .tbody li:nth-child(4) {
-  width: 9%;
-  text-align: right;
-  padding-right: 10px;
-}
-
-.table .thead li:last-child, .table .tbody li:last-child {
-  width: 14%;
-}
-
-.table .tbody .tr li:nth-child(2) > span {
-  float: right;
-  margin-left: 2px;
-  margin-right: 5px;
-  cursor: pointer;
+.search:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .search-btn {

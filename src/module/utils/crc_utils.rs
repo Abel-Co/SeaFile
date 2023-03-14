@@ -19,7 +19,6 @@ fn crc() -> &'static Crc<u64> {
 #[cfg(test)]
 mod test_crc {
     use crc::*;
-    use crate::module::utils::encryption;
 
     const INIT: &[u8] = b"123456789";
 
@@ -83,7 +82,7 @@ mod test_crc {
             digest.update(str.as_ref());
             println!("{:?}", digest.finalize());
 
-            println!("{:?}", encryption::md5(str));
+            // println!("{:?}", encryption::md5(str));
         }
     }
 

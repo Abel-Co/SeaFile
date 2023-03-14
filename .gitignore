@@ -1,6 +1,7 @@
 /**/dist
 /**/target
 /**/node_modules
+/**/visualizer.html
 /**/.DS_Store
 /**/.vscode
 /**/.docker

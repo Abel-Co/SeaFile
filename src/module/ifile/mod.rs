@@ -1,14 +1,15 @@
-use std::cmp::Ordering;
 use std::{cmp, fs};
+use std::cmp::Ordering;
 use std::path::Path;
 
-use futures::executor::block_on;
+use rayon::prelude::*;
 use rbatis::snowflake::new_snowflake_id;
 use rbatis::TimestampZ;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+use crate::module::filesystem;
 use crate::module::utils::crc_utils;
 
 pub mod api;
@@ -28,14 +29,17 @@ pub struct Files {
 }
 
 impl Files {
-    pub fn new(kind: String, path: &str) -> Self {
+    pub async fn new(kind: String, path: &str) -> Self {
         let _file = Path::new(path);
-        let parent_path = _file.parent().unwrap().to_str().unwrap();
+        let parent_path = if let Some(_path)
+            = _file.parent() { _path.to_str().unwrap() } else { "" };
+        let _file_name = if let Some(_name) = _file.file_name() {
+            _name.to_str().unwrap() } else { "/" };
         Files {
             id: new_snowflake_id(),
             path: path.to_string(),
-            name: format!("{}", _file.file_name().unwrap().to_str().unwrap()),
-            parent: block_on(async { dao::check(parent_path).await.map_or(0, |p_file| p_file.id) }),
+            name: _file_name.to_string(),
+            parent: dao::get_by_path(parent_path).await.map_or(0, |p_file| p_file.id),
             size: fs::metadata(path).map_or(0, |meta| meta.len()),
             kind,
             crc: crc_utils::crc_i64(path),
@@ -51,6 +55,7 @@ lazy_static! {
     );
 }
 
+/// 为免乱序，简单做个排序
 impl Ord for Files {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.kind == "Folder" && other.kind != "Folder" {
@@ -93,5 +98,37 @@ impl PartialOrd<Self> for Files {
 impl PartialEq<Self> for Files {
     fn eq(&self, other: &Self) -> bool {
         self.path == other.path
+    }
+}
+
+/**
+ * 巡检、脱敏、排序
+ */
+async fn desensitize_sort(mut files: Vec<Files>) -> Vec<Files> {
+    filesystem::async_patrol(&files).await; // 巡检, push to queue only
+    files.par_iter_mut().for_each(|x| x.path = x.path[6..].to_string()); // 脱敏
+    files.par_sort_by(|a, b| a.cmp(&b));    // 排序
+    files
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+pub struct Depth {
+    pub len: u64,
+    pub cnt: u64,
+    pub ids: String,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct Backtrace {
+    pub path: String
+}
+
+impl Backtrace {
+    pub fn backtrace(self) -> Vec<String> {
+        let slice = self.path.split("/").collect::<Vec<&str>>();
+        let mut vec = (1..slice.len() + 1).map(|i|
+            slice.chunks(i).next().unwrap().join("/")).collect::<Vec<String>>();
+        vec.reverse();
+        vec
     }
 }

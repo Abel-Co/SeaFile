@@ -8,7 +8,8 @@ pub struct Conf {
     pub server: Server,
     pub postgres: Option<Postgres>,
     pub mysql: Option<Mysql>,
-    pub watch_path: Option<String>,
+    pub watch_path: String,
+    pub jwt: Jwt,
     pub white_list: HashMap<String, Vec<String>>,
 }
 
@@ -16,6 +17,7 @@ pub struct Conf {
 pub struct Server {
     pub port: u32,
     pub env: Option<String>,
+    // pub context_path: String,
 }
 
 #[derive(Debug, Deserialize)]

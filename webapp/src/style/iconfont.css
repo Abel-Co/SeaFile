@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3543302 */
-  src: url('iconfont.woff2?t=1667562717262') format('woff2'),
-       url('iconfont.woff?t=1667562717262') format('woff'),
-       url('iconfont.ttf?t=1667562717262') format('truetype');
+  src: url('iconfont.woff2?t=1677334067482') format('woff2'),
+       url('iconfont.woff?t=1677334067482') format('woff'),
+       url('iconfont.ttf?t=1677334067482') format('truetype');
 }
 
 .icon {
@@ -21,6 +21,74 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-analysis:before {
+  content: "\e612";
+}
+
+.icon-person:before {
+  content: "\e61d";
+}
+
+.icon-users:before {
+  content: "\e6d2";
+}
+
+.icon-outline-security-safe:before {
+  content: "\e695";
+}
+
+.icon-folder-open:before {
+  content: "\e64c";
+}
+
+.icon-webp:before {
+  content: "\e671";
+}
+
+.icon-modify:before {
+  content: "\e621";
+}
+
+.icon-json:before {
+  content: "\e685";
+}
+
+.icon-cargo-lock:before {
+  content: "\e602";
+}
+
+.icon-cargo:before {
+  content: "\e603";
+}
+
+.icon-icon_file-dockerfile:before {
+  content: "\e61c";
+}
+
+.icon-git:before {
+  content: "\e72a";
+}
+
+.icon-yarn:before {
+  content: "\e6bd";
+}
+
+.icon-SVG:before {
+  content: "\e6e4";
+}
+
+.icon-apk:before {
+  content: "\e68b";
+}
+
+.icon-icon-config:before {
+  content: "\e601";
+}
+
+.icon-epub:before {
+  content: "\e618";
 }
 
 .icon-docindex:before {
@@ -149,10 +217,6 @@
 
 .icon-xlsx:before {
   content: "\e679";
-}
-
-.icon-light-component-dataconvert-convertText:before {
-  content: "\e785";
 }
 
 .icon-si-glyph-movie-play:before {

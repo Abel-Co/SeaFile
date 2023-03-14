@@ -1,7 +1,7 @@
 use actix_files::Files;
 use actix_web::{App, HttpServer, middleware};
 
-use sea_file::{boot, module};
+use seafile::{boot, module};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -9,8 +9,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || App::new()
         .wrap(middleware::Compress::default())
         .wrap(middleware::Logger::default())
-        // .wrap(boot::middleware::Auth)
-        .service(module::handler::api_routes())
+        .wrap(boot::middleware::Auth)
+        .service(module::api_routes())
         .default_service(Files::new("/", "dist/").index_file("index.html"))
     ).bind(boot::global().addr())?.run().await
 }
