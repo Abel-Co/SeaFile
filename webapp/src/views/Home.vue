@@ -274,7 +274,7 @@ onMounted(() => {
     const name = path.split('/').pop()
     // folders.get(name).then(item => item ? show(JSONBigInt.parse(item.value)) : router.push({name: 'Home'}))
     folders[name] ? show(folders[name])     // 直接 load data
-        : post('/backtrace', { path }).then(({ data }) => { // 回溯式查找最长可访问路径
+        : post('/backtrace', { path: '/' + path }).then(({ data }) => { // 回溯式查找最长可访问路径
           data ? ((folders[data.name] = data) && (router.push({ path: data.path })))
               : router.push({ name: 'Home' })   // 否则，访问用户根路径
         })

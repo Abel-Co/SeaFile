@@ -127,7 +127,7 @@ impl Backtrace {
     pub fn backtrace(self) -> Vec<String> {
         let slice = self.path.split("/").collect::<Vec<&str>>();
         let mut vec = (1..slice.len() + 1).map(|i|
-            format!("/{}", slice.chunks(i).next().unwrap().join("/"))).collect::<Vec<String>>();
+            slice.chunks(i).next().unwrap().join("/")).collect::<Vec<String>>();
         vec.reverse();
         vec
     }

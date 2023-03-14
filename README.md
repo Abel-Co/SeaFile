@@ -40,6 +40,9 @@
 - 资源固定搜索路径：
   - /home/{account}/xxx
 
+## 推荐部署架构
+
+
 ## 构建
 ```shell
 cd webapp
@@ -85,7 +88,7 @@ docker run \
     --name seafile --restart unless-stopped \
     -p 8080:8080 -p 139:139 -p 445:445 \
     -v /data/samba:/home \
-    auraco/seafile:xxx
+    abelco/seafile
 ```
 
 ## 挂载smb
