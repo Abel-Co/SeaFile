@@ -27,29 +27,29 @@ jobs:
       - name: Build Vue
         run: |
           cd webapp && yarn install && yarn build
-          mkdir /tmp/heloworld && mv ../dist /tmp/heloworld/
-#  build-rust:
-#    name: 编译后端
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Cache Target
-#        uses: actions/cache@v3
-#        with:
-#          path: ./target
-#          key: target-${{ github.ref_name }}
-#          restore-keys: SeaFile-Cache
-#      - name: Build Rust
-#        run: |
-#          cargo build --release --verbose
+#          mkdir /tmp/heloworld && mv ../dist /tmp/heloworld/    # 不工作
+  build-rust:
+    name: 编译后端
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Target
+        uses: actions/cache@v3
+        with:
+          path: ./target
+          key: target-${{ github.ref_name }}
+          restore-keys: SeaFile-Cache
+      - name: Build Rust
+        run: |
+          cargo build --release --verbose
 #          cp target/release/seafile /tmp/${{ github.sha }}/
   build-image:
     name: 构建镜像
     runs-on: ubuntu-latest
     needs:
       - build-vue
-#      - build-rust
+      - build-rust
     steps:
       - uses: actions/checkout@v3
 
