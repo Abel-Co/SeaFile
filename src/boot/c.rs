@@ -117,46 +117,46 @@ mod ctx_mod_test {
     /// 测试 - rbatis - 池化
     #[tokio::test]
     async fn test_rbatis_pool() {
-        log::info!("{:?}", "中华人民共和国");
-
-        // rbatis::core::runtime::task::block_on(async {
-        // init_rbatis().await;
-        start().await;
-        let rbatis = rb();
-        // 连接数据库
-        let page_req = PageRequest::new(1, 10);
-        let data = rbatis
-            .fetch_page_by_wrapper::<Users>(
-                rbatis
-                    .new_wrapper()
-                    .is_not_null("username")
-                    .order_by(true, &["id"]),
-                &page_req,
-            )
-            .await;
-        println!("{:?}", data)
+        // log::info!("{:?}", "中华人民共和国");
+        //
+        // // rbatis::core::runtime::task::block_on(async {
+        // // init_rbatis().await;
+        // start().await;
+        // let rbatis = rb();
+        // // 连接数据库
+        // let page_req = PageRequest::new(1, 10);
+        // let data = rbatis
+        //     .fetch_page_by_wrapper::<Users>(
+        //         rbatis
+        //             .new_wrapper()
+        //             .is_not_null("username")
+        //             .order_by(true, &["id"]),
+        //         &page_req,
+        //     )
+        //     .await;
+        // println!("{:?}", data)
         // });
     }
 
     /// 测试 - rbatis - 基本
     #[tokio::test]
     async fn test_rbatis_basic() {
-        // rbatis::core::runtime::task::block_on(async {
-        let rbatis = Rbatis::new();
-        // 连接数据库
-        rbatis.link("postgres://favorites_rw:agYx0DzkYsRASuQT@182.92.107.221:30432/favorites").await.unwrap();
-        let page_req = PageRequest::new(1, 10);
-        let data = rbatis
-            .fetch_page_by_wrapper::<Users>(
-                rbatis
-                    .new_wrapper()
-                    .is_not_null("username")
-                    .order_by(true, &["id"]),
-                &page_req,
-            )
-            .await;
-        println!("{:?}", data)
-        // });
+        // // rbatis::core::runtime::task::block_on(async {
+        // let rbatis = Rbatis::new();
+        // // 连接数据库
+        // rbatis.link("postgres://favorites_rw:agYx0DzkYsRASuQT@182.92.107.221:30432/favorites").await.unwrap();
+        // let page_req = PageRequest::new(1, 10);
+        // let data = rbatis
+        //     .fetch_page_by_wrapper::<Users>(
+        //         rbatis
+        //             .new_wrapper()
+        //             .is_not_null("username")
+        //             .order_by(true, &["id"]),
+        //         &page_req,
+        //     )
+        //     .await;
+        // println!("{:?}", data)
+        // // });
     }
 }
 

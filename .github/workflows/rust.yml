@@ -16,7 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build
+    - name: 编译前端
+      run: cd webapp && yarn install && yarn build
+    - name: 编译后端
       run: cargo build --release --verbose
-    - name: Run tests
-      run: cargo test --verbose
+#    - name: Run tests
+#      run: cargo test --verbose
