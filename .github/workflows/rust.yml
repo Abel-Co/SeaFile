@@ -20,7 +20,7 @@ jobs:
       - name: Cache Node_Modules
         uses: actions/cache@v3
         with:
-          path: ./webapp/node_modules
+          path: webapp/node_modules
           key: node_modules-${{ github.ref_name }}
           restore-keys: SeaFile-Cache
       - name: Build Vue
@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist.tar.gz
-          path: ./dist.tar.gz
+          path: dist.tar.gz
   build-rust:
     name: 编译后端
     runs-on: ubuntu-latest
@@ -41,7 +41,7 @@ jobs:
       - name: Cache Target
         uses: actions/cache@v3
         with:
-          path: ./target
+          path: target
           key: target-${{ github.ref_name }}
           restore-keys: SeaFile-Cache
       - name: Build Rust
@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: seafile
-          path: ./target/release/seafile
+          path: target/release/seafile
   build-image:
     name: 构建镜像
     runs-on: ubuntu-latest
@@ -64,13 +64,11 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: dist.tar.gz
-          path: ./
-#        run: ls ./
+          path: docker/
       - uses: actions/download-artifact@v2
         with:
           name: seafile
-          path: ./
-#        run: ls ./
+          path: docker/
       - name: Docker Build
         run: |
-          ls ./
+          ls 
