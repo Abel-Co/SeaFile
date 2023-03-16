@@ -26,12 +26,12 @@ jobs:
       - name: Build Vue
         run: |
           cd webapp && yarn install && yarn build
-          cd ../ && tar zcvf dist.tar.gz dist
+          cd ../ && tar zcvf app.tar.gz dist
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: dist.tar.gz
-          path: dist.tar.gz
+          name: app.tar.gz
+          path: app.tar.gz
   build-rust:
     name: 编译后端
     runs-on: ubuntu-latest
@@ -63,7 +63,7 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          name: dist.tar.gz
+          name: app.tar.gz
           path: docker/
       - uses: actions/download-artifact@v2
         with:
@@ -71,4 +71,6 @@ jobs:
           path: docker/
       - name: Docker Build
         run: |
+          cp .dockerfile docker/ && cd docker
+          docker build .
           ls 
