@@ -27,7 +27,7 @@ jobs:
       - name: Build Vue
         run: |
           cd webapp && yarn install && yarn build
-          mkdir /tmp/$GITHUB_SHA && mv ../dist /tmp/$GITHUB_SHA/
+          mkdir /tmp/heloworld && mv ../dist /tmp/heloworld/
 #  build-rust:
 #    name: 编译后端
 #    runs-on: ubuntu-latest
@@ -37,10 +37,9 @@ jobs:
 #      - name: Cache Target
 #        uses: actions/cache@v3
 #        with:
-#          path: |
-#            ./target
-#            /tmp/${{ github.sha }}
-#          key: seafile-rust-target
+#          path: ./target
+#          key: target-${{ github.ref_name }}
+#          restore-keys: SeaFile-Cache
 #      - name: Build Rust
 #        run: |
 #          cargo build --release --verbose
