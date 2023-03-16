@@ -63,7 +63,7 @@ jobs:
 
       - uses: actions/download-artifact@v2
         with:
-          name: dist
+          name: dist.tar.gz
           path: ./
 #        run: ls ./
       - uses: actions/download-artifact@v2

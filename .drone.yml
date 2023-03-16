@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: drone pipeline
+name: SeaFile CI/CD
 
 trigger:
   branch: [apr, test01, dev01, abc01]
