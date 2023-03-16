@@ -1,4 +1,4 @@
-name: Rust
+name: SeaFile CI/CD
 
 on:
   push:
@@ -26,9 +26,8 @@ jobs:
           restore-keys: seafile-vue-node_modules
       - name: Build Vue
         run: |
+          echo "github.ref" $GITHUB_REF
           echo "github.ref_name" $GITHUB_REF_NAME
-          echo "github.base_ref" $BASE_REF
-          echo "github.head_ref" $HEAD_REF
           cd webapp && yarn install && yarn build
           mkdir /tmp/${{ github.sha }} && mv ../dist /tmp/${{ github.sha }}/
 #  build-rust:
