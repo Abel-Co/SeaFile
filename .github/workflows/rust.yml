@@ -23,11 +23,12 @@ jobs:
         with:
           path: ./webapp/node_modules
           key: seafile-vue-node_modules
+          restore-keys: seafile-vue-node_modules
       - name: Build Vue
         run: |
           echo "github.ref_name" $GITHUB_REF_NAME
-          echo "github.base_ref" $GITHUB.BASE_REF
-          echo "github.head_ref" $GITHUB.HEAD_REF
+          echo "github.base_ref" $GITHUB_BASE_REF
+          echo "github.head_ref" $GITHUB_HEAD_REF
           cd webapp && yarn install && yarn build
           mkdir /tmp/${{ github.sha }} && mv ../dist /tmp/${{ github.sha }}/
 #  build-rust:
@@ -57,4 +58,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: 构建镜像
-        run: ls /tmp && ls /tmp/${{ github.sha }}/
+        run: |
+          ls /tmp
+#          ls /tmp/${{ github.sha }}/
