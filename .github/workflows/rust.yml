@@ -16,14 +16,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - name: Cache Node_Modules
-#        uses: actions/cache@v3
-#        with:
-#          path: ./webapp/node_modules
-#          restore-keys: |
-#            seafile-vue-node_modules
+      - name: Cache Node_Modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./webapp/node_modules
+
+          key: ${{ github.repository }}-vue-node_modules
       - name: Build Vue
-        run: cd webapp && yarn install && yarn build && ls -al
+        run: |
+          cd webapp && yarn install && yarn build
+          mv ../dist /tmp/${{ github.sha }}/
   build-rust:
     name: 编译后端
     runs-on: ubuntu-latest
@@ -33,10 +36,15 @@ jobs:
       - name: Cache Target
         uses: actions/cache@v3
         with:
-          path: ./target
+          path: |
+            ./target
+            /tmp/${{ github.sha }}
           key: ${{ github.repository }}-rust-target
       - name: Build Rust
-        run: cargo build --release --verbose && du -sh target
+        run: |
+          du -sh target 
+          cargo build --release --verbose
+          cp target/release/seafile /tmp/${{ github.sha }}/
   build-image:
     name: 构建镜像
     runs-on: ubuntu-latest
@@ -47,4 +55,4 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: 构建镜像
-        run: ls -al . && ls -al dist
+        run: ls /tmp && ls /tmp/${{ github.sha }}/
