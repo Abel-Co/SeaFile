@@ -1,4 +1,4 @@
-name: SeaFile CI/CD
+name: Github Actions SeaFile
 
 on:
   push:
