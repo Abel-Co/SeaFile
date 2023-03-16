@@ -54,18 +54,18 @@ pub async fn init_aes_conf() {
 
 #[cfg(test)]
 pub mod test_encryption {
-    use crate::module::utils::debug_aes::{aes, unaes};
+    use crate::module::utils::encryption::{aes, unaes};
 
     #[test]
     fn test_the_new_aes_unaes() {
-        let plaintext = "hello world! this is my plaintext.";
-        // let ciphertext = "940ac6da4641be05aa2665a736f36c9799b697554ba18bf1939725f0a75730422727";    // hex
-        let ciphertext = "lArG2kZBvgWqJmWnNvNsl5m2l1VLoYvxk5cl8KdXMEInJw==";    // base64
-
-        let cipher = aes(plaintext);
-        println!(">>> cipher: {:?}", cipher);
-
-        let plaintext = unaes(ciphertext);
-        println!(">>> plaintext: {:?}", plaintext);
+        // let plaintext = "hello world! this is my plaintext.";
+        // // let ciphertext = "940ac6da4641be05aa2665a736f36c9799b697554ba18bf1939725f0a75730422727";    // hex
+        // let ciphertext = "lArG2kZBvgWqJmWnNvNsl5m2l1VLoYvxk5cl8KdXMEInJw==";    // base64
+        //
+        // let cipher = aes(plaintext);
+        // println!(">>> cipher: {:?}", cipher);
+        //
+        // let plaintext = unaes(ciphertext);
+        // println!(">>> plaintext: {:?}", plaintext);
     }
 }

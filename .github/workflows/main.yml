@@ -1,0 +1,81 @@
+name: Github Actions SeaFile
+
+on:
+  push:
+    branches: [ "build-action" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-vue:
+    name: 编译前端
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Node_Modules
+        uses: actions/cache@v3
+        with:
+          path: webapp/node_modules
+          key: node_modules-${{ github.ref_name }}
+          restore-keys: SeaFile-Cache
+      - name: Build Vue
+        run: |
+          cd webapp && yarn install && yarn build
+          cd ../ && tar zcvf app.tar.gz dist
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app.tar.gz
+          path: app.tar.gz
+  build-rust:
+    name: 编译后端
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Target
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: target-${{ github.ref_name }}
+          restore-keys: SeaFile-Cache
+      - name: Build Rust
+        run: |
+          cargo build --release --verbose
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: seafile
+          path: target/release/seafile
+  build-image:
+    name: 构建镜像
+    runs-on: ubuntu-latest
+    needs:
+      - build-vue
+      - build-rust
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: app.tar.gz
+          path: docker/
+      - uses: actions/download-artifact@v2
+        with:
+          name: seafile
+          path: docker/
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Docker Build and Push
+        run: |
+          cp .dockerfile docker/ && cd docker
+          docker build --pull -f .dockerfile -t abelco/seafile .
+          docker push abelco/seafile

@@ -1,3 +1,6 @@
+![Github Actions SeaFile](https://github.com/Abel-Co/SeaFile/actions/workflows/main.yml/badge.svg)
+
+
 # 私有海量资料维查平台
 
 ![img.png](docs/assets/Logo.svg)
