@@ -27,8 +27,8 @@ jobs:
       - name: Build Vue
         run: |
           echo "github.ref_name" $GITHUB_REF_NAME
-          echo "github.base_ref" $GITHUB_BASE_REF
-          echo "github.head_ref" $GITHUB_HEAD_REF
+          echo "github.base_ref" $BASE_REF
+          echo "github.head_ref" $HEAD_REF
           cd webapp && yarn install && yarn build
           mkdir /tmp/${{ github.sha }} && mv ../dist /tmp/${{ github.sha }}/
 #  build-rust:
