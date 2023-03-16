@@ -64,12 +64,12 @@ jobs:
         with:
           name: dist
           path: ./
-        run: ls ./
+#        run: ls ./
       - uses: actions/download-artifact@v2
         with:
           name: seafile
           path: ./
-        run: ls ./
+#        run: ls ./
       - name: Docker Build
         run: |
           ls ./
