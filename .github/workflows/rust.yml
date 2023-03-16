@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ "main" ]
 
+  workflow_dispatch:
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -42,7 +44,6 @@ jobs:
           key: seafile-rust-target
       - name: Build Rust
         run: |
-          du -sh target 
           cargo build --release --verbose
           cp target/release/seafile /tmp/${{ github.sha }}/
   build-image:
