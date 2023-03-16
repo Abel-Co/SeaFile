@@ -69,8 +69,13 @@ jobs:
         with:
           name: seafile
           path: docker/
-      - name: Docker Build
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Docker Build and Push
         run: |
           cp .dockerfile docker/ && cd docker
-          docker build --pull -f .dockerfile .
-          ls 
+          docker build --pull -f .dockerfile -t abelco/seafile .
+          docker push abelco/seafile
