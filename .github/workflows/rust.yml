@@ -72,5 +72,5 @@ jobs:
       - name: Docker Build
         run: |
           cp .dockerfile docker/ && cd docker
-          docker build .
+          docker build --pull -f .dockerfile .
           ls 
