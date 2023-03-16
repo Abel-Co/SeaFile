@@ -2,19 +2,21 @@ name: Rust
 
 on:
   push:
-    branches: [ "build-action" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "dev01" ]
+    branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-    runs-on: auraco/rust:alpine
+
+    runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
     - name: Build
       run: cargo build --release
-#    - name: Run tests
-#      run: cargo test --verbose
+    - name: Run tests
+      run: cargo test --verbose
