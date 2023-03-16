@@ -22,7 +22,7 @@ jobs:
 #          path: ./webapp/node_modules
 #          restore-keys: |
 #            seafile-vue-node_modules
-      - name: 编译前端
+      - name: Build Vue
         run: cd webapp && yarn install && yarn build && ls -al
   build-rust:
     name: 编译后端
@@ -33,18 +33,10 @@ jobs:
       - name: Cache Target
         uses: actions/cache@v3
         with:
-          path: /tmp/.rust-cache
-          key: ${{ runner.os }}-seafile-rust-target-${{ github.sha }}
-          restore-keys: |
-            seafile-rust-target
-      - name: 编译后端
-        run: cargo build --release --verbose && ls -al
-  #    - name: Run tests
-  #      run: cargo test --verbose
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.rust-cache
-          mv /tmp/.rust-cache-new /tmp/.rust-cache
+          path: ./target
+          key: ${{ github.repository }}-rust-target
+      - name: Build Rust
+        run: cargo build --release --verbose && du -sh target
   build-image:
     name: 构建镜像
     runs-on: ubuntu-latest
