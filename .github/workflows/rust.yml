@@ -10,14 +10,16 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  编译前端:
+  build-vue:
+    name: 编译前端
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       - name: 编译前端
         run: cd webapp && yarn install && yarn build
-  编译后端:
+  build-rust:
+    name: 编译后端
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,11 +28,12 @@ jobs:
         run: cargo build --release --verbose
   #    - name: Run tests
   #      run: cargo test --verbose
-  构建镜像:
+  build-image:
+    name: 构建镜像
     runs-on: ubuntu-latest
     needs:
-      - 编译前端
-      - 编译后端
+      - build-vue
+      - build-rust
     steps:
       - uses: actions/checkout@v3
 
