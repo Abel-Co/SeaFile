@@ -21,8 +21,8 @@ jobs:
         with:
           path: |
             ./webapp/node_modules
-
-          key: ${{ github.repository }}-vue-node_modules
+            /tmp/${{ github.sha }}
+          key: seafile-vue-node_modules
       - name: Build Vue
         run: |
           cd webapp && yarn install && yarn build
@@ -39,7 +39,7 @@ jobs:
           path: |
             ./target
             /tmp/${{ github.sha }}
-          key: ${{ github.repository }}-rust-target
+          key: seafile-rust-target
       - name: Build Rust
         run: |
           du -sh target 
