@@ -85,25 +85,26 @@ import { useRouter } from "vue-router"
 // import { createCache } from "@baikbingo/cache"
 // import JSONBigInt from "json-bigint"
 
+const account = JSON.parse(localStorage.subject)['account']
+
 // 关于 list 相关内容的封装
 const listRelativeEffect = () => {
   const router = useRouter()
   const list = reactive([])
   const q = ref(null)
-  const folders = reactive({})
-  /*const folders = createCache({
-    databaseName: "folders",    // 数据库名称
-    tableName: "folders", // 表名
-    memory: true,   // 内存接管
-    version: 1      // 版本号
-  })*/
+  const paths = reactive(JSON.parse('{"'+`${account}/`+'":{"id":0}}'))
+  // const paths = createCache({
+  //   databaseName: "paths",    // 数据库名称
+  //   tableName: "paths", // 表名
+  //   memory: true,   // 内存接管
+  //   version: 1      // 版本号
+  // });paths.set('/', JSONBigInt.stringify({ id: 0 })).then(_ => _)
   const click = item => {
     if (item.kind === 'Folder') {
       const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
-      const to = `${path}/${item.name}`.replace('//', '/')
-      // folders.set(item.name, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))
-      folders[item.name] = item
-      router.push({ path: `${to}` })
+      const to = `${path}/${item.name}`.replace('//', '/');
+      /*// paths.set(item.path, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))*/
+      (paths[item.path] = item) && router.push({ path: `${to}` })
     } else if (item.kind === 'File') {
       // window["item"] = item
       let suffix = item.name.split('.').pop().toLowerCase()
@@ -125,7 +126,16 @@ const listRelativeEffect = () => {
         ? router.push({ name: 'Home', query: { q: q.value } })
         : router.push({ name: 'Home' })
   }
-  return { list, folders, router, q, click, search }
+  const show = (item, query) => {
+    (async () => {
+      if (item) {
+        get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
+      } else if (query) {
+        get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
+      }
+    })()
+  }
+  return { list, paths, router, q, click, search, show }
 }
 
 // 关于 icon 相关内容的封装
@@ -228,12 +238,14 @@ const operateRelativeEffect = () => {
 import { computed, onMounted, reactive, ref } from 'vue'
 import Header from './Header.vue'
 import { get, post } from '../utils/request'
+import { isObject } from "lodash"
+import { onBeforeRouteUpdate } from "vue-router"
 
 // const qh = reactive([])
 const count = ref(0)
 
 // 关于 list 相关内容的封装
-const { list, folders, router, q, click, search } = listRelativeEffect()
+const { list, paths, router, q, click, search, show } = listRelativeEffect()
 
 // 关于 icon 相关内容的封装
 const { icon } = iconRelativeEffect()
@@ -244,44 +256,40 @@ const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEf
 // 关于 operate 相关内容的封装
 const { openx11, refresh } = operateRelativeEffect()
 
-// beforeEach、afterEach 均可，此处采用 beforeEach 以尽早执行 IO 查询，提高人机交互速度
-router.beforeEach(async (to, from) => {
-  // console.log('>>> beforeEach', JSON.stringify(to))
-  if (Object.keys(to.query).length === 0) {
-    let name = decodeURIComponent(to.path.split('/').pop())
-    // folders.get(name).then(item => show(item ? JSONBigInt.parse(item) : { id: 0 }))
-    show(folders[name] ?? { id: 0 })
-  } else {
+onBeforeRouteUpdate(async (to, from) => {
+  if (to.query['q']) {
     show(null, to.query["q"])
+  } else {
+    const path = decodeURIComponent(to.path)
+    const key = account + path
+    // paths.get(key).then(item => item ? show(JSONBigInt.parse(item)) : backtrace(path))
+    paths[key] ? show(paths[key]) : backtrace(path)
+    // show(paths[key] ?? { id: 0 })
   }
 })
 
-function show(item, query) {
-  (async () => {
-    if (item) {
-      get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
-    } else if (query) {
-      get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
+const backtrace = path => {
+  post('/backtrace', { path }).then(({ data }) => { // 回溯式查找最长可访问路径
+    if (isObject(data)) {
+      paths[data.path] = data
+      router.push({ path: data.path.split(account).pop() })
+    } else {
+      router.push({ name: 'Home' })   // 否则，访问用户根路径
     }
-  })()
+  })
 }
 
 onMounted(() => {
-  const path = location.hash.split('#/').pop()
-  if (path.startsWith('?q=')) {
+  const path = decodeURIComponent(location.hash.split('#').pop())
+  if (path.startsWith('/?q=')) {
     show(null, path.split('?q=').pop())
-  } else if (path.length > 0) {
-    const name = path.split('/').pop()
-    // folders.get(name).then(item => item ? show(JSONBigInt.parse(item.value)) : router.push({name: 'Home'}))
-    folders[name] ? show(folders[name])     // 直接 load data
-        : post('/backtrace', { path: '/' + path }).then(({ data }) => { // 回溯式查找最长可访问路径
-          data ? ((folders[data.name] = data) && (router.push({ path: data.path })))
-              : router.push({ name: 'Home' })   // 否则，访问用户根路径
-        })
   } else {
-    show({ id: 0 })
+    const key = account + path
+    // paths.get(key).then(item => item ? show(JSONBigInt.parse(item.value)) : backtrace(path))
+    // console.log(JSON.stringify(paths))
+    paths[key] ? show(paths[key]) : backtrace(path)
+    // show(paths[key] ?? { id: 0 })
   }
-  // console.log('>>> beforeEach', JSON.stringify(to))
 })
 
 
