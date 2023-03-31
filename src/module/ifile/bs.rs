@@ -163,7 +163,7 @@ pub async fn backtrace(username: &str, trace: Vec<String>) -> Option<Files> {
     let paths = trace.par_iter().map(|path| format!("{}{}", home, path)).collect();
     match dao::backtrace(paths).await {
         Some(mut file) => {
-            file.path = file.path[home.len()..].to_string();
+            file.path = file.path[6..].to_string();
             Some(file)
         }
         None => None

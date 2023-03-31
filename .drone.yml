@@ -85,7 +85,7 @@ steps:
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
       - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
      # - docker tag $repo abelco/seafile && docker push abelco/seafile   # 由 GitHub Action 接管   # 同步发布 docker.io
-      - docker push $repo && docker rmi $repo
+#      - docker push $repo && docker rmi $repo
     when:
       branch: [apr, test01, dev01]
       # event: push
