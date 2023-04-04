@@ -1,7 +1,7 @@
 use rbatis::snowflake::new_snowflake_id;
 
 use crate::module::{auth, samba, user};
-use crate::module::user::{dao, Users};
+use crate::module::user::{dao, Users, UserType};
 
 /**
  * 特定用户
@@ -40,6 +40,8 @@ pub async fn create_root() -> u64 {
         id: Some(new_snowflake_id()),
         username: Some("root".to_string()),
         password: Some(auth::passaes("123456")),
+        user_type: UserType::Admin,
+        status: Some(1),
         ..Default::default()
     };
     user::dao::save(&user).await
