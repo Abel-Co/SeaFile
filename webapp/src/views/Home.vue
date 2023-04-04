@@ -85,7 +85,7 @@ import { useRouter } from "vue-router"
 // import { createCache } from "@baikbingo/cache"
 // import JSONBigInt from "json-bigint"
 
-const account = JSON.parse(localStorage.subject)['account']
+const account = JSON.parse(localStorage.subject ?? "{}")['account']
 
 // 关于 list 相关内容的封装
 const listRelativeEffect = () => {
