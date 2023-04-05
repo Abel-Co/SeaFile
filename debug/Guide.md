@@ -1,5 +1,5 @@
 #### Networking failed to start
-- 最终补齐 /etc/network/interfaces 文件，从而解决。
+- 最终补齐 /etc/network/interfaces 文件，从而解决。**以下可不填，文件留空即可**。
   ```ini
   auto lo
   iface lo inet loopback
