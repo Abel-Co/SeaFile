@@ -1,3 +1,16 @@
+#### Networking failed to start
+- 最终补齐 /etc/network/interfaces 文件，从而解决。
+  ```ini
+  auto lo
+  iface lo inet loopback
+
+  auto eth0
+  iface eth0 inet static
+      address 192.168.140.13/32
+      gateway 172.26.16.2
+      hostname alpine
+  ```
+- https://unix.stackexchange.com/questions/284791/networking-failed-to-start-on-alpine-linux
 
 #### 校正目录体积
 - // 不能全表整体一批进行，因同一批，可能具有层级关系.

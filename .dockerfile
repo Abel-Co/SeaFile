@@ -1,6 +1,6 @@
 FROM auraco/samba:alpine
 
-VOLUME [ "/var/run/docker.sock", "/sys/fs/cgroup" ]
+VOLUME [ "/sys/fs/cgroup" ]
 
 EXPOSE 8080 137/udp 138/udp 139 445
 
