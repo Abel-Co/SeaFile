@@ -10,7 +10,7 @@ const avatar_cache = createCache({
 const getBlobByURL = imgUrl => {
   return new Promise(resolve => {
     window.URL = window.URL || window.webkitURL
-    var xhr = new XMLHttpRequest()
+    let xhr = new XMLHttpRequest()
     xhr.open("get", imgUrl, true)
     xhr.responseType = "blob"
     xhr.onload = function () {
@@ -33,7 +33,7 @@ const blob2Src = res => {
 }
 export const async_avatar = (account, imgUrl, callback) => {
   avatar_cache.get(account).then(res => callback(blob2Src(res)))
-  getBlobByURL(imgUrl).then(({ blob }) => {
+  imgUrl && getBlobByURL(imgUrl).then(({ blob }) => {
     avatar_cache.set(account, blob).then(_ => callback(blob2Src(blob)))
   })
 }
