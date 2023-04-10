@@ -83,7 +83,7 @@ steps:
       - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
       - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
-      - mkdir ~/.docker ; echo $dockerconfig > ~/.docker/config.json
+      - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
      # - docker tag $repo abelco/seafile && docker push abelco/seafile   # 由 GitHub Action 接管   # 同步发布 docker.io
       - docker push $repo && docker rmi $repo
     when:
