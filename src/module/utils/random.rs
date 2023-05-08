@@ -1,3 +1,5 @@
+use base64::Engine;
+use base64::engine::general_purpose;
 use rand::Rng;
 
 const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -8,6 +10,15 @@ pub fn get_rand_code(len: usize) -> String {
         let idx = rng.gen::<usize>() % CHARSET.len();
         char::from(*CHARSET.get(idx).unwrap())
     }).collect()
+}
+
+pub fn gen_str64() -> String {
+    let rng_str: String = rand::thread_rng()
+        .sample_iter(&rand::distributions::Alphanumeric)
+        .take(16)
+        .map(char::from)
+        .collect();
+    general_purpose::STANDARD.encode(rng_str)
 }
 
 /**

@@ -1,10 +1,12 @@
 use actix_files::NamedFile;
-use actix_web::{error, get, HttpResponse, Responder, Result};
+use actix_web::{error, get, post, HttpResponse, Responder, Result};
 use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionType};
+use actix_web::web::Json;
 use actix_web_lab::extract::Path;
 
 use crate::boot::middleware::JwtToken;
-use crate::module::ifile;
+use crate::module::{auth, ifile};
+use crate::module::ifile::{Backtrace, bs};
 
 /**
  * 目录树浏览
@@ -77,6 +79,18 @@ pub async fn download(Path((id, _name)): Path<(i64, String)>) -> Result<impl Res
         }
         None => Err(error::ErrorBadRequest("资源不存在！"))
     }
+}
+
+/**
+ * 回溯路径
+ */
+#[post("/backtrace")]
+pub async fn backtrace(trace: Json<Backtrace>, jwt: JwtToken) -> impl Responder {
+    if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
+        let file = bs::backtrace(&subject.username.unwrap(), trace.0.backtrace()).await;
+        return HttpResponse::Ok().json(file);
+    }
+    return HttpResponse::Ok().json("none")
 }
 
 

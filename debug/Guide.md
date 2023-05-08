@@ -1,3 +1,16 @@
+#### Networking failed to start
+- 最终补齐 /etc/network/interfaces 文件，从而解决。**以下可不填，文件留空即可**。
+  ```ini
+  auto lo
+  iface lo inet loopback
+
+  auto eth0
+  iface eth0 inet static
+      address 192.168.140.13/32
+      gateway 172.26.16.2
+      hostname alpine
+  ```
+- https://unix.stackexchange.com/questions/284791/networking-failed-to-start-on-alpine-linux
 
 #### Smb 挂载目录轮询多实例，登录状态同步问题
 

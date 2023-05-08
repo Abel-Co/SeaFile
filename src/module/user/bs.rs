@@ -1,7 +1,7 @@
 use rbatis::snowflake::new_snowflake_id;
 
 use crate::module::{auth, samba, user};
-use crate::module::user::Users;
+use crate::module::user::{dao, Users, UserType};
 
 /**
  * 特定用户
@@ -33,6 +33,18 @@ pub async fn create(mut user: Users) -> Result<u64, String> {
         return Err(e.to_string());
     }
     Ok(rows_affected)
+}
+
+pub async fn create_root() -> u64 {
+    let user = Users {
+        id: Some(new_snowflake_id()),
+        username: Some("root".to_string()),
+        password: Some(auth::passaes("123456")),
+        user_type: UserType::Admin,
+        status: Some(1),
+        ..Default::default()
+    };
+    user::dao::save(&user).await
 }
 
 /**
@@ -81,4 +93,11 @@ pub async fn get_by_username(username: &str) -> Option<Users> {
  */
 pub async fn get_by_username_ignore_case(username: &str) -> Vec<Users> {
     user::dao::get_by_username_ignore_case(username).await
+}
+
+/**
+ * 删除用户-务必谨慎操作-校验好权限
+ */
+pub async fn delete(id: i64) -> u64 {
+    dao::delete(id).await
 }

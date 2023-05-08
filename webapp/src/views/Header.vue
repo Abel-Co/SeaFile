@@ -149,7 +149,7 @@ onMounted(() => {
 
 // 退出登录
 const doLogout = () => {
-  dialog.info({
+  let dia = dialog.warning({
     title: '提示',
     content: '您确定要退出登录吗',
     positiveText: '确定',
@@ -164,8 +164,10 @@ const doLogout = () => {
         },
       }).finally(() => location.reload())
     },
-    onNegativeClick: () => _,
+    onNegativeClick: () => {
+    },
   })
+  document.addEventListener("keydown", e => e.key === 'Enter' && dia.onPositiveClick())
 }
 </script>
 

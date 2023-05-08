@@ -1,56 +1,55 @@
 <template>
   <div class="login">
     <div class="login-rg">
-      <h1 class="label">登陆</h1>
-      <div class="login--inputs">
-        <Form @keydown.enter="handleSubmit" ref="userForm">
-          <ul>
-            <li>
-              <!-- rules="account" -->
-              <Input v-model.trim="user.username" name="username" data-vv-as="账号"
-                   :placeholder="'请输入账号'" key="login-username" :errors="errors"/>
-            </li>
-            <li>
-              <!-- rules="account" -->
-              <Input v-model.trim="user.password" name="password" data-vv-as="密码" type="password"
-                  :placeholder="'请输入密码'" key="login-password" :errors="errors"/>
-            </li>
-          </ul>
-        </Form>
-      </div>
+      <h1 class="label">登 陆</h1>
+      <n-form ref="formRef" @keydown.enter="handleSubmit"
+              :style="{maxWidth: '320px', margin:'auto'}" size="large" :show-label="false">
+        <n-form-item first :validation-status="status" :feedback="errors">
+          <n-input v-model:value="user.username" :placeholder="'请输入账号'" @input="handleInput"
+                   :style="{borderRadius: '6px', lineHeight:'43px'}"></n-input>
+        </n-form-item>
+        <n-form-item first :validation-status="status" :feedback="errors">
+          <n-input v-model:value="user.password" :placeholder="'请输入密码'" @input="handleInput"
+                   :style="{borderRadius: '6px', lineHeight:'43px'}" type="password"></n-input>
+        </n-form-item>
+      </n-form>
       <Button class="login--btn" themes="primary" @click="handleSubmit"></Button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Form } from 'vee-validate'
 import { post } from "../utils/request"
+import { useMessage } from "naive-ui"
 
+const message = useMessage()
 const router = useRouter()
-const errors = reactive({})
-const userForm = ref(null)
+const formRef = ref(null)
+const user = reactive({})
+const status = ref('success')
 
-const user = reactive({ username: 'abel', password: '123456' })
+const handleInput = () => status.value = 'success'
+const errors = computed(() => status.value === 'success' ? '' : '账号或密码错误')
 
 async function handleSubmit() {
-  const result = await userForm.value.validate()
   // console.log(result.valid, result)
-  if (result.valid) {
-    post('/login', user).then(resp => {
-      localStorage.subject = JSON.stringify(resp.data)
-      router.push({ name: 'Home' })
-    }).catch(e => {
-      if (e?.response?.status === 401) {
-        Object.assign(errors, {
-          username: '账号或密码错误!',
-          password: '账号或密码错误!'
-        })
+  post('/login', user).then(resp => {
+    localStorage.subject = JSON.stringify(resp.data)
+    router.push({ name: 'Home' })
+  }).catch(e => {
+    status.value = 'error'
+    switch (e?.response?.status) {
+      case 400: {
+        let data = e.response.data
+        const ele = data.username || data.password
+        message.error(ele[0].message)
+        break
       }
-    })
-  }
+      case 401:
+    }
+  })
 }
 </script>
 
@@ -70,32 +69,46 @@ async function handleSubmit() {
     width: 400px;
     margin: 73px auto auto;
 
-    img {
-      width: 97px;
-      height: 32px;
-      margin: 7px 0;
-    }
-
     .label {
-      font-size: 34px;
+      text-align: center;
+      font-size: 36px;
       line-height: 20px;
-      margin-bottom: 20px;
+      margin-top: -20px;
+      margin-bottom: 30px;
     }
-  }
-}
-
-.login--inputs {
-  width: 356px;
-
-  li {
-    margin-top: 20px;
   }
 }
 
 .login--btn {
-  width: 100%;
+  width: 55%;
+  height: 44px;
   border-radius: 8px;
   font-size: 14px;
-  margin-top: 20px;
+  margin: auto;
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

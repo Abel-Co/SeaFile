@@ -29,3 +29,18 @@ pub async fn login(login: Json<Login>) -> impl Responder {
         }
     }
 }
+
+/**
+ * 登录检查
+ */
+#[post("/login/check")]
+pub async fn login_check(user: Json<Login>, jwt: JwtToken) -> impl Responder {
+    if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
+        if user.verify_aes(subject.password.as_ref().unwrap()) {
+            return HttpResponse::Ok().json("Ok");
+        } else {
+            return HttpResponse::Ok().json("Fail")
+        }
+    }
+    HttpResponse::BadRequest().json("权限不足")
+}

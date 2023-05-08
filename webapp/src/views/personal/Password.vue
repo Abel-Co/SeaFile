@@ -25,9 +25,9 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue"
+import { reactive, ref } from "vue"
 import { useMessage } from "naive-ui"
-import { get, put } from '../../utils/request'
+import { put } from '../../utils/request'
 
 const formRef = ref(null)
 const rPasswordFormItemRef = ref(null)

@@ -28,15 +28,15 @@ create table files
     updated_at timestamptz default now() not null
 );
 create trigger file_timestamp before update on files for each row execute procedure upd_timestamp();
-create index idx_name on files (name);
-create index idx_kind on files (kind);
-create index idx_size on files (size);
-create index idx_path on files (path);
-create index idx_crc on files (crc);
-create index idx_times on files (times);
-create index idx_parent on files (parent);
-create index idx_created_at on files (created_at);
-create index idx_updated_at on files (updated_at);
+create index idx_files_name on files (name);
+create index idx_files_kind on files (kind);
+create index idx_files_size on files (size);
+create index idx_files_path on files (path);
+create index idx_files_crc on files (crc);
+create index idx_files_times on files (times);
+create index idx_files_parent on files (parent);
+create index idx_files_created_at on files (created_at);
+create index idx_files_updated_at on files (updated_at);
 comment on table  files             is '文件表';
 comment on column files.id          is '雪花主键';
 comment on column files.name        is '文件名称';
@@ -65,9 +65,8 @@ create table users
     created_at timestamptz  default now() not null,
     updated_at timestamptz  default now() not null
 );
-
 create trigger users_timestamp before update on users for each row execute procedure upd_timestamp();
-create index idx_username on users (username);
+create index idx_users_username on users (username);
 comment on table  users             is '用户表';
 comment on column users.id          is '主键: 雪花主键';
 comment on column users.username    is '账号';
@@ -81,3 +80,22 @@ comment on column users.quota       is '配额：单位GB，默认初始1GB';
 comment on column users.usage       is '存储使用量';
 comment on column users.created_at  is '创建时间';
 comment on column users.updated_at  is '更新时间';
+
+drop table if exists base;
+create table base
+(
+    id         bigint                    not null primary key,
+    name       varchar(100) unique       not null,
+    key        varchar(500)              not null,
+    iv         varchar(500)              not null,
+    created_at timestamptz default now() not null,
+    updated_at timestamptz default now() not null
+);
+create trigger base_timestamp before update on base for each row execute procedure upd_timestamp();
+create index idx_base_name on base (name);
+comment on table base             is 'AES-Key信息';
+comment on column base.name       is '名称';
+comment on column base.key        is 'key';
+comment on column base.iv         is 'iv';
+comment on column base.created_at is '创建时间';
+comment on column base.updated_at is '更新时间';

@@ -41,7 +41,7 @@
               <use v-bind:xlink:href="icon(item)"></use>
             </svg>
             <span>
-              <a href="#" @click.prevent="handle_click(item)">{{ item.name }}</a>
+              <a href="#" @click.prevent="click(item)">{{ item.name }}</a>
             </span>
           </li>
           <li>
@@ -77,177 +77,233 @@
   </div>
 </template>
 
+<script>
+import { computed, reactive, ref } from "vue"
+import { get } from "../utils/request"
+import { useMessage } from "naive-ui"
+import { useRouter } from "vue-router"
+// import { createCache } from "@baikbingo/cache"
+// import JSONBigInt from "json-bigint"
+
+const account = JSON.parse(localStorage.subject ?? "{}")['account']
+
+// 关于 list 相关内容的封装
+const listRelativeEffect = () => {
+  const router = useRouter()
+  const list = reactive([])
+  const q = ref(null)
+  const paths = reactive(JSON.parse('{"'+`${account}/`+'":{"id":0}}'))
+  // const paths = createCache({
+  //   databaseName: "paths",    // 数据库名称
+  //   tableName: "paths", // 表名
+  //   memory: true,   // 内存接管
+  //   version: 1      // 版本号
+  // });paths.set('/', JSONBigInt.stringify({ id: 0 })).then(_ => _)
+  const click = item => {
+    if (item.kind === 'Folder') {
+      const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
+      const to = `${path}/${item.name}`.replace('//', '/');
+      /*// paths.set(item.path, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))*/
+      (paths[item.path] = item) && router.push({ path: `${to}` })
+    } else if (item.kind === 'File') {
+      // window["item"] = item
+      let suffix = item.name.split('.').pop().toLowerCase()
+      switch (true) {
+        case /txt|md/.test(suffix):
+          window.open(`#/show?${item.id}=${item.name}`, '_blank')
+          break
+        case /mp4|mkv/.test(suffix):
+          window.open(`#/play?${item.id}=${item.name}`, '_blank')
+          break
+        default:
+          window.open(`${location.origin}/visit/${item.id}/${item.name}`, '_blank')
+          break
+      }
+    }
+  }
+  const search = () => {
+    q.value
+        ? router.push({ name: 'Home', query: { q: q.value } })
+        : router.push({ name: 'Home' })
+  }
+  const show = (item, query) => {
+    (async () => {
+      if (item) {
+        get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
+      } else if (query) {
+        get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
+      }
+    })()
+  }
+  return { list, paths, router, q, click, search, show }
+}
+
+// 关于 icon 相关内容的封装
+const iconRelativeEffect = () => {
+  const icons = {}
+  const icon_template = {
+    'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
+    'zip|rar|tar|gz|bz2|tgz': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
+    'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
+    'ds_store|localized': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
+    'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
+    'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
+    'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
+    'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
+    'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
+    'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
+    'sh': '#icon-a-kuozhanicon_huaban1fuben33', 'webp': '#icon-webp'
+  }
+  for (let key in icon_template) {
+    key.split('|').forEach(ic => {
+      icons[ic] = icon_template[key]
+    })
+  }
+  const icon = (item) => {
+    if (item.kind === 'Folder') {
+      return '#icon-folder'
+    } else {
+      let suffix = item.name.split('.').pop().toLowerCase()
+      if (suffix === 'toml' || suffix === 'lock') {
+        return icons[item.name.toLowerCase()]
+      }
+      return icons[suffix]
+    }
+  }
+  return { icon }
+}
+
+// 关于 download 相关内容的封装
+const downloadRelativeEffect = () => {
+  const { list } = listRelativeEffect()
+  const checked = computed(() => list.filter(item => item.checked))
+  const checkedAll = computed({
+    get() {
+      return list.length > 0 && checked.length === list.length
+    },
+    set(val) {
+      list.forEach(item => item.checked = val)
+    }
+  })
+  const downloadAllChecked = () => {
+    checked.value.forEach(item => {
+      download({ id: item.id.toString(), name: 'batch-download' })
+    })
+  }
+  const download = (item) => {
+    window.open(`${location.origin}/download/${item.id}/${item.name}`, '_blank')
+  }
+  return { checked, checkedAll, download, downloadAllChecked }
+}
+
+// 关于 operate 相关内容的封装
+const operateRelativeEffect = () => {
+  const message = useMessage()
+  const platform = (() => {
+    const userAgent = navigator.userAgent
+    if (userAgent.indexOf('Macintosh') || userAgent.indexOf('Mac OS') || userAgent.indexOf('OS X')) {
+      return 'macOS'
+    } else if (userAgent.indexOf('Windows')) {
+      return 'Windows'
+    } else if (userAgent.indexOf('Linux')) {
+      return 'Linux'
+    }
+  })()
+  const openx11 = (item) => {
+    switch (platform) {
+      case 'macOS':
+        window.open(`smb://${location.hostname}/${item.path}`)
+        break
+      case 'Windows': {
+        const path = item.kind === 'Folder' ? item.path : item.path.slice(0, item.path.lastIndexOf('/'))
+        window.open(`smb://${location.hostname}/${path}`)
+        break
+      }
+      case 'Linux':
+        // Arch、Fedora、Ubuntu、？
+        break
+    }
+  }
+  const refresh = (item) => {
+    (async () => {
+      get(`/index/${item.id}/${item.name}`).then(resp => {
+        message.success("操作成功")
+      })
+    })()
+  }
+  return { openx11, refresh }
+}
+</script>
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import Header from './Header.vue'
-import { get } from '../utils/request'
-import { useRouter } from "vue-router"
+import { get, post } from '../utils/request'
+import { isObject } from "lodash"
+import { onBeforeRouteUpdate } from "vue-router"
 
-const q = ref(null)
-const qh = ref(null)
+// const qh = reactive([])
 const count = ref(0)
-const input = ref(null)
-const list = reactive([])
-const folders = reactive({})
-const router = useRouter()
-const checked = computed(() => list.filter(item => item.checked))
-const checkedAll = computed({
-  get() {
-    return list.length > 0 && checked.length === list.length
-  },
-  set(val) {
-    list.forEach(item => item.checked = val)
-  }
-})
 
-router.beforeEach(async (to, from) => {
-  if (Object.keys(to.query).length === 0) {
-    let _item = folders[decodeURIComponent(to.path.split('/').pop())]
-    let item = _item ?? { kind: 'Folder', id: 0 }
-    show(item)
-  } else {
+// 关于 list 相关内容的封装
+const { list, paths, router, q, click, search, show } = listRelativeEffect()
+
+// 关于 icon 相关内容的封装
+const { icon } = iconRelativeEffect()
+
+// 关于 download 相关内容的封装
+const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEffect()
+
+// 关于 operate 相关内容的封装
+const { openx11, refresh } = operateRelativeEffect()
+
+onBeforeRouteUpdate(async (to, from) => {
+  if (to.query['q']) {
     show(null, to.query["q"])
+  } else {
+    const path = decodeURIComponent(to.path)
+    const key = account + path
+    // paths.get(key).then(item => item ? show(JSONBigInt.parse(item)) : backtrace(path))
+    paths[key] ? show(paths[key]) : backtrace(path)
+    // show(paths[key] ?? { id: 0 })
   }
 })
 
-function search() {
-  qh.value = q.value
-  if (q.value) {
-    if (location.hash.split('#/').pop() === `?q=${q.value}`) {
-      show(null, q.value)
+const backtrace = path => {
+  post('/backtrace', { path }).then(({ data }) => { // 回溯式查找最长可访问路径
+    if (isObject(data)) {
+      paths[data.path] = data
+      router.push({ path: data.path.split(account).pop() })
     } else {
-      router.push({ path: '/', query: { q: q.value } })
+      router.push({ name: 'Home' })   // 否则，访问用户根路径
     }
-  } else {
-    router.push({ path: '/' })
-  }
-}
-
-function show(item, query) {
-  (async () => {
-    list.length = 0
-    if (item) {
-      get(`/list/${item.id}`).then(resp => {
-        list.push(...resp.data)
-      })
-    } else if (query) {
-      get(`/search/${query}`).then(resp => {
-        list.push(...resp.data)
-      })
-    }
-  })()
-}
-
-function handle_click(item) {
-  if (item.kind === 'Folder') {
-    folders[item.name] = item
-    let to = `${location.hash.split('#').pop()}/${item.name}`.replace(/\?q=.*?\//, '').replace('//', '/')
-    router.push({ path: `${to}` })
-  } else if (item.kind === 'File') {
-    // window["item"] = item
-    let suffix = item.name.split('.').pop().toLowerCase()
-    switch (true) {
-      case /txt|md/.test(suffix):
-        window.open(`#/show?${item.id}=${item.name}`, '_blank')
-        break
-      case /mp4|mkv/.test(suffix):
-        window.open(`#/play?${item.id}=${item.name}`, '_blank')
-        break
-      default:
-        window.open(`${location.origin}/visit/${item.id}/${item.name}`, '_blank')
-        break
-    }
-  }
+  })
 }
 
 onMounted(() => {
-  if (location.hash.length > 2) router.push({ path: '/' })
-  else show({ kind: 'Folder', name: '', id: 0 })
-  // list.push(...[{ "id": 400667160457908200, "crc": -3063266662694528000, "size": 2336, "name": "Downloads", "path": "/Users/Abel/Downloads", "kind": "Folder", "parent": 0, "updated_at": "2022-10-28T06:41:06.192967Z" }])
+  const path = decodeURIComponent(location.hash.split('#').pop())
+  if (path.startsWith('/?q=')) {
+    show(null, path.split('?q=').pop())
+  } else {
+    const key = account + path
+    // paths.get(key).then(item => item ? show(JSONBigInt.parse(item.value)) : backtrace(path))
+    // console.log(JSON.stringify(paths))
+    paths[key] ? show(paths[key]) : backtrace(path)
+    // show(paths[key] ?? { id: 0 })
+  }
 })
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+const input = ref(null)
+
 function reuse() {
-  q.value = qh.value
-  input.value.focus()
+  // q.value = qh.value
+  // input.value.focus()
 }
 
-function downloadAllChecked() {
-  checked.value.forEach(item => {
-    download({ id: item.id.toString(), name: 'batch-download' })
-  })
-}
-
-const icons = {}
-const icon_template = {
-  'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
-  'zip|rar|tar|gz|bz2|tgz': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
-  'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
-  'ds_store|localized': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
-  'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
-  'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
-  'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
-  'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
-  'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
-  'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
-  'sh': '#icon-a-kuozhanicon_huaban1fuben33', 'webp': '#icon-webp'
-}
-for (let key in icon_template) {
-  key.split('|').forEach(ic => {
-    icons[ic] = icon_template[key]
-  })
-}
-
-const icon = (item) => {
-  if (item.kind === 'Folder') {
-    return '#icon-folder'
-  } else {
-    let suffix = item.name.split('.').pop().toLowerCase()
-    if (suffix === 'toml' || suffix === 'lock') {
-      return icons[item.name.toLowerCase()]
-    }
-    return icons[suffix]
-  }
-}
-const download = (item) => {
-  window.open(`${location.origin}/download/${item.id}/${item.name}`, '_blank')
-}
-const openx11 = (item) => {
-  switch (platform) {
-    case 'macOS':
-      window.open(`smb://${location.hostname}/${item.path}`)
-      break
-    case 'Windows': {
-      const path = item.kind === 'Folder' ? item.path : item.path.slice(0, item.path.lastIndexOf('/'))
-      window.open(`smb://${location.hostname}/${path}`)
-      break
-    }
-    case 'Linux':
-      // Arch、Fedora、Ubuntu、？
-      break
-  }
-}
-
-const refresh = (item) => {
-  (async () => {
-    get(`/index/${item.id}/${item.name}`).then(resp => {
-      alert('操作成功')
-    })
-  })()
-}
 const remove = (item) => {
   console.log(item)
 }
-
-const platform = (() => {
-  const userAgent = navigator.userAgent
-  if (userAgent.indexOf('Macintosh') || userAgent.indexOf('Mac OS') || userAgent.indexOf('OS X')) {
-    return 'macOS'
-  } else if (userAgent.indexOf('Windows')) {
-    return 'Windows'
-  } else if (userAgent.indexOf('Linux')) {
-    return 'Linux'
-  }
-})()
 
 window.onfocus = () => {
   // input.value.focus()

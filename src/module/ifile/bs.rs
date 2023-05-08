@@ -156,6 +156,21 @@ pub async fn reindex(user_id: i64, id: i64) {
 }
 
 /**
+ * 路径回溯
+ */
+pub async fn backtrace(username: &str, trace: Vec<String>) -> Option<Files> {
+    let home = format!("{}/{}", HOME.as_str(), username);
+    let paths = trace.par_iter().map(|path| format!("{}{}", home, path)).collect();
+    match dao::backtrace(paths).await {
+        Some(mut file) => {
+            file.path = file.path[6..].to_string();
+            Some(file)
+        }
+        None => None
+    }
+}
+
+/**
  * 校正目录(size)
  * 建议在：进入 登录、个人中心 后，预热触发
  */

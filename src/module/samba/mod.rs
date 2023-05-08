@@ -17,6 +17,7 @@ lazy_static! {
 pub async fn daemon_smb() {
     let mut samba_status = String::new();
     do_loop!({
+        let _ = Command::new("touch").arg("/etc/network/interfaces").output();
         if let Ok(output) = Command::new("sh").arg("-c").arg("rc-status | grep samba").output() {
             samba_status = String::from_utf8_lossy(&output.stdout).to_string();
             log::info!("rc-status samba:{}", RE_BLANK_3CHAR.replace(&samba_status, "        "));

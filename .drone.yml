@@ -1,6 +1,6 @@
 kind: pipeline
 type: docker
-name: drone pipeline
+name: SeaFile CI/CD
 
 trigger:
   branch: [apr, test01, dev01, abc01]
@@ -83,7 +83,8 @@ steps:
       - mkdir -p docker && cp app.tar.gz .dockerfile docker/ && cd docker/
       - repo=registry.cn-beijing.aliyuncs.com/wcik/seafile:${DRONE_BRANCH##feature/}
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
-      - mkdir ~/.docker && echo $dockerconfig > ~/.docker/config.json
+      - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
+     # - docker tag $repo abelco/seafile && docker push abelco/seafile   # 由 GitHub Action 接管   # 同步发布 docker.io
       - docker push $repo && docker rmi $repo
     when:
       branch: [apr, test01, dev01]
@@ -94,6 +95,8 @@ steps:
     image: alpine/helm
     pull: if-not-exists
     environment:
+      helm_user:
+        from_secret: helm_user
       helm_secret:
         from_secret: helm_secret
       HELM_KUBEAPISERVER:
@@ -102,8 +105,8 @@ steps:
         from_secret: kube_token
       HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
     commands:
-#      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=Ni73Mg --password=$helm_secret
-#      - helm upgrade --install favorites alihelm/favorites -n ${DRONE_BRANCH##feature/}
+      - helm repo add alihelm https://repomanage.rdc.aliyun.com/helm_repositories/111122-wcik --username=$helm_user --password=$helm_secret
+      - helm upgrade --install seafile alihelm/seafile -n ${DRONE_BRANCH##feature/}
     when:
       branch: [apr, test01, dev01]
       # event: push
@@ -139,6 +142,12 @@ name: dockerconfig
 get:
   path: secret/data/drone
   name: dockerconfig
+---
+kind: secret
+name: helm_user
+get:
+  path: secret/data/drone
+  name: helm_user
 ---
 kind: secret
 name: helm_secret

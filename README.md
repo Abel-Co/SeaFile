@@ -1,3 +1,6 @@
+![Github Actions SeaFile](https://github.com/Abel-Co/SeaFile/actions/workflows/main.yml/badge.svg)
+
+
 # 私有海量资料维查平台
 
 ![img.png](docs/assets/Logo.svg)
@@ -13,7 +16,7 @@
 
 ## 特点
 - 不需要先建平台，从页面上传数据，才能被软件管理。
-- SeaFile可对已知目录构建索引（首次启动，构建全部索引，后续实时自动维护）。
+- SeaFile可对已知目录构建索引（首次启动，构建全部索引，之后自动维护）。
 - 索引实时更新，类似 windows 上的 everything。
 
 ## 环境
@@ -24,16 +27,24 @@
 - PostgreSQL，当前仅支持 PG 数据库。
 
 ## Screenshots
-| ![Profile](docs/assets/profile.png) | ![Password.png](docs/assets/password.png) | ![Avatar_Options](docs/assets/avatar_options.png) |
-|:-----------------------------------:|:-----------------------------------------:|:--------------------------------------------------:|
-|   ![Users](docs/assets/users.png)   |   ![Sunburst](docs/assets/sunburst.png)   |
+|           ![Profile](docs/assets/profile.png)           |           ![Password.png](docs/assets/password.png)           | ![Avatar_Options](docs/assets/avatar_options.png) |
+|:-------------------------------------------------------:|:-------------------------------------------------------------:|:-------------------------------------------------:|
+|             ![Users](docs/assets/users.png)             |             ![Sunburst](docs/assets/sunburst.png)             |                                                   |
+| ![Seafile-Cpu-Usage](docs/assets/seafile-cpu-usage.png) | ![Seafile-Memory-Usage](docs/assets/seafile-memory-usage.png) |                                                   |
+
 
 ## 注意
+- 初始账号：
+  - 系统首次启动，会创建初始的账号密码：root、123456。
+  - 建议在启动后，用其创建自定义的管理员账号，之后移除该 root 账户。
 - 账号密码：
   - 密码采用了可还原的加密算法来存储。
-  - 原因是，当基于k8s进行部署时，在发生调度时，需在新的容器中重建smb账号信息，此时需知道原始账号密码。
+  - 原因是，当基于k8s进行部署时，在发生调度时，需在新容器中重建smb账号信息，需知道原始账号密码。
 - 资源固定搜索路径：
   - /home/{account}/xxx
+
+## 推荐部署架构
+
 
 ## 构建
 ```shell
@@ -80,7 +91,7 @@ docker run \
     --name seafile --restart unless-stopped \
     -p 8080:8080 -p 139:139 -p 445:445 \
     -v /data/samba:/home \
-    auraco/seafile:xxx
+    abelco/seafile
 ```
 
 ## 挂载smb
@@ -138,10 +149,13 @@ docker run \
 | 19  |        支援 k8s pod 动态增减时，smb账户重建        | OK  |
 | 20  |         支援 k8s 部署，从环境变量解析配置功能          | ... |
 | 21  |                  页面上传                  | ... |
-| 22  |                 用户旭日图                  | OK |
-| 23  |                 系统旭日图                  | OK |
+| 22  |                 用户旭日图                  | OK  |
+| 23  |                 系统旭日图                  | OK  |
 | 24  |     对图片、html，增加“合并打开”(iframe做单页渲染)     | ... |
 | 25  |             登录页面向NaiveUI美化             | ... |
+| 26  |                初始的管理账户                 | OK  |
+| 27  |                初始密码学配置                 | OK  |
+
 
 [//]: # (- 来源：FS事件、巡视校准)
 

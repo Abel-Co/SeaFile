@@ -1,7 +1,7 @@
 server:
   port: 8080
 postgres:
-  dsn: postgres://postgres:postgres@172.17.16.110:5432/postgres
+  dsn: postgres://seafile_rw:agYx0DzkYsRASuQT@postgresql:5432/seafile
   min: 3
   max: 10
 watch_path: /home

@@ -2,7 +2,7 @@
   <div class="input" :class="inputClass">
     <div class="input--box">
       <slot name="prev"></slot>
-      <Field
+      <input
           :name="name"
           :type="type"
           :value="modelValue"
@@ -14,7 +14,7 @@
           :placeholder="placeholder"
           autocomplete="off"
           @keyup.enter="$emit('keyup')"
-      ></Field>
+      ></input>
       <slot name="suff"></slot>
     </div>
     <div class="message" v-if="errorMessage">
@@ -24,7 +24,6 @@
 </template>
 <script setup>
 import { computed, ref } from "vue"
-import { Field, useField } from 'vee-validate'
 
 const props = defineProps({
   name: String,
@@ -137,7 +136,8 @@ export default {
 
   .message {
     color: #e32425;
-    font-size: 10px;
+    font-size: var(--n-feedback-font-size);
+    //font-size: 10px;
   }
 }
 </style>

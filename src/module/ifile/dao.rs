@@ -91,6 +91,15 @@ pub async fn find_posterity(path: &str) -> Vec<Files> {
     ).await.unwrap()
 }
 
+/**
+ * 路径回溯
+ */
+pub async fn backtrace(trace: Vec<String>) -> Option<Files> {
+   RB.fetch_by_wrapper(
+       RB.new_wrapper().r#in("path", &trace).order_by(false, &["length(path)"]).limit(1)
+   ).await.unwrap()
+}
+
 /// 查找path后代目录, 按长度降续
 pub async fn folder_depth_desc(path: &str) -> Vec<Depth> {
     let sql = r#"

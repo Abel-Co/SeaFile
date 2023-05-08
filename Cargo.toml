@@ -43,11 +43,11 @@ chrono = { version = "0.4", features = ["serde"] }
 jsonwebtoken = "8.1"        # json web token
 aes = "0.8"
 ctr = "0.9"
-hex = "0.4"
-bcrypt = "0.13"
+bcrypt = "^0"
 rand = "0.8"                # Random
 reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
 crc = "3.0"
 regex = "1.5"
 lazy_static = "1"
 itertools = "0.10.5"
+base64 = "0.21.0"
