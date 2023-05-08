@@ -1,4 +1,10 @@
 
+#### Smb 挂载目录轮询多实例，登录状态同步问题
+
+- 先测试以域名挂载k8s下的seafile目录，若确实出现跨实例无法通信问题，以下为备选方案；
+- 已知 smb 支持 ldap 做账户管理。考虑为 seafile 内置 ldap-server，smb 以  127.0.0.1 使用自身的 ldap-server ；
+- Rust 实现的 ldap-server: lldap: [lldap/**lldap**](https://github.com/lldap/lldap) ，2.5k 星，53 Contributors 。
+
 #### 校正目录体积
 - // 不能全表整体一批进行，因同一批，可能具有层级关系.
 - // (若一定要考虑批量方案，则要为当前目录，统计'后代'全部'文件'，而不能是'子代'的'目录+文件')
