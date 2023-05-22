@@ -17,7 +17,7 @@ pub struct Users {
     pub password: Option<String>,
     #[validate(email)]
     pub email: Option<String>,
-    #[validate(phone)]
+    // #[validate(phone)]
     pub phone: Option<String>,
     #[validate(url)]
     pub avatar: Option<String>,
