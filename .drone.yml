@@ -36,7 +36,13 @@ steps:
       - restore
   - name: 编译后端
     image: auraco/rust:alpine
+    environment:
+      dockerconfig:
+        from_secret: dockerconfig
     commands:
+      - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
+      - ls -hl ~/.docker
+      - cat ~/.docker/config.json
       - mkdir -p target/.cargo
       - ln -s /drone/src/target/.cargo /root/.cargo
       - export CARGO_HOME=~/.cargo
