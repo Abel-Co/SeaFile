@@ -36,12 +36,18 @@ steps:
       - restore
   - name: 编译后端
     image: auraco/rust:alpine
-    volumes:
-      - name: docker
-        path: /var/run
     environment:
       dockerconfig:
         from_secret: dockerconfig
+      helm_user:
+        from_secret: helm_user
+      helm_secret:
+        from_secret: helm_secret
+      HELM_KUBEAPISERVER:
+        from_secret: kube_api_server
+      HELM_KUBETOKEN:
+        from_secret: kube_token
+      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
     commands:
       - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
       - ls -hl ~/.docker
