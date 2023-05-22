@@ -36,6 +36,9 @@ steps:
       - restore
   - name: 编译后端
     image: auraco/rust:alpine
+    volumes:
+      - name: docker
+        path: /var/run
     environment:
       dockerconfig:
         from_secret: dockerconfig
