@@ -36,22 +36,7 @@ steps:
       - restore
   - name: 编译后端
     image: auraco/rust:alpine
-    environment:
-      dockerconfig:
-        from_secret: dockerconfig
-      helm_user:
-        from_secret: helm_user
-      helm_secret:
-        from_secret: helm_secret
-      HELM_KUBEAPISERVER:
-        from_secret: kube_api_server
-      HELM_KUBETOKEN:
-        from_secret: kube_token
-      HELM_KUBEINSECURE_SKIP_TLS_VERIFY: TRUE
     commands:
-      - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
-      - ls -hl ~/.docker
-      - cat ~/.docker/config.json
       - mkdir -p target/.cargo
       - ln -s /drone/src/target/.cargo /root/.cargo
       - export CARGO_HOME=~/.cargo
@@ -100,7 +85,6 @@ steps:
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
       - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
       - ls -hl ~/.docker
-      - cat ~/.docker/config.json
      # - docker tag $repo abelco/seafile && docker push abelco/seafile   # 由 GitHub Action 接管   # 同步发布 docker.io
       - docker push $repo && docker rmi $repo
     when:
