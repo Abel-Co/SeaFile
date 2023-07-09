@@ -20,39 +20,19 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
   return response
 }, error => {
-  if (error?.response?.status === 401) {
-    // 未登录。
+  if (error?.response?.status === 401) {  // 401 未登录。
     // router.push('/login').then(r => {});
-  } else if (error?.response?.status === 403) {
-    // 权限不足。
+  } else if (error?.response?.status === 403) { // 403 权限不足。
   }
   return Promise.reject(error)
 })
 
-const CancelToken = axios.CancelToken
+export let get, post, put, del
 
-export const get = (url, params = {}, options = {}) => {
-  return foxy(axios.get, url, params, options)
-}
+get = (url, params = {}, options = {}) => foxy(axios.get, url, { params: params }, options)
+post = (url, params = {}, options = {}) => foxy(axios.post, url, params, options)
+put = (url, params = {}, options = {}) => foxy(axios.put, url, params, options)
+del = (url, params = {}, options = {}) => foxy(axios.delete, url, { data: params }, options)
+// axios.delete content-type to send data: https://github.com/axios/axios/issues/1083
 
-export const post = (url, params = {}, options = {}) => {
-  return foxy(axios.post, url, params, options)
-}
-
-export const put = (url, params = {}, options = {}) => {
-  return foxy(axios.put, url, params, options)
-}
-
-export const del = (url, params = {}, options = {}) => {
-  // axios.delete content-type to send data: https://github.com/axios/axios/issues/1083
-  return foxy(axios.delete, url, { data: params }, options)
-}
-
-function foxy(f, url, params, options) {
-  const source = CancelToken.source()
-  let request = f(url, {
-    ...params, ...options, cancelToken: source.token
-  })
-  request.cancel = source.cancel
-  return request
-}
+const foxy = (f, url, params, options) => f(url, { ...params, ...options })

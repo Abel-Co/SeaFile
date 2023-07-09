@@ -41,10 +41,8 @@ export default defineConfig(({ command, mode }) => {
         open: false
       }), viteCompression({
         deleteOriginFile: true,
-        algorithm: "brotliCompress",
-        ext: ".br",
-        // algorithm: 'gzip',
-        // ext: '.gz',
+        algorithm: "brotliCompress", ext: ".br",
+        // algorithm: 'gzip', ext: '.gz',
       })*/
     )
   } else if (command === 'serve') {
