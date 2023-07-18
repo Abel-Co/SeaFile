@@ -22,6 +22,7 @@
     "naive-ui": "^2.34.3",
     "rollup-plugin-visualizer": "^5.9.0",
     "sass": "^1.57.1",
+    "unplugin-auto-import": "^0.16",
     "unplugin-vue-components": "^0.23.0",
     "vditor": "^3.9.0",
     "vfonts": "^0.0.3",

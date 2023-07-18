@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
+import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import viteCompression from 'vite-plugin-compression'
@@ -8,7 +9,11 @@ import viteCompression from 'vite-plugin-compression'
 /** https://vitejs.dev/config/ */
 export default defineConfig(({ command, mode }) => {
   let viteConfig = {
-    plugins: [vue(), Components({ resolvers: [NaiveUiResolver()] })],
+    plugins: [
+      vue(),
+      AutoImport({ imports: ['vue', 'pinia'], dts: './auto-import.d.ts' }),
+      Components({ resolvers: [NaiveUiResolver()], dts: './components.d.ts' }),
+    ],
     build: { outDir: '../dist' },
   }
   if (command === 'build') {  // 情景配置
@@ -33,17 +38,17 @@ export default defineConfig(({ command, mode }) => {
       }
     }
     viteConfig.plugins.push(
-      /*visualizer({
+      visualizer({
         gzipSize: true,
         brotliSize: true,
         emitFile: false,
         filename: "visualizer.html",
         open: false
       }), viteCompression({
-        deleteOriginFile: true,
-        algorithm: "brotliCompress", ext: ".br",
-        // algorithm: 'gzip', ext: '.gz',
-      })*/
+        deleteOriginFile: false,
+        // algorithm: "brotliCompress", ext: ".br",
+        algorithm: 'gzip', ext: '.gz',
+      })
     )
   } else if (command === 'serve') {
     viteConfig.server = {
