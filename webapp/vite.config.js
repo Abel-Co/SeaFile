@@ -38,13 +38,10 @@ export default defineConfig(({ command, mode }) => {
       }
     }
     viteConfig.plugins.push(
-      visualizer({
-        gzipSize: true,
-        brotliSize: true,
-        emitFile: false,
-        filename: "visualizer.html",
-        open: false
-      }), viteCompression({
+      /* visualizer({
+        gzipSize: true, brotliSize: true, emitFile: false,
+        filename: "visualizer.html", open: false
+      }), */ viteCompression({
         deleteOriginFile: false,
         // algorithm: "brotliCompress", ext: ".br",
         algorithm: 'gzip', ext: '.gz',
