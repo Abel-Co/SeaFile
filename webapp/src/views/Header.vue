@@ -229,6 +229,7 @@ const doLogout = () => {
       display: flex;
       align-items: center;
       height: 64px;
+      // object-fit:cover
 
       //.n-avatar {background-color: blueviolet;     }
     }
