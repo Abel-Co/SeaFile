@@ -1,6 +1,10 @@
 #### Smb 负载均衡
-- Final => 所有smb容器：启动后重建smb账号，之后 1/min 扫描数据库，更新/创建 账号。
-  - a 
+- **Final =>** 
+  1. 所有smb容器，启动后重建smb账号，之后 /1/min 扫描数据库，更新/创建 账号。
+  2. 内网DNS解析域名到多个k8s-node-ip，已知 dnsmasq addn-hosts 支持单域名多ip 。
+     1. 多ip时顺序是随机的，客户端一般使用第一个，以此近似LB，并避免单点带宽压力。
+     2. 当记录值有多个IP地址时，域名是如何解析的？ - https://support.huaweicloud.com/dns_faq/dns_faq_023.html
+     3. 如果DNS返回多个IP，浏览器如何决定使用哪个？ - https://www.zhihu.com/question/605637765/answer/3066192097
 - HaProxy:445
   ```shell
   # cat /etc/haproxy/haproxy.cfg
