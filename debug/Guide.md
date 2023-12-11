@@ -1,3 +1,55 @@
+#### Smb 负载均衡
+- HaProxy:445
+  ```shell
+  # cat /etc/haproxy/haproxy.cfg
+  global
+      daemon
+      maxconn 4096
+  
+  defaults
+      mode tcp
+      timeout connect 5s
+      timeout client 50s
+      timeout server 50s
+      timeout check 3s
+  
+  listen 445
+      bind *:445
+      stick on src
+      stick-table type ip size 200k expire 30m 
+  #    server 172.17.16.110 172.17.16.110:446 check inter 1366 fall 2 rise 2 weight 1
+      server 172.17.16.110 172.17.16.110:447 check inter 1366 fall 2 rise 2 weight 1
+  ```
+- **（待测）DNS负载均衡: 共享 /var/lib/samba/private/passdb.tdb 文件**
+
+  - dperson/samba 镜像 =>
+  - 变更 haproxy, macOS Finder 不能持续浏览smb，user账号不可用，需要用user2账号。
+
+  ```shell
+  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount -v /var/lib/samba/private/:/var/lib/samba/private/ dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
+  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount -v /var/lib/samba/private/:/var/lib/samba/private/ dperson/samba -u "user2;123456" -s "share;/mount/;yes;no;no;all;user2;user2"
+  ```
+- **（成功）Smb多实例具有相同账号/密码 + HaProxy 445**
+ 
+  变更haproxy, macOS Finder 不需要重新登录, 可持续浏览 smb 目录。
+
+  ```shell
+  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
+  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
+  ```
+- Traefik tcp 代理
+  - 由 traefik 做 tcp 445 代理。
+  - 做会话保持、或 hash client ip 负载均衡 到 svc 。
+- Ldap 管理用户
+  - 先测试以域名挂载k8s下的seafile目录，若确实出现跨实例无法通信问题，以下为备选方案；
+  - 已知 smb 支持 ldap 做账户管理。考虑为 seafile 内置 ldap-server，smb 以  127.0.0.1 使用自身的 ldap-server ；
+    - [linux samba 配置ldap认证,Samba通过Openldap统一认证](https://blog.csdn.net/weixin_39616855/article/details/116963337)
+  - Rust 实现的 ldap-server: lldap: [lldap/**lldap**](https://github.com/lldap/lldap) ，2.5k 星，53 Contributors 。
+    - [samba4的负载均衡群集](https://blog.51cto.com/cmdschool/1829675)
+ 
+#### Smb 挂载目录轮询多实例，登录状态同步问题
+
+
 #### Networking failed to start
 - 最终补齐 /etc/network/interfaces 文件，从而解决。**以下可不填，文件留空即可**。
   ```ini
@@ -12,23 +64,10 @@
   ```
 - https://unix.stackexchange.com/questions/284791/networking-failed-to-start-on-alpine-linux
 
-#### Smb 挂载目录轮询多实例，登录状态同步问题
-
-- Traefik tcp 代理
-  - 由 traefik 做 tcp 445 代理。
-  - 做会话保持、或 hash client ip 负载均衡 到 svc 。
-  - 
-- Ldap 管理用户
-  - 先测试以域名挂载k8s下的seafile目录，若确实出现跨实例无法通信问题，以下为备选方案；
-  - 已知 smb 支持 ldap 做账户管理。考虑为 seafile 内置 ldap-server，smb 以  127.0.0.1 使用自身的 ldap-server ； 
-    - [linux samba 配置ldap认证,Samba通过Openldap统一认证](https://blog.csdn.net/weixin_39616855/article/details/116963337) 
-  - Rust 实现的 ldap-server: lldap: [lldap/**lldap**](https://github.com/lldap/lldap) ，2.5k 星，53 Contributors 。
-    - [samba4的负载均衡群集](https://blog.51cto.com/cmdschool/1829675) 
-
 #### 校正目录体积
 - // 不能全表整体一批进行，因同一批，可能具有层级关系.
 - // (若一定要考虑批量方案，则要为当前目录，统计'后代'全部'文件'，而不能是'子代'的'目录+文件')
-- // ('子代'是通过parent_id串连，'后代'是通过path like /xx/% 串连，单条最优耗时分别为：4ms、253ms)
+- // ('子代'是通过parent_id串连，'后代'是通过path like /xx/% 串连，单条SQL最优耗时分别为：4ms、253ms)
 - 发生登录时，校正一次用户级全量：
   ```sql
   select * from files where kind = 'Folder' and path like '/Users/Abel/%' order by length(path) desc;
