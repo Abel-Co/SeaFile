@@ -1,4 +1,6 @@
 #### Smb 负载均衡
+- Final => 所有smb容器：启动后重建smb账号，之后 1/min 扫描数据库，更新/创建 账号。
+  - a 
 - HaProxy:445
   ```shell
   # cat /etc/haproxy/haproxy.cfg
@@ -20,23 +22,39 @@
   #    server 172.17.16.110 172.17.16.110:446 check inter 1366 fall 2 rise 2 weight 1
       server 172.17.16.110 172.17.16.110:447 check inter 1366 fall 2 rise 2 weight 1
   ```
-- **（待测）DNS负载均衡: 共享 /var/lib/samba/private/passdb.tdb 文件**
-
-  - dperson/samba 镜像 =>
-  - 变更 haproxy, macOS Finder 不能持续浏览smb，user账号不可用，需要用user2账号。
-
-  ```shell
-  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount -v /var/lib/samba/private/:/var/lib/samba/private/ dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
-  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount -v /var/lib/samba/private/:/var/lib/samba/private/ dperson/samba -u "user2;123456" -s "share;/mount/;yes;no;no;all;user2;user2"
-  ```
 - **（成功）Smb多实例具有相同账号/密码 + HaProxy 445**
- 
-  变更haproxy, macOS Finder 不需要重新登录, 可持续浏览 smb 目录。
+
+  - 变更haproxy, macOS Finder 不需要重新登录, 可持续浏览 smb 目录。
 
   ```shell
   docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
   docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
   ```
+- **（失败）DNS负载均衡: 共享 /var/lib/samba/private/passdb.tdb 文件**
+
+  - （失败）auraco/samba:alpine 镜像 =>
+  - 变更 haproxy, macOS Finder 不能持续浏览smb，samba3 未承认账号 abel，samba2 账号 abel 可用。
+  - 得知：passdb.tdb 只是一份db文件，共享该文件，并不能将账号实际创建到各 smb容器实例的 linux 账户体系中去。
+
+  ```shell
+  docker rm -f samba2 samba3
+  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
+  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
+  docker exec -ti samba2 sh
+  "adduser -D abel
+	echo -e "123456\n123456\n" | smbpasswd -a -s abel"
+  docker exec -ti samba2 sh -c rc-status ; docker exec -ti samba2 rc-service samba restart
+  docker exec -ti samba3 sh -c rc-status ; docker exec -ti samba3 rc-service samba restart
+  ```
+
+  - （失败）dperson/samba 镜像 =>
+  - 变更 haproxy, macOS Finder 不能持续浏览smb，user账号不可用，需要用user2账号。
+  
+  ```shell
+  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount -v /var/lib/samba/private/:/var/lib/samba/private/ dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
+  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount -v /var/lib/samba/private/:/var/lib/samba/private/ dperson/samba -u "user2;123456" -s "share;/mount/;yes;no;no;all;user2;user2"
+  ```
+
 - Traefik tcp 代理
   - 由 traefik 做 tcp 445 代理。
   - 做会话保持、或 hash client ip 负载均衡 到 svc 。
