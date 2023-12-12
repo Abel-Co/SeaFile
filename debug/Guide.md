@@ -42,8 +42,8 @@
 
   ```shell
   docker rm -f samba2 samba3
-  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
-  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
+  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/home/abel -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
+  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/home/abel -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
   docker exec -ti samba2 sh
   "adduser -D abel
 	echo -e "123456\n123456\n" | smbpasswd -a -s abel"
