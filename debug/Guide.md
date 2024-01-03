@@ -1,8 +1,8 @@
 #### Smb 负载均衡
 - **Final =>** 
-  1. 所有smb容器，启动后重建smb账号，之后 /1/min 扫描数据库，更新/创建 账号。
+  1. 所有smb容器，启动后重建smb账号，之后 /*/min 扫描数据库，更新/创建 账号。
   2. 内网DNS解析域名到多个k8s-node-ip，已知 dnsmasq addn-hosts 支持单域名多ip 。
-     1. 多ip时顺序是随机的，客户端一般使用第一个，以此近似LB，并避免单点带宽压力。
+     1. 多ip时顺序是随机的，客户端一般使用第一个，以此近似LB，避免单点带宽压力。
      2. 当记录值有多个IP地址时，域名是如何解析的？ - https://support.huaweicloud.com/dns_faq/dns_faq_023.html
      3. 如果DNS返回多个IP，浏览器如何决定使用哪个？ - https://www.zhihu.com/question/605637765/answer/3066192097
 - HaProxy:445
@@ -23,30 +23,32 @@
       bind *:445
       stick on src
       stick-table type ip size 200k expire 30m 
-  #    server 172.17.16.110 172.17.16.110:446 check inter 1366 fall 2 rise 2 weight 1
-      server 172.17.16.110 172.17.16.110:447 check inter 1366 fall 2 rise 2 weight 1
+      server 172.17.16.110 172.17.16.110:446 check inter 1366 fall 2 rise 2 weight 1
+  #    server 172.17.16.110 172.17.16.110:447 check inter 1366 fall 2 rise 2 weight 1
   ```
 - **（成功）Smb多实例具有相同账号/密码 + HaProxy 445**
 
   - 变更haproxy, macOS Finder 不需要重新登录, 可持续浏览 smb 目录。
 
   ```shell
-  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/mount dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
-  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/mount dperson/samba -u "user;123456" -s "share;/mount/;yes;no;no;all;user;user"
+  docker run -d -it --name samba2 --restart unless-stopped -p 140:139 -p 446:445 -v /home/share:/mount dperson/samba -u "abel;123456" -s "share;/mount/;yes;no;no;all;abel;abel"
+  docker run -d -it --name samba3 --restart unless-stopped -p 141:139 -p 447:445 -v /home/share:/mount dperson/samba -u "abel;123456" -s "share;/mount/;yes;no;no;all;abel;abel"
   ```
 - **（失败）DNS负载均衡: 共享 /var/lib/samba/private/passdb.tdb 文件**
 
+  - **得知：passdb.tdb 只是一份db文件，共享该文件，并不能将账号实际创建到各 smb容器实例的 linux 账户体系中去。**
+
   - （失败）auraco/samba:alpine 镜像 =>
   - 变更 haproxy, macOS Finder 不能持续浏览smb，samba3 未承认账号 abel，samba2 账号 abel 可用。
-  - 得知：passdb.tdb 只是一份db文件，共享该文件，并不能将账号实际创建到各 smb容器实例的 linux 账户体系中去。
 
   ```shell
   docker rm -f samba2 samba3
-  docker run -d -it --name samba2 -p 140:139 -p 446:445 -v /home/share:/home/abel -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
-  docker run -d -it --name samba3 -p 141:139 -p 447:445 -v /home/share:/home/abel -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
+  docker run -d -it --name samba2 --restart unless-stopped -p 140:139 -p 446:445 -v /home/share:/home/abel -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
+  docker run -d -it --name samba3 --restart unless-stopped -p 141:139 -p 447:445 -v /home/share:/home/abel -v /var/lib/samba/:/var/lib/samba/ auraco/samba:alpine
   docker exec -ti samba2 sh
-  "adduser -D abel
-	echo -e "123456\n123456\n" | smbpasswd -a -s abel"
+    "adduser -D abel
+	  echo -e "123456\n123456\n" | smbpasswd -a -s abel
+      exit"
   docker exec -ti samba2 sh -c rc-status ; docker exec -ti samba2 rc-service samba restart
   docker exec -ti samba3 sh -c rc-status ; docker exec -ti samba3 rc-service samba restart
   ```
@@ -68,9 +70,6 @@
     - [linux samba 配置ldap认证,Samba通过Openldap统一认证](https://blog.csdn.net/weixin_39616855/article/details/116963337)
   - Rust 实现的 ldap-server: lldap: [lldap/**lldap**](https://github.com/lldap/lldap) ，2.5k 星，53 Contributors 。
     - [samba4的负载均衡群集](https://blog.51cto.com/cmdschool/1829675)
- 
-#### Smb 挂载目录轮询多实例，登录状态同步问题
-
 
 #### Networking failed to start
 - 最终补齐 /etc/network/interfaces 文件，从而解决。**以下可不填，文件留空即可**。
@@ -116,6 +115,11 @@
 - navigator.platform 已 @deprecated
 - navigator.userAgent 将作为仅剩的
 - 一个检测库：https://github.com/matthewhudson/current-device
+
+#### 资源管理器打开网络位置
+- https://www.google.com/search?q=%E7%94%A8%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%99%A8%E6%89%93%E5%BC%80%E4%B8%80%E4%B8%AA%E7%9B%AE%E5%BD%95%E5%B9%B6%E8%87%AA%E5%8A%A8%E9%80%89%E5%AE%9A%E6%9F%90%E4%B8%AA%E6%96%87%E4%BB%B6&newwindow=1&sxsrf=AJOqlzUjVc1-wVBKHWzO942scJXve2XpAg%3A1675355949892&ei=LefbY9SHNr_j2roPl42P2AU&ved=0ahUKEwiU0o-io_f8AhW_sVYBHZfGA1sQ4dUDCA8&uact=5&oq=%E7%94%A8%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%E5%99%A8%E6%89%93%E5%BC%80%E4%B8%80%E4%B8%AA%E7%9B%AE%E5%BD%95%E5%B9%B6%E8%87%AA%E5%8A%A8%E9%80%89%E5%AE%9A%E6%9F%90%E4%B8%AA%E6%96%87%E4%BB%B6&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIKCAAQ8QQQHhCiBDoICAAQogQQsAM6DQgAEPEEEB4QogQQsANKBAhBGAFKBAhGGABQxARYxARgjQZoAXAAeACAAb8BiAG_AZIBAzAuMZgBAKABAqABAcgBBcABAQ&sclient=gws-wiz-serp
+- https://jackxiang.com/post/7661/
+- 
 
 #### 打开smb位置
 - 浏览器
