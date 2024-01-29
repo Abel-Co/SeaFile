@@ -101,6 +101,13 @@ docker run \
 ### Windows
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;右键，此电脑，添加一个网络位置，`\\192.168.3.120\Yali`。（或，开始，运行，输入地址）（结尾的 share，请根据实际情况输入）。
 ![img.png](docs/assets/win-smb.png)
+### Android
+- Astro File Manager
+- AndSMB
+- File Manager
+- ES文件浏览器/ES File Explorer（据说广告多）
+### iOS
+- FileExplorer Free
 
 ## 检索、预览
 
