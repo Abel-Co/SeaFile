@@ -75,7 +75,7 @@ pub async fn init_rbatis_old() {
     }
 }
 
-pub fn rb() -> &'static Rbatis {
+pub fn rb<'a>() -> &'a Rbatis {
     RB_OLD.get().unwrap()
 }
 

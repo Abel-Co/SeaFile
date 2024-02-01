@@ -13,7 +13,7 @@ pub mod c;
 pub mod conf;
 pub mod middleware;
 
-pub fn app_env() -> &'static Arc<String> {
+pub fn app_env<'a>() -> &'a Arc<String> {
     static ENV: OnceCell<Arc<String>> = OnceCell::new();
     ENV.get_or_init(|| {
         Arc::new(env::var("APP_ENV").unwrap())  // 不unwrap_or，这里必须要供给个标识
@@ -35,7 +35,7 @@ fn use_env(postgres: Option<Postgres>) -> Option<Postgres> {
     }
 }
 
-pub fn global() -> &'static Arc<Conf> {
+pub fn global<'a>() -> &'a Arc<Conf> {
     static CONFIG: OnceCell<Arc<Conf>> = OnceCell::new();
     CONFIG.get_or_init(|| {
         let config_path = get_config_path();

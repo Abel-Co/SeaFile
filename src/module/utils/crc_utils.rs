@@ -7,7 +7,7 @@ pub fn crc_i64(str: &str) -> i64 {
     crc().checksum(str.as_bytes()) as i64
 }
 
-fn crc() -> &'static Crc<u64> {
+fn crc<'a>() -> &'a Crc<u64> {
     static CRC: OnceCell<Crc<u64>> = OnceCell::new();
     CRC.get_or_init(|| {
         Crc::<u64>::new(&CRC_64_XZ)

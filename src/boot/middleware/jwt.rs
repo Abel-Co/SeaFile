@@ -48,7 +48,7 @@ impl JwtToken {
 
     /// create token
     /// secret: your secret string
-    pub fn create(&self) -> Result<String, &'static str> {
+    pub fn create<'a>(&self) -> Result<String, &'a str> {
         return match encode(
             &Header::default(),
             self,
@@ -60,7 +60,7 @@ impl JwtToken {
     }
     /// verify token
     /// secret: your secret string
-    pub fn verify(token: &str) -> Result<JwtToken, &'static str> {
+    pub fn verify<'a>(token: &str) -> Result<JwtToken, &'a str> {
         return match decode::<JwtToken>(
             &token,
             &DecodingKey::from_secret(global().jwt.key.as_ref()),
