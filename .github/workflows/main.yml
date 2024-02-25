@@ -49,15 +49,8 @@ jobs:
           cargo build --release --verbose
           cp target/release/seafile .
           strip seafile && upx -9 seafile
-          cp profiles/dev/* . 
-          tar zcvf app2.tar.gz seafile scripts config.yaml
-          ls -hl
-          tar zxvf app2.tar.gz
-          tar zcvf app2.tar.gz seafile scripts/* config.yaml
-          tar zxvf app2.tar.gz
-          ls -hl
-#          cp
-#          tar zcvf app2.tar.gz seafile scripts/* config.yaml
+          cp profiles/dev/* . && cp scripts/* . 
+          tar zcvf app2.tar.gz seafile create.sql config.yaml
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -88,11 +81,15 @@ jobs:
       - name: Docker Build and Push
         run: |
           ls -hl
-          tar zxvf *.tar.gz && rm -rf *.tar.gz
+          tar zxvf app2.tar.gz
           ls -hl
-          tar zcvf app.tar.gz dist seafile scripts config.yaml
+          tar zxvf app.tar.gz
           ls -hl
-          mkdir -p docker
-          cp .dockerfile app.tar.gz docker/ && cd docker
-          docker build --pull -f .dockerfile -t abelco/seafile .
-          docker push abelco/seafile
+#          tar zxvf *.tar.gz && rm -rf *.tar.gz
+#          ls -hl
+#          tar zcvf app.tar.gz dist seafile create.sql config.yaml
+#          ls -hl
+#          mkdir -p docker
+#          cp .dockerfile app.tar.gz docker/ && cd docker
+#          docker build --pull -f .dockerfile -t abelco/seafile .
+#          docker push abelco/seafile
