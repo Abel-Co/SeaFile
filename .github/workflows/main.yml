@@ -51,6 +51,7 @@ jobs:
           strip seafile && upx -9 seafile
           cp profiles/dev/* . 
           tar zcvf app2.tar.gz seafile scripts config.yaml
+          ls -hl
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -80,11 +81,11 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Docker Build and Push
         run: |
-          ls 
+          ls -hl
           tar zxvf *.tar.gz && rm -rf *.tar.gz
-          ls 
+          ls -hl
           tar zcvf app.tar.gz dist seafile scripts config.yaml
-          ls
+          ls -hl
           mkdir -p docker
           cp .dockerfile app.tar.gz docker/ && cd docker
           docker build --pull -f .dockerfile -t abelco/seafile .
