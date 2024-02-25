@@ -86,6 +86,5 @@ jobs:
           tar zcvf app.tar.gz dist seafile create.sql config.yaml
           mkdir -p docker
           cp .dockerfile app.tar.gz docker/ && cd docker
-          ls -hl docker/
           docker build --pull -f .dockerfile -t abelco/seafile .
           docker push abelco/seafile
