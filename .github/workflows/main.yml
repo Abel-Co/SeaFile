@@ -49,12 +49,13 @@ jobs:
           cargo build --release --verbose
           cp target/release/seafile .
           strip seafile && upx -9 seafile
-          ls
+          cp profiles/dev/* . 
+          tar zcvf app2.tar.gz seafile scripts config.yaml
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: seafile
-          path: target/release/seafile
+          name: app2.tar.gz
+          path: app2.tar.gz
   build-image:
     name: 构建镜像
     runs-on: ubuntu-latest
@@ -70,7 +71,7 @@ jobs:
           path: docker/
       - uses: actions/download-artifact@v2
         with:
-          name: seafile
+          name: app2.tar.gz
           path: docker/
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -80,5 +81,7 @@ jobs:
       - name: Docker Build and Push
         run: |
           cp .dockerfile docker/ && cd docker
+          tar zxvf app.tar.gz app2.tar.gz && rm -rf *.tar.gz
+          tar zcvf app.tar.gz dist seafile scripts config.yaml
           docker build --pull -f .dockerfile -t abelco/seafile .
           docker push abelco/seafile
