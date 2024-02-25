@@ -83,10 +83,9 @@ jobs:
           tar zxvf app.tar.gz
           tar zxvf app2.tar.gz
           rm -rf app.tar.gz app2.tar.gz
-          ls -hl
           tar zcvf app.tar.gz dist seafile create.sql config.yaml
-          ls -hl
-#          mkdir -p docker
-#          cp .dockerfile app.tar.gz docker/ && cd docker
-#          docker build --pull -f .dockerfile -t abelco/seafile .
-#          docker push abelco/seafile
+          mkdir -p docker
+          cp .dockerfile app.tar.gz docker/ && cd docker
+          ls -hl docker/
+          docker build --pull -f .dockerfile -t abelco/seafile .
+          docker push abelco/seafile
