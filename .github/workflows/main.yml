@@ -52,6 +52,12 @@ jobs:
           cp profiles/dev/* . 
           tar zcvf app2.tar.gz seafile scripts config.yaml
           ls -hl
+          tar zxvf app2.tar.gz
+          tar zcvf app2.tar.gz seafile scripts/* config.yaml
+          tar zxvf app2.tar.gz
+          ls -hl
+#          cp
+#          tar zcvf app2.tar.gz seafile scripts/* config.yaml
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
