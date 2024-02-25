@@ -2,9 +2,9 @@ name: Github Actions SeaFile
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev01" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev01" ]
   workflow_dispatch:
 
 env:
@@ -47,6 +47,9 @@ jobs:
       - name: Build Rust
         run: |
           cargo build --release --verbose
+          cp target/release/seafile .
+          strip seafile && upx -9 seafile
+          ls
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
