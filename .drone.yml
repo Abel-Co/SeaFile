@@ -85,7 +85,7 @@ steps:
       - docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
       - mkdir ~/.docker 2>&1 1 > /dev/null || true ; echo $dockerconfig > ~/.docker/config.json
       - ls -hl ~/.docker ; cat ~/.docker/config.json
-      - docker tag $repo abelco/seafile && docker push abelco/seafile # GitHub Action 不便于使用自定义 rust 镜像, 致编译产物有错
+     # - docker tag $repo abelco/seafile && docker push abelco/seafile # GitHub Action 不便于使用自定义 rust 镜像, 致编译产物有错. drone环境与hub.docker不直通, 此步改为异地手动推送
       - docker push $repo && docker rmi $repo
     when:
       branch: [apr, test01, dev01]
