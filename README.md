@@ -86,11 +86,13 @@ docker build --pull -f .dockerfile --build-arg APP_ENV=$env -t $repo .
 docker run --restart=unless-stopped -p 5432:5432 -e POSTGRES_PASSWORD=postgres 
     --name postgres -d postgres:12-alpine
 # 2.部署 seafile
-docker run \
-    -d -ti --pull always \
-    --name seafile --restart unless-stopped \
+docker run -d -ti \
+    --pull=always \
+    --name=seafile \
+    --restart=unless-stopped \
+    -e DATABASE_DSN=postgres://seafile_rw:xxx@192.168.1.109:5432/seafile \
     -p 8080:8080 -p 139:139 -p 445:445 \
-    -v /data/samba:/home \
+    -v /home:/home \
     abelco/seafile
 ```
 
