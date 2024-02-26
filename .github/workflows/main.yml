@@ -87,4 +87,4 @@ jobs:
           mkdir -p docker
           cp .dockerfile app.tar.gz docker/ && cd docker
           docker build --pull -f .dockerfile -t abelco/seafile .
-          docker push abelco/seafile
+#          docker push abelco/seafile
