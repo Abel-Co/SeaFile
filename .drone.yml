@@ -26,6 +26,7 @@ steps:
       - clone
   - name: 编译前端
     image: auraco/node:alpine
+    pull: always
     commands:
       # - rm -rf node_modules   # 需要时，可开启，以清理缓存
       - cd webapp && yarn install && yarn build
@@ -36,6 +37,7 @@ steps:
       - restore
   - name: 编译后端
     image: auraco/rust:alpine
+    pull: always
     commands:
       - mkdir -p target/.cargo
       - ln -s /drone/src/target/.cargo /root/.cargo
