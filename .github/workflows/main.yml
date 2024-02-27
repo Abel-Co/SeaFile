@@ -47,7 +47,9 @@ jobs:
 
       - name: Setup Alpine Linux environment
         uses: jirutka/setup-alpine@v1
-      - run: |
+
+      - name: Build Rust
+        run: |
           cat /etc/os-release
           apk add musl-dev openssl-dev upx
           apk add rustup gcc build-base && rustup-init -y
@@ -59,6 +61,7 @@ jobs:
           strip seafile && upx -9 seafile
           cp profiles/dev/* .
           tar zcvf app2.tar.gz seafile scripts config.yaml
+        shell: alpine.sh {0}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
