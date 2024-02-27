@@ -47,8 +47,6 @@ jobs:
 
       - name: Setup Alpine Linux environment
         uses: jirutka/setup-alpine@v1
-        with:
-          branch: v3.15
       - run: |
           cat /etc/os-release
           apk add musl-dev openssl-dev upx
