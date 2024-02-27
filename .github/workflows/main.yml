@@ -44,8 +44,9 @@ jobs:
           path: target
           key: target-${{ github.ref_name }}
           restore-keys: SeaFile-Cache
-      - name: Build Rust
+      - name: Setup latest Alpine Linux
         uses: jirutka/setup-alpine@v1
+      - name: Build Rust
         run: |
           cat /etc/os-release
           apk add musl-dev openssl-dev upx
