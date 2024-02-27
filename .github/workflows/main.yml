@@ -44,33 +44,35 @@ jobs:
           path: target
           key: target-${{ github.ref_name }}
           restore-keys: SeaFile-Cache
-      - name: Setup Alpine Linux environment
-        uses: jirutka/setup-alpine@v1
-      - name: Build Rust
-        run: |
-          cat /etc/os-release
-          apk add musl-dev openssl-dev upx
-          apk add rustup gcc build-base && rustup-init -y
-#          curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf > rustup.sh && sh rustup.sh -y
-          source "$HOME/.cargo/env"
-          
-          cargo build --release --verbose
-          cp target/release/seafile .
-          strip seafile && upx -9 seafile
-          cp profiles/dev/* .
-          tar zcvf app2.tar.gz seafile scripts config.yaml
+
 #      - name: Build Rust
 #        run: |
-#          apt update
-#          apt install -y openssl libssl-dev gcc
-#          apt install -y curl musl-dev upx
-#          curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf > rustup.sh && sh rustup.sh -y
+#          cat /etc/os-release
+#          apk add musl-dev openssl-dev upx
+#          apk add rustup gcc build-base && rustup-init -y
+##          curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf > rustup.sh && sh rustup.sh -y
 #          source "$HOME/.cargo/env"
+#
 #          cargo build --release --verbose
 #          cp target/release/seafile .
 #          strip seafile && upx -9 seafile
 #          cp profiles/dev/* .
 #          tar zcvf app2.tar.gz seafile scripts config.yaml
+      - name: Build Rust
+        uses: stevenleadbeater/rust-musl-builder@master
+        with:
+          args: /bin/bash -c "cargo build --release --target=x86_64-unknown-linux-musl"
+        run: |
+#          apt update
+#          apt install -y openssl libssl-dev gcc
+#          apt install -y curl musl-dev upx
+#          curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf > rustup.sh && sh rustup.sh -y
+#          source "$HOME/.cargo/env"
+          cargo build --release --verbose
+          cp target/release/seafile .
+          strip seafile && upx -9 seafile
+          cp profiles/dev/* .
+          tar zcvf app2.tar.gz seafile scripts config.yaml
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
