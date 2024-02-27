@@ -49,6 +49,7 @@ jobs:
         uses: stevenleadbeater/rust-musl-builder@master
         with:
           args: /bin/bash -c "cargo build --release --target=x86_64-unknown-linux-musl"
+      - name: Package Rust
         run: |
           cargo build --release --verbose 
           cp target/release/seafile .
