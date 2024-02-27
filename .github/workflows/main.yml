@@ -61,7 +61,7 @@ jobs:
           strip seafile && upx -9 seafile
           cp profiles/dev/* .
           tar zcvf app2.tar.gz seafile scripts config.yaml
-        shell: alpine.sh {0}
+        shell: alpine.sh --root {0}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
