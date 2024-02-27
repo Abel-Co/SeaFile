@@ -47,14 +47,13 @@ jobs:
 
       - name: Build Rust
         run: |
-          apt install musl-tools
+          sudo apt install musl-tools
           rustup target add x86_64-unknown-linux-musl
           cargo build --release --target=x86_64-unknown-linux-musl
           cp target/x86_64-unknown-linux-musl/release/seafile .
           strip seafile && upx -9 seafile
           cp profiles/dev/* .
           tar zcvf app2.tar.gz seafile scripts config.yaml
-        shell: bash --root {0}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
