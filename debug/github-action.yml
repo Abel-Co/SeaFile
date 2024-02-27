@@ -1,0 +1,17 @@
+
+
+- name: Setup Alpine Linux environment
+  uses: jirutka/setup-alpine@v1
+
+- name: Build Rust
+  run: |
+    cat /etc/alpine-release
+    apk add musl-dev openssl-dev upx
+    apk add rustup gcc build-base && rustup-init -y
+    source "$HOME/.cargo/env"
+    cargo build --release --verbose
+    cp target/release/seafile .
+    strip seafile && upx -9 seafile
+    cp profiles/dev/* .
+    tar zcvf app2.tar.gz seafile scripts config.yaml
+  shell: alpine.sh --root {0}
