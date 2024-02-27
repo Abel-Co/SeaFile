@@ -46,7 +46,7 @@ jobs:
           restore-keys: SeaFile-Cache
       - uses: jirutka/setup-alpine@v1
         with:
-          branch: v3.18
+          branch: v3.15
       - name: Build Rust
         run: |
           cat /etc/os-release
