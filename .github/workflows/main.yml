@@ -54,6 +54,7 @@ jobs:
           strip seafile && upx -9 seafile
           cp profiles/dev/* .
           tar zcvf app2.tar.gz seafile scripts config.yaml
+        shell: bash --root {0}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
