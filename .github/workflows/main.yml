@@ -45,12 +45,31 @@ jobs:
           key: target-${{ github.ref_name }}
           restore-keys: SeaFile-Cache
       - name: Build Rust
+        uses: jirutka/setup-alpine@v1
         run: |
+          cat /etc/os-release
+          apk add musl-dev openssl-dev upx
+          apk add rustup gcc build-base && rustup-init -y
+#          curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf > rustup.sh && sh rustup.sh -y
+          source "$HOME/.cargo/env"
+          
           cargo build --release --verbose
           cp target/release/seafile .
           strip seafile && upx -9 seafile
           cp profiles/dev/* .
           tar zcvf app2.tar.gz seafile scripts config.yaml
+#      - name: Build Rust
+#        run: |
+#          apt update
+#          apt install -y openssl libssl-dev gcc
+#          apt install -y curl musl-dev upx
+#          curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf > rustup.sh && sh rustup.sh -y
+#          source "$HOME/.cargo/env"
+#          cargo build --release --verbose
+#          cp target/release/seafile .
+#          strip seafile && upx -9 seafile
+#          cp profiles/dev/* .
+#          tar zcvf app2.tar.gz seafile scripts config.yaml
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
