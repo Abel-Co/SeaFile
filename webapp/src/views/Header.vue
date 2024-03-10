@@ -37,7 +37,7 @@
       <div class="layout-header-trigger layout-header-trigger-min">
         <n-dropdown trigger="hover" :options="avatarOptions">
           <div class="avatar">
-            <n-avatar round :src="avatar">
+            <n-avatar round :src="avatar.url">
               <!-- {{ state.username }} -->
               <!-- <template #icon> -->
               <!--  &lt;!&ndash; <UserOutlined/> &ndash;&gt; -->
@@ -58,21 +58,24 @@ import { GithubOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@vic
 import { get } from "../utils/request"
 import md5 from "md5"
 import { async_avatar } from "../utils/avatar"
+import { use_avatar_store } from "../store/avatar_store"
 
 const message = useMessage()
 const dialog = useDialog()
 const router = useRouter()
 const route = useRoute()
 
-const avatar = ref('')
 const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
 const props = defineProps({ user: Object, headerLeft: String })
-props.user && watch(props.user, () => {
-  Object.assign(model, props.user)
+props.user && watch(props.user, () => Object.assign(model, props.user))
+const avatar = use_avatar_store()
+const avatar_switch = computed(() => !!(model.email && !model.avatar))
+watch(avatar_switch, () => {
+  let avatar_url = avatar_switch.value
+      ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
+      : model.avatar
+  avatar.update(model.username, avatar_url)
 })
-const avatar_url = computed(() => model.avatar === 'email' ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
-
-watch(avatar_url, () => async_avatar(model.username, avatar_url.value, (imgUrl) => avatar.value = imgUrl))
 
 const account = JSON.parse(localStorage.getItem('subject'))?.account
 const state = shallowRef({

@@ -24,10 +24,10 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         // 'vue': 'https://cdn.jsdelivr.net/npm/vue@3.2.47/+esm',
         // 'vue': 'https://cdn.bytedance.com/cdn/vue/3.2.31/vue.esm-browser.prod.min.js',
-        'vue': 'https://cdn.bytedance.com/cdn/vue/3.2.31/vue.runtime.esm-browser.prod.min.js',
+        'vue': 'https://cdn.bytedance.com/cdn/vue/3.4.21/vue.runtime.esm-browser.prod.min.js',
         // 'vue-router': 'https://cdn.jsdelivr.net/npm/vue-router@4.1.6/+esm',      // 失败：未完全+esm. Cannot read properties of undefined (reading 'value')
         // 'axios': 'https://cdn.jsdelivr.net/npm/axios@1.3.1/+esm',
-        'axios': 'https://cdn.staticfile.org/axios/1.3.2/esm/axios.min.js',
+        'axios': 'https://cdn.staticfile.org/axios/1.6.7/esm/axios.min.js',
         'json-bigint': 'https://cdn.jsdelivr.net/npm/json-bigint@1.0.0/+esm',
         '_': 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/+esm',
         // 'vee-validate': 'https://cdn.jsdelivr.net/npm/vee-validate@4.7.3/+esm',  // 失败：不报错，不出结果

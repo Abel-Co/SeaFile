@@ -1,7 +1,7 @@
 <template>
   <!--  账号，密码，邮箱，手机号，使用邮箱获取头像，用户属性（用户、管理员）-->
   <n-form ref="formRef" :model="model" :rules="rules">
-    <n-image width="260" :style="{float: 'right', borderRadius: '50%', marginRight: '10%'}" :src="avatar"/>
+    <n-image width="260" :style="{float: 'right', borderRadius: '50%', marginRight: '10%'}" :src="avatar.url"/>
     <n-form-item path="username" label="账号" :style="{maxWidth: '320px'}">
       <n-input v-model:value="model.username" @keydown.enter.prevent :disabled="true"/>
     </n-form-item>
@@ -12,7 +12,7 @@
       <n-input v-model:value="model.email" @keydown.enter.prevent/>
     </n-form-item>
     <n-form-item path="avatar" label="用邮箱获取头像" :style="{maxWidth: '320px'}">
-      <n-switch v-model:value="avatar_switch" checked-value="email" unchecked-value=""/>
+      <n-switch v-model:value="avatar_switch"/>
     </n-form-item>
     <n-form-item v-if="!avatar_switch" path="avatar" label="头像地址" :style="{width: '700px'}">
       <n-input v-model:value="model.avatar" @keydown.enter.prevent/>
@@ -38,16 +38,17 @@ import { useMessage } from "naive-ui"
 import { get, put } from '../../utils/request'
 import md5 from "md5"
 import { async_avatar } from "../../utils/avatar"
+import { use_avatar_store } from "../../store/avatar_store"
 
 const formRef = ref(null)
 const message = useMessage()
 
-const avatar = ref('')
-const model = reactive({ username: '', email: '' })
-const avatar_switch = ref('email')
-const avatar_url = computed(() => avatar_switch.value === 'email' ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
-
-watch(avatar_url, () => async_avatar(model.username, avatar_url.value, (imgUrl) => avatar.value = imgUrl))
+const model = reactive({ username: '', email: '', avatar: '' })
+const avatar = use_avatar_store()
+const avatar_switch = ref(true)
+watch(model, () => avatar_switch.value = !!(model.email && !model.avatar))
+const avatar_url = computed(() => avatar_switch.value ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
+watch(avatar_url, () => async_avatar(model.username, avatar_url.value, imgUrl => avatar.url = imgUrl))
 
 const rules = {
   phone: [{
@@ -64,10 +65,6 @@ const rules = {
 
 onMounted(() => {
   get('/user').then(resp => {
-    if (resp.data.avatar === 'email') {
-      avatar_switch.value = resp.data.avatar
-      resp.data.avatar = ''
-    } else avatar_switch.value = ''
     Object.assign(model, resp.data)
   })
 })
@@ -76,7 +73,7 @@ const submit = e => {
   e.preventDefault()
   formRef.value?.validate(err => {
     if (!err) {
-      avatar.value && (model.avatar = avatar.value)
+      model.avatar = avatar_switch ? '' : model.avatar
       put('/user/self', model).then(resp => {
         message.success("保存成功")
       })

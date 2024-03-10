@@ -3,7 +3,7 @@
   <div class="Layout">
     <n-space vertical>
       <n-card size="small" :bordered="false">
-        <n-avatar round :size="50" style="float: left" :src="avatar"/>
+        <n-avatar round :size="50" style="float: left" :src="avatar.url"/>
         <div style="margin-top: 2px; margin-left: 60px">
           <div class="n-card__content" role="none"><strong>{{ ('' + model.username).firstUpperCase() }}</strong></div>
           <div class="n-card__content" role="none">{{ model.email }}</div>
@@ -31,14 +31,10 @@
 import { computed, onMounted, reactive, watch, ref } from 'vue'
 import Header from "../Header.vue"
 import { get } from "../../utils/request"
-import md5 from 'md5'
-import { async_avatar } from "../../utils/avatar"
+import { use_avatar_store } from "../../store/avatar_store"
 
-const avatar = ref(null)
+const avatar = use_avatar_store()
 const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
-const avatar_url = computed(() => model.avatar === 'email' ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
-
-watch(avatar_url, () => async_avatar(model.username, avatar_url.value, (imgUrl) => avatar.value = imgUrl))
 
 const nav_sidebar = reactive([
   {

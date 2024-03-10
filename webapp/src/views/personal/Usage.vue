@@ -113,7 +113,6 @@ const { data, option } = sunburstRelativeEffect()
 const { columns, list, sync_table } = datatableRelativeEffect()
 
 get('/daisy/user/0').then(resp => {
-  // console.log(resp.data)
   data.value = JSON.parse(JSONBigInt.stringify(resp.data))
   sync_table({name: 'Abel', value: 12312445678, children: data.value})
 })
