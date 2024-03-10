@@ -19,14 +19,14 @@ name = "tests"
 path = "tests/lib.rs"
 
 [dependencies]
-actix-web = "4.2"             # actix-web main
+actix-web = "4.3"             # actix-web main
 actix-files = "0.6"
-actix-web-lab = "0.18"
+actix-web-lab = "0.19"
 async-channel = "1.6"
 futures = "0.3"
 tokio = { version = "1.20", features = ["full"] }
 rayon = "1.6"
-notify = "5.0.0-pre.16"
+notify = "6.0"
 walkdir = "2"
 #bytes = "0.5.6"
 serde = { version = "1", features = ["derive"] }
@@ -49,5 +49,5 @@ reqwest = { version = "0.11", default-features = false, features = ["json", "rus
 crc = "3.0"
 regex = "1.5"
 lazy_static = "1"
-itertools = "0.10.5"
+itertools = "0.11"
 base64 = "0.21.0"

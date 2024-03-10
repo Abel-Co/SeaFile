@@ -22,7 +22,7 @@ pub async fn daemon_smb() {
             samba_status = String::from_utf8_lossy(&output.stdout).to_string();
             log::info!("rc-status samba:{}", RE_BLANK_3CHAR.replace(&samba_status, "        "));
             if let Some(_) = RE_SAMBA_STATUS.find(&samba_status) {
-                log::info!("smb died, now restart ...");
+                log::info!("smb died, restart now ...");
                 if let Ok(output) = Command::new("rc-service").arg("samba").arg("restart").output() {
                     let output_str = String::from_utf8_lossy(&output.stdout).to_string();
                     log::info!("rc-service samba restart ...\n{}", output_str)
@@ -35,7 +35,7 @@ pub async fn daemon_smb() {
 pub async fn init_smb_account() {
     if cfg!(target_os = "linux") {
         let output = Command::new("sh").arg("-c").arg("cat /etc/os-release").output();
-        if !String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") { return; }
+        if String::from_utf8_lossy(&output.unwrap().stdout).find("Alpine Linux").is_none() { return; }
         for user in user::dao::list().await {
             let account = user.username.unwrap();
             let _ = Command::new("adduser").arg("-D").arg(&account).output();
@@ -65,8 +65,8 @@ pub async fn create(account: &str, password: Option<String>) -> Result<(), Strin
             }
             if let Some(password) = password {
                 let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
-                if let Err(e) = Command::new("sh").arg("-c").arg(shell).output() {
-                    return Err(e.to_string());
+                if let Err(err) = Command::new("sh").arg("-c").arg(shell).output() {
+                    return Err(err.to_string());
                 }
             }
         }
@@ -93,4 +93,15 @@ pub async fn modify_password(account: &str, password: &str) -> Result<(), String
 /**
  * 删除系统smb账户
  */
-pub async fn remove() -> Result<(), String> { Ok(()) }
+pub async fn remove(account: &str) -> Result<(), String> {
+    if cfg!(target_os = "linux") {
+        let output = Command::new("cat").arg("/etc/os-release").output();
+        if String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") {
+            // let shell = format!("echo -e '{}\n{}\n' | smbpasswd -a -s {}", password, password, account);
+            // if let Err(err) = Command::new("sh").arg("-c").arg(shell).output() {
+            //     return Err(err.to_string());
+            // }
+        }
+    }
+    Ok(())
+}

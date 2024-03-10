@@ -11,7 +11,7 @@ pub async fn daemon() {
     // 1.文件系统 监视
     thread::spawn(|| {
         block_on(async {
-            let _ = filesystem::async_watch(global().watch_path.as_str()).await;
+            _ = filesystem::async_watch(global().watch_path.as_str()).await;
         })
     });
 

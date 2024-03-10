@@ -81,7 +81,7 @@ pub async fn show(id: i64) -> String {
     }
 }
 
-pub async fn save_or_update(kind: CreateKind, path: &str) {
+pub async fn create(kind: CreateKind, path: &str) {
     match dao::get_by_path(path).await {
         Some(file) => dao::update(file.id, Files::new(format!("{:?}", kind), path).await).await,
         None => dao::save(Files::new(format!("{:?}", kind), path).await).await
@@ -91,15 +91,21 @@ pub async fn save_or_update(kind: CreateKind, path: &str) {
 pub async fn update(_kind: ModifyKind, path: &str) {
     let _file = Path::new(path);
     if _file.exists() {
-        let kind = if _file.is_file() { CreateKind::File } else if _file.is_dir() { CreateKind::Folder } else { CreateKind::Other };
-        save_or_update(kind, path).await;
+        let kind = if _file.is_file() {
+            CreateKind::File
+        } else if _file.is_dir() {
+            CreateKind::Folder
+        } else {
+            CreateKind::Other
+        };
+        create(kind, path).await;
     } else {
         ifile::dao::delete_by_path(path).await;
     }
 }
 
 pub async fn delete(_kind: RemoveKind, path: &str) {
-    // ifile::dao::delete_children(path).await; // macOS Finder 下 “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
+    // ifile::dao::delete_children(path).await; // macOS Finder “解压/删除”，“增/删” 不干净而添加，结果仍 “增/删” 不彻底。（sh下没问题）（待验 Linux smb）
     ifile::dao::delete_by_path(path).await;
 }
 
@@ -120,13 +126,13 @@ pub async fn index(path: &str) {
             if let Ok(entry) = entry {
                 match entry.file_type() {
                     file_type if file_type.is_file() => {
-                        save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                        create(CreateKind::File, entry.path().to_str().unwrap()).await;
                     }
                     file_type if file_type.is_dir() => {
-                        save_or_update(CreateKind::Folder, entry.path().to_str().unwrap()).await;
+                        create(CreateKind::Folder, entry.path().to_str().unwrap()).await;
                     }
                     file_type if file_type.is_symlink() => {
-                        save_or_update(CreateKind::File, entry.path().to_str().unwrap()).await;
+                        create(CreateKind::File, entry.path().to_str().unwrap()).await;
                     }
                     _ => {}
                 }

@@ -46,7 +46,7 @@ pub async fn init_db_schema() {
         let _ = RB.exec(sql.as_str(), vec![]).await;
         // 2.记录管理路径
         let watch_path = global().watch_path.as_str();
-        ifile::bs::save_or_update(CreateKind::Folder, watch_path).await;
+        ifile::bs::create(CreateKind::Folder, watch_path).await;
     }
     // let files: i64 = RB.fetch("select count(*) from files;", vec![]).await.unwrap();
     // if files < 2 {
