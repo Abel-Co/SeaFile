@@ -76,7 +76,6 @@ watch(model, () => {
 })
 
 onMounted(() => {
-  // person info
   get('/user').then(resp => {
     Object.assign(model, resp.data)
   })

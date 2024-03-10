@@ -28,8 +28,9 @@ steps:
     image: auraco/node:alpine
     pull: always
     commands:
-      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
-      - cd webapp && yarn install && yarn build
+     # - rm -rf node_modules   # 需要时，可开启，以清理缓存
+     # - cd webapp && yarn install && yarn build
+      - cd webapp && bun install && bun run build
     when:
       branch: [apr, test01, dev01]
       # event: push
