@@ -20,7 +20,23 @@ const routes = [
     ]
   },
   {
-    path: '/admin', name: 'Admin', component: () => import('../views/admin/Index.vue')
+    path: '/admin', name: 'Admin', component: () => import('../views/admin/Index.vue'),
+    redirect: '/admin/users',
+    children: [
+      {
+        path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px',
+        active: 0, component: () => import('../views/admin/Users.vue'),
+        // beforeEnter: (to, from, next) => {
+        //   if ('admin') next()
+        // }
+      }, {
+        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'analysis', icon_margin_top: '-29.3px',
+        active: 0, component: () => import('../views/admin/Storage.vue'),
+        // beforeEnter: (to, from, next) => {
+        //   if ('admin') next()
+        // }
+      }
+    ]
   }
 ]
 

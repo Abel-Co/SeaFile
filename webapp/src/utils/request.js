@@ -1,11 +1,10 @@
 import axios from "axios"
-import JSONBigInt from 'json-bigint'
-// import router from "../router"
+import { jsonBigInt } from "./objects"
 
 // axios.defaults.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-axios.defaults.headers = { 'Content-Type': 'application/json' }
-axios.defaults.transformRequest = [data => JSONBigInt.stringify(data)]
-axios.defaults.transformResponse = [data => JSONBigInt.parse(data)]
+axios.defaults.headers['Content-Type'] = 'application/json'
+axios.defaults.transformRequest = [data => jsonBigInt.stringify(data)]
+axios.defaults.transformResponse = [data => jsonBigInt.parse(data, null)]
 
 axios.interceptors.request.use(config => {
   const subject = localStorage.getItem('subject')

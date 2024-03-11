@@ -33,22 +33,26 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import { useMessage } from "naive-ui"
-import { get, put } from '../../utils/request'
+import { put } from '../../utils/request'
 import md5 from "md5"
-import { async_avatar } from "../../utils/avatar"
 import { use_avatar_store } from "../../store/avatar_store"
+import { use_user_store } from "../../store/user_store"
 
 const formRef = ref(null)
 const message = useMessage()
 
-const model = reactive({ username: '', email: '', avatar: '' })
+const model = use_user_store()
 const avatar = use_avatar_store()
 const avatar_switch = ref(true)
-watch(model, () => avatar_switch.value = !!(model.email && !model.avatar))
-const avatar_url = computed(() => avatar_switch.value ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870` : model.avatar)
-watch(avatar_url, () => async_avatar(model.username, avatar_url.value, imgUrl => avatar.url = imgUrl))
+watch(model, () => {
+  avatar_switch.value = !!(model.email && !model.avatar)
+  let avatar_url = avatar_switch.value
+      ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
+      : model.avatar
+  avatar.update(model.username, avatar_url)
+})
 
 const rules = {
   phone: [{
@@ -63,17 +67,11 @@ const rules = {
   }],
 }
 
-onMounted(() => {
-  get('/user').then(resp => {
-    Object.assign(model, resp.data)
-  })
-})
-
 const submit = e => {
   e.preventDefault()
   formRef.value?.validate(err => {
     if (!err) {
-      model.avatar = avatar_switch ? '' : model.avatar
+      model.avatar = avatar_switch.value ? '' : model.avatar
       put('/user/self', model).then(resp => {
         message.success("保存成功")
       })

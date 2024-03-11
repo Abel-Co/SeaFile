@@ -8,7 +8,7 @@ export const use_avatar_store = defineStore('avatar', {
   getters: {},
   actions: {
     update(account, avatar_url) {
-      async_avatar(account, avatar_url.value, imgUrl => this.url = imgUrl)
+      async_avatar(account, avatar_url, imgUrl => this.url = imgUrl)
       // email/links/generate
     }
   },

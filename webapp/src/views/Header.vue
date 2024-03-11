@@ -51,31 +51,29 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, shallowRef, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDialog, useMessage } from 'naive-ui'
 import { GithubOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@vicons/antd'
 import { get } from "../utils/request"
 import md5 from "md5"
-import { async_avatar } from "../utils/avatar"
 import { use_avatar_store } from "../store/avatar_store"
+import { use_user_store } from "../store/user_store"
 
 const message = useMessage()
 const dialog = useDialog()
 const router = useRouter()
 const route = useRoute()
 
-const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
+const model = use_user_store()
 const props = defineProps({ user: Object, headerLeft: String })
 props.user && watch(props.user, () => Object.assign(model, props.user))
 const avatar = use_avatar_store()
 const avatar_switch = computed(() => !!(model.email && !model.avatar))
-watch(avatar_switch, () => {
-  let avatar_url = avatar_switch.value
-      ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
-      : model.avatar
-  avatar.update(model.username, avatar_url)
-})
+const avatar_url = avatar_switch.value
+    ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
+    : model.avatar
+avatar.update(model.username, avatar_url)
 
 const account = JSON.parse(localStorage.getItem('subject'))?.account
 const state = shallowRef({
@@ -123,32 +121,17 @@ const avatarOptions = [
   { label: '退出登录', key: 3, props: { onClick: () => doLogout() } },
 ]
 
-watch(model, () => {
-  if (model.user_type === 'Admin') {
-    // if (avatarOptions.findIndex(value => value.key === 2) < 0) {
-    const avatarOptionsAdmin = [
-      { type: 'divider', key: 'd1' },
-      { label: '管理面板', key: 2, props: { onClick: () => router.push({ name: 'Admin' }) } },
-      { type: 'divider', key: 'd1' },
-    ]
-    avatarOptions.splice(avatarOptions.length - 1, 0, ...avatarOptionsAdmin)
-  }
-  // }
-})
+if (model.user_type === 'Admin') {
+  // if (avatarOptions.findIndex(value => value.key === 2) < 0) {
+  const avatarOptionsAdmin = [
+    { type: 'divider', key: 'd1' },
+    { label: '管理面板', key: 2, props: { onClick: () => router.push({ name: 'Admin' }) } },
+    { type: 'divider', key: 'd1' },
+  ]
+  avatarOptions.splice(avatarOptions.length - 1, 0, ...avatarOptionsAdmin)
+}
 
-onMounted(() => {
-  // const user = JSONBigInt.parse(localStorage.getItem('user'))
-  // if (user) {
-  //   Object.assign(model, user)  // 来自localStorage的user,会触发两次 watch(model).
-  // } else {
-  if (!props.user) {
-    get('/user').then(resp => {
-      Object.assign(model, resp.data)
-      // localStorage.setItem('user', JSONBigInt.stringify(resp.data)) // 写入localStorage,将更易于仿冒
-    })
-  }
-  // }
-})
+onMounted(() => !props.user && get('/user').then(resp => Object.assign(model, resp.data)))
 
 // 退出登录
 const doLogout = () => {

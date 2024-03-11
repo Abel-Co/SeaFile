@@ -1,12 +1,12 @@
 <template>
-  <Header :user="model" :header-left="'show'"/>
+  <Header :user="user" :header-left="'show'"/>
   <div class="Layout">
     <n-space vertical>
       <n-card size="small" :bordered="false">
         <n-avatar round :size="50" style="float: left" :src="avatar.url"/>
         <div style="margin-top: 2px; margin-left: 60px">
-          <div class="n-card__content" role="none"><strong>{{ ('' + model.username).firstUpperCase() }}</strong></div>
-          <div class="n-card__content" role="none">{{ model.email }}</div>
+          <div class="n-card__content" role="none"><strong>{{ ('' + user.username).firstUpperCase() }}</strong></div>
+          <div class="n-card__content" role="none">{{ user.email }}</div>
         </div>
       </n-card>
     </n-space>
@@ -28,58 +28,43 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, watch, ref } from 'vue'
+import { reactive } from 'vue'
 import { useRouter } from "vue-router"
 import Header from "../Header.vue"
-import { get } from "../../utils/request"
 import { use_avatar_store } from "../../store/avatar_store"
+import { use_user_store } from "../../store/user_store"
 
 const router = useRouter()
-
-const avatar = use_avatar_store()
-const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
-
-router.afterEach((to, from, next) => {
-  const path_hash = location.hash.slice(1)
-  nav_sidebar.forEach(v => path_hash === v.path && (v.active = 1))
-})
-
 const nav_sidebar = reactive([])
+const avatar = use_avatar_store()
+const user = use_user_store()
+
+if (user.user_type === 'Admin') {
+  const routes = [
+    {
+      path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px',
+      active: 0, component: () => import('./Users.vue'),
+      beforeEnter: (to, from, next) => {
+        if ('admin') next()
+      }
+    }, {
+      path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'analysis', icon_margin_top: '-29.3px',
+      active: 0, component: () => import('./Storage.vue'),
+      beforeEnter: (to, from, next) => {
+        if ('admin') next()
+      }
+    }
+  ]
+  nav_sidebar.push(...routes)
+}
+
+const path_hash = location.hash.slice(1)
+nav_sidebar.forEach(v => path_hash === v.path && (v.active = 1))
 
 const clickLink = item => {
   item.active = 1
   nav_sidebar.forEach(v => v.name === item.name || (v.active = 0))
 }
-
-watch(model, () => {
-  if (model.user_type === 'Admin') {
-    const routes = [
-      {
-        path: '/admin/users', name: 'Users', title: '用户管理', icon: 'users', icon_margin_top: '-29.3px',
-        active: 0, component: () => import('./Users.vue'),
-        beforeEnter: (to, from, next) => {
-          if ('admin') next()
-        }
-      }, {
-        path: '/admin/storage', name: 'Storage', title: '存储分析', icon: 'analysis', icon_margin_top: '-29.3px',
-        active: 0, component: () => import('./Storage.vue'),
-        beforeEnter: (to, from, next) => {
-          if ('admin') next()
-        }
-      }
-    ]
-    routes.forEach(v => router.addRoute('Admin', v))
-    nav_sidebar.push(...routes)
-    // 进入默认页
-    router.push({ path: "/admin/users" })
-  }
-})
-
-onMounted(() => {
-  get('/user').then(resp => {
-    Object.assign(model, resp.data)
-  })
-})
 </script>
 
 <style lang="scss">

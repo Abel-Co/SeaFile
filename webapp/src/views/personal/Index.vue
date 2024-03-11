@@ -28,13 +28,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, watch, ref } from 'vue'
+import { reactive } from 'vue'
 import Header from "../Header.vue"
-import { get } from "../../utils/request"
 import { use_avatar_store } from "../../store/avatar_store"
+import { use_user_store } from "../../store/user_store"
 
 const avatar = use_avatar_store()
-const model = reactive({ username: '', email: '', user_type: '', avatar: '' })
+const model = use_user_store()
 
 const nav_sidebar = reactive([
   {
@@ -49,20 +49,13 @@ const nav_sidebar = reactive([
   }
 ])
 
+const path_hash = location.hash.slice(1)
+nav_sidebar.forEach(v => path_hash === v.path && (v.active = 1))
+
 const clickLink = item => {
   item.active = 1
   nav_sidebar.forEach(v => v.name === item.name || (v.active = 0))
 }
-
-onMounted(() => {
-  {
-    get('/user').then(resp => {
-      Object.assign(model, resp.data)
-    })
-  }
-  const path_hash = location.hash.slice(1)
-  nav_sidebar.forEach(v => path_hash === v.path && (v.active = 1))
-})
 </script>
 
 <style lang="scss">
