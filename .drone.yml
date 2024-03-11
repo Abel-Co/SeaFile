@@ -25,7 +25,7 @@ steps:
     depends_on:
       - clone
   - name: 编译前端
-    image: oven/bun:alpine     # auraco/node:alpine
+    image: auraco/bun:alpine     # auraco/node:alpine
     pull: always
     commands:
      # - rm -rf node_modules   # 需要时，可开启，以清理缓存

@@ -93,7 +93,7 @@ pub async fn modify_password(account: &str, password: &str) -> Result<(), String
 /**
  * 删除系统smb账户
  */
-pub async fn remove(account: &str) -> Result<(), String> {
+pub async fn remove(_account: &str) -> Result<(), String> {
     if cfg!(target_os = "linux") {
         let output = Command::new("cat").arg("/etc/os-release").output();
         if String::from_utf8_lossy(&output.unwrap().stdout).contains("Alpine Linux") {
