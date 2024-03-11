@@ -2,9 +2,7 @@ import { defineStore } from 'pinia'
 import { async_avatar } from "../utils/avatar"
 
 export const use_avatar_store = defineStore('avatar', {
-  state: () => ({
-    url: '',
-  }),
+  state: () => ({ url: '' }),
   getters: {},
   actions: {
     update(account, avatar_url) {

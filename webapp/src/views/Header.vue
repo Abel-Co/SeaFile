@@ -70,10 +70,13 @@ const props = defineProps({ user: Object, headerLeft: String })
 props.user && watch(props.user, () => Object.assign(model, props.user))
 const avatar = use_avatar_store()
 const avatar_switch = computed(() => !!(model.email && !model.avatar))
-const avatar_url = avatar_switch.value
-    ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
-    : model.avatar
-avatar.update(model.username, avatar_url)
+
+router.afterEach((to, from, next) => {
+  const avatar_url = avatar_switch.value
+      ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
+      : model.avatar
+  avatar.update(model.username, avatar_url)
+})
 
 const account = JSON.parse(localStorage.getItem('subject'))?.account
 const state = shallowRef({

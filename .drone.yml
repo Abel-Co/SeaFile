@@ -20,8 +20,6 @@ steps:
       mount:
         - ./target
         - ./webapp/node_modules
-    when:
-      branch: [ apr, test01, dev01 ]
     depends_on:
       - clone
   - name: 编译前端
@@ -65,8 +63,6 @@ steps:
       mount:
         - ./target
         - ./webapp/node_modules
-    when:
-      branch: [ apr, test01, dev01 ]
     depends_on:
       - 编译前端
       - 编译后端
