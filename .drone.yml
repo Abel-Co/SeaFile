@@ -30,9 +30,10 @@ steps:
     commands:
      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
      # - cd webapp && yarn install && yarn build
+      - apk add nodejs npm
       - cd webapp && bun install && bun run build
     when:
-      branch: [apr, test01, dev01]
+      branch: [apr, test01, dev01, feat/br]
       # event: push
     depends_on:
       - restore
