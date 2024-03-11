@@ -30,7 +30,7 @@ steps:
      # - cd webapp && yarn install && yarn build
       - apk add nodejs npm
       - npm i -g n
-      - n lts
+      - /usr/local/bin/n lts
       - cd webapp && bun install && bun run build
     when:
       branch: [apr, test01, dev01, feat/br]
