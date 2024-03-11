@@ -3,7 +3,7 @@ type: docker
 name: SeaFile CI/CD
 
 trigger:
-  branch: [apr, test01, dev01, abc01]
+  branch: [apr, test01, dev01, abc01, feat/br]
   event: [push, pull_request, tag, promote, custom, deployment]
   # status: [ failure, changed, success ]
   # environment: stating production
