@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { jsonBigInt } from "../utils/objects"
 
 export const use_user_store = defineStore('user', {
   state: () => ({
@@ -6,11 +7,6 @@ export const use_user_store = defineStore('user', {
     status: 1, user_type: "", usage: 0, quota: 1, created_at: "", updated_at: ""
   }),
   getters: {},
-  actions: {
-    // update(account, avatar_url) {
-    //   async_avatar(account, avatar_url.value, imgUrl => this.url = imgUrl)
-    //   // email/links/generate
-    // }
-  },
+  actions: {},
   persist: true,   // 数据持久化, 默认为 localStorage
 })

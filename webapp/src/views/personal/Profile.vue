@@ -45,10 +45,10 @@ const message = useMessage()
 
 const model = use_user_store()
 const avatar = use_avatar_store()
-const avatar_switch = ref(true)
-watch(model, () => {
-  avatar_switch.value = !!(model.email && !model.avatar)
-  let avatar_url = avatar_switch.value
+const avatar_switch = ref(!!(model.email && !model.avatar))
+
+watch(() => [model, avatar_switch.value], () => {
+  const avatar_url = avatar_switch.value
       ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
       : model.avatar
   avatar.update(model.username, avatar_url)
@@ -71,10 +71,8 @@ const submit = e => {
   e.preventDefault()
   formRef.value?.validate(err => {
     if (!err) {
-      model.avatar = avatar_switch.value ? '' : model.avatar
-      put('/user/self', model).then(resp => {
-        message.success("保存成功")
-      })
+      avatar_switch.value && (model.avatar = '')
+      put('/user/self', model).then(resp => message.success("保存成功"))
     }
   })
 }

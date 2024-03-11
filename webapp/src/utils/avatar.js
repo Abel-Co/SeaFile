@@ -31,7 +31,10 @@ const blob2Src = res => {
   const blob = new window.Blob([res], { type: 'image/jpeg' })
   return window.URL.createObjectURL(blob)
 }
-export const async_avatar = (account, imgUrl, callback) => {
+
+export const avatar_sync = account => blob2Src(avatar_cache.syncGet(account))
+
+export const avatar_async = (account, imgUrl, callback) => {
   avatar_cache.get(account).then(res => callback(blob2Src(res)))
   imgUrl && getBlobByURL(imgUrl).then(({ blob }) => {
     avatar_cache.set(account, blob).then(_ => callback(blob2Src(blob)))
