@@ -28,9 +28,9 @@ steps:
     commands:
      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
      # - cd webapp && yarn install && yarn build
-      - apk add nodejs npm
+      - apk add nodejs npm bash
       - npm i -g n
-      - /usr/local/bin/n lts
+      - n lts
       - cd webapp && bun install && bun run build
     when:
       branch: [apr, test01, dev01, feat/br]
