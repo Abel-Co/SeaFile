@@ -3,17 +3,20 @@ import { avatar_async, avatar_sync } from "../utils/avatar"
 import { use_user_store } from "./user_store"
 
 export const use_avatar_store = defineStore('avatar', {
-  state: () => ({ url: '' }),
+  state: () => ({ url: null }),
   getters: {},
   actions: {
-    load(state) {
-      const user = use_user_store()
+    load() {
+      let [user, count] = [use_user_store(), 0]
       const _load = () => {
         return new Promise((_resolve, _reject) => {
           const imgObj = new Image()
-          imgObj.src = avatar_sync(user.username)
-          imgObj.onload = res => this.url = imgObj.src // ; resolve(res)
-          imgObj.onerror = err => _load().then(_ => _)  // ; reject(err)
+          imgObj.src = this.url || avatar_sync(user.username)
+          imgObj.onload = res => this.url = imgObj.src    // ; resolve(res)
+          imgObj.onerror = err => {
+            this.url = avatar_sync(user.username)
+            count < 90 && setTimeout(() => _load().then(_ => _), 30) && count++
+          }  // ; reject(err)
         })
       }
       _load().then(_ => _)

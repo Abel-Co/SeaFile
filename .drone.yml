@@ -3,7 +3,7 @@ type: docker
 name: SeaFile CI/CD
 
 trigger:
-  branch: [apr, test01, dev01, abc01]
+  branch: [apr, test01, dev01]
   event: [push, pull_request, tag, promote, custom, deployment]
   # status: [ failure, changed, success ]
   # environment: stating production
@@ -24,7 +24,7 @@ steps:
       - clone
   - name: 编译前端
     image: oven/bun:alpine     # auraco/node:alpine
-    pull: always
+    pull: if-not-exists  # always
     commands:
      # - rm -rf node_modules   # 需要时，可开启，以清理缓存
      # - cd webapp && yarn install && yarn build
@@ -36,7 +36,7 @@ steps:
       - restore
   - name: 编译后端
     image: auraco/rust:alpine
-    pull: always
+    pull: if-not-exists  # always
     commands:
       - mkdir -p target/.cargo
       - ln -s /drone/src/target/.cargo /root/.cargo

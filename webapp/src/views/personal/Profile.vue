@@ -52,7 +52,7 @@ watch(() => [model, avatar_switch.value], () => {
       ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
       : model.avatar
   avatar.update(model.username, avatar_url)
-})
+}, { deep: true })
 
 const rules = {
   phone: [{

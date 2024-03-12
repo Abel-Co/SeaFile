@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, shallowRef, watch } from 'vue'
+import { onMounted, shallowRef, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDialog, useMessage } from 'naive-ui'
 import { GithubOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@vicons/antd'
@@ -66,17 +66,10 @@ const router = useRouter()
 const route = useRoute()
 
 const model = use_user_store()
-const props = defineProps({ user: Object, headerLeft: String })
-props.user && watch(props.user, () => Object.assign(model, props.user))
+// const props = defineProps({ user: Object, headerLeft: String })
+const headerLeft = ref(true)
+// props.user && watch(props.user, () => Object.assign(model, props.user))
 const avatar = use_avatar_store().load()
-
-router.afterEach((to, from, next) => {
-  const avatar_switch = computed(() => !!(model.email && !model.avatar))
-  const avatar_url = avatar_switch.value
-      ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
-      : model.avatar
-  avatar.update(model.username, avatar_url)
-})
 
 const account = JSON.parse(localStorage.getItem('subject'))?.account
 const state = shallowRef({
@@ -119,22 +112,31 @@ const iconList = [
 //   ]
 // }
 // 头像下拉菜单, 需去除：@select="avatarOptions"
-const avatarOptions = [
+const avatarOptions = reactive([
   { label: '个人中心', key: 1, props: { onClick: () => router.push({ name: 'Personal' }) } },
   { label: '退出登录', key: 3, props: { onClick: () => doLogout() } },
-]
+])
 
-if (model.user_type === 'Admin') {
-  // if (avatarOptions.findIndex(value => value.key === 2) < 0) {
-  const avatarOptionsAdmin = [
-    { type: 'divider', key: 'd1' },
-    { label: '管理面板', key: 2, props: { onClick: () => router.push({ name: 'Admin' }) } },
-    { type: 'divider', key: 'd1' },
-  ]
-  avatarOptions.splice(avatarOptions.length - 1, 0, ...avatarOptionsAdmin)
-}
+watch(model, () => {
+  const avatar_url = !!(model.email && !model.avatar)
+      ? `https://www.gravatar.com/avatar/${md5(model.email)}?d=identicon&s=870`
+      : model.avatar
+  avatar.update(model.username, avatar_url)
 
-onMounted(() => !props.user && get('/user').then(resp => Object.assign(model, resp.data)))
+  if (model.user_type === 'Admin') {
+    // if (avatarOptions.findIndex(value => value.key === 2) < 0) {
+    const avatarOptionsAdmin = [
+      { type: 'divider', key: 'd1' },
+      { label: '管理面板', key: 2, props: { onClick: () => router.push({ name: 'Admin' }) } },
+      { type: 'divider', key: 'd1' },
+    ]
+    avatarOptions.splice(avatarOptions.length - 1, 0, ...avatarOptionsAdmin)
+  }
+}, { immediate: true })
+
+onMounted(() => {
+  get('/user').then(resp => Object.assign(model, resp.data))
+})
 
 // 退出登录
 const doLogout = () => {
