@@ -63,7 +63,7 @@ pub async fn create(user: Json<Users>, jwt: JwtToken) -> impl Responder {
             let _ = user::bs::create(user.0).await;
         }
     }
-    HttpResponse::Ok()
+    HttpResponse::Ok().json(200)
 }
 
 /**
@@ -79,7 +79,7 @@ pub async fn update(id: Path<i64>, user: Json<Users>, jwt: JwtToken) -> impl Res
             }
         }
     }
-    HttpResponse::Ok()
+    HttpResponse::Ok().json(200)
 }
 
 /**

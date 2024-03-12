@@ -26,20 +26,20 @@
         <n-input v-model:value="model.email" @keydown.enter.prevent/>
       </n-form-item>
       <n-form-item path="avatar" label="用邮箱获取头像" :style="{maxWidth: '320px'}">
-        <n-switch v-model:value="avatar" checked-value="email" unchecked-value=""/>
+        <n-switch v-model:value="avatar_switch"/>
       </n-form-item>
-      <n-form-item v-if="!avatar" path="avatar" label="头像地址" :style="{width: '450px'}">
+      <n-form-item v-if="!avatar_switch" path="avatar" label="头像地址" :style="{width: '450px'}">
         <n-input v-model:value="model.avatar" @keydown.enter.prevent/>
       </n-form-item>
-<!--      <p>
-        用户属性：
-        <input type="radio" v-model.trim="user.user_type" value="User" style="width: 17px; margin-right:14px;">普通用户
-        <input type="radio" v-model.trim="user.user_type" value="Admin" style="width: 38px; margin-right:5px;">管理员
-      </p>
-      <p>用户状态：
-        <input type="radio" v-model.trim="user.status" value="1" style="width: 38px; margin-right:5px;">启用
-        <input type="radio" v-model.trim="user.status" value="419" style="width: 38px; margin-right:5px;">停用
-      </p>-->
+      <!--      <p>
+              用户属性：
+              <input type="radio" v-model.trim="user.user_type" value="User" style="width: 17px; margin-right:14px;">普通用户
+              <input type="radio" v-model.trim="user.user_type" value="Admin" style="width: 38px; margin-right:5px;">管理员
+            </p>
+            <p>用户状态：
+              <input type="radio" v-model.trim="user.status" value="1" style="width: 38px; margin-right:5px;">启用
+              <input type="radio" v-model.trim="user.status" value="419" style="width: 38px; margin-right:5px;">停用
+            </p>-->
     </n-form>
     <template #action>
       <n-button type="primary" @click="save_user">保存</n-button>
@@ -47,9 +47,9 @@
   </n-modal>
   <n-modal v-model:show="deleteModal.show" preset="dialog" title="确认" positive-text="确认" negative-text="取消"
            @after-leave="(deleteModal.status = 'success') && (deleteModal.password = '')" @positive-click="delete_user">
-    <n-form ref="passwordRef" :model="deleteModal" :rules="deleteModal.rules" >
+    <n-form ref="passwordRef" :model="deleteModal" :rules="deleteModal.rules">
       <n-form-item path="password" first label="需要验证您你密码" required>
-        <n-input v-model:value="deleteModal.password" type="password" @input="deleteModal.status = 'success'" />
+        <n-input v-model:value="deleteModal.password" type="password" @input="deleteModal.status = 'success'"/>
       </n-form-item>
     </n-form>
   </n-modal>
@@ -59,10 +59,13 @@
 import { computed, h, reactive, ref } from "vue"
 import { del, get, post, put } from "../../utils/request"
 import { NButton, NSpace } from "naive-ui"
+import { use_user_store } from "../../store/user_store"
+import { use_avatar_store } from "../../store/avatar_store"
+
+const list = reactive([])
 
 // 关于 user-list 相关内容的封装
 const userListRelativeEffect = () => {
-  const list = reactive([])
   const fetchTableList = () => {
     get('/user/list').then(resp => {
       resp.data.map(v => {
@@ -80,31 +83,34 @@ const userListRelativeEffect = () => {
 // 关于 user-modal 相关内容的封装
 const userModalRelativeEffect = () => {
   const title = ref('')
-  const model = ref({ id: 0, avatar: '' })
+  const model = ref({ id: 0, email: '', avatar: '' })
+  const formRef = ref(null)
+  const avatar_switch = ref('')
+  const user_template = { user_type: 'User', status: 1, usage: 0 }
   const userModal = reactive({
     show: false,
     start: user => {
       title.value = user.id ? '更新用户' : '添加用户'
       Object.assign(model.value, user.id ? user : user_template)
       model.value.id ? delete rules.username : Object.assign(rules, rule_username)
-      if (model.value.avatar === 'email') {
-        avatar.value = model.value.avatar
-        model.value.avatar = ''
-      } else avatar.value = ''
+      avatar_switch.value = !!(model.value.email && !model.value.avatar)
       userModal.show = true
     },
     afterLeave: () => model.value = {}
   })
-  const avatar = ref('')
-  const user_template = { user_type: 'User', status: 1, usage: 0 }
-  const formRef = ref(null)
   const save_user = () => {
     formRef.value?.validate(err => {
       if (!err) {
         const user = model.value
-        avatar.value && (user.avatar = avatar.value);
-        (user.id ? put(`/user/${user.id}`, user) : post('/user', user)).catch(_ => _)
+        avatar_switch.value && (user.avatar = '')
+        const { fetchTableList } = userListRelativeEffect()
+        ;(user.id ? put(`/user/${user.id}`, user) : post('/user', user)).then(() => fetchTableList())
         userModal.show = false
+        const user_store = use_user_store()
+        if (user_store.id === user.id) {
+          Object.assign(user_store, user)
+          use_avatar_store().update(user.username, user.avatar)
+        }
       }
     })
   }
@@ -145,13 +151,12 @@ const userModalRelativeEffect = () => {
       }
     ]
   }
-  return { model, avatar, title, userModal, formRef, rules, save_user }
+  return { model, avatar_switch, title, userModal, formRef, rules, save_user }
 }
 
 // 关于 user-delete 相关内容的封装
 const userDeleteRelativeEffect = () => {
   const passwordRef = ref(null)
-  const { fetchTableList } = userListRelativeEffect()
   const deleteModal = reactive({
     show: false,
     password: '',
@@ -179,6 +184,7 @@ const userDeleteRelativeEffect = () => {
   const delete_user = () => {
     return new Promise((resolve, reject) => {
       passwordRef.value?.validate(err => {
+        const { fetchTableList } = userListRelativeEffect()
         !err && del(`/user/${deleteModal.model.id}`, { password: deleteModal.password })
             .then(resp => fetchTableList()) && resolve()
       }).catch(err => reject(err))
@@ -202,7 +208,7 @@ const columns = [
   { title: "上次登录", key: "_logged_at", align: 'center' },
   {
     title: "操作", key: "action", align: 'center', render(row) {
-      return h(NSpace, { style: {display: 'inline-flex'} }, {
+      return h(NSpace, { style: { display: 'inline-flex' } }, {
         default: () => [
           h(NButton, { strong: true, size: 'tiny', onClick: () => userModal.start(row) }, { default: () => "Edit" }),
           h(NButton, { strong: true, size: 'tiny', onClick: () => deleteModal.start(row) }, { default: () => "Del" })
@@ -219,14 +225,12 @@ const columns = [
 const { list, fetchTableList } = userListRelativeEffect()
 
 // 关于 user-modal 相关内容的封装
-const { model, avatar, title, userModal, formRef, rules, save_user } = userModalRelativeEffect()
+const { model, avatar_switch, title, userModal, formRef, rules, save_user } = userModalRelativeEffect()
 
 // 关于 user-delete 相关内容的封装
 const { passwordRef, deleteModal, delete_user } = userDeleteRelativeEffect()
 
-onMounted(() => {
-  fetchTableList()
-})
+onMounted(() => fetchTableList())
 
 </script>
 

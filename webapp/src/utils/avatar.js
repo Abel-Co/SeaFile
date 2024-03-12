@@ -1,5 +1,8 @@
 import { createCache } from "@baikbingo/cache"
 
+/**
+ * 中国区对secure.gravatar.com访问不畅，所以一经成功，便做本地化缓存
+ */
 const avatar_cache = createCache({
   databaseName: "cache",    // 数据库名称
   tableName: "avatar", // 表名
