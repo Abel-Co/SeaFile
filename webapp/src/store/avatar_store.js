@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { avatar_async, avatar_sync } from "../utils/avatar"
 import { use_user_store } from "./user_store"
+import { jsonBigInt } from "../utils/objects"
 
 export const use_avatar_store = defineStore('avatar', {
   state: () => ({ url: null }),
@@ -8,14 +9,16 @@ export const use_avatar_store = defineStore('avatar', {
   actions: {
     load() {
       let [user, count] = [use_user_store(), 0]
+      const account = user.username || jsonBigInt.parse(localStorage.getItem('user')).username
       const _load = () => {
         return new Promise((_resolve, _reject) => {
           const imgObj = new Image()
-          imgObj.src = this.url || avatar_sync(user.username)
+          imgObj.src = this.url || avatar_sync(account)
           imgObj.onload = res => this.url = imgObj.src    // ; resolve(res)
           imgObj.onerror = err => {
-            this.url = avatar_sync(user.username)
-            count < 90 && setTimeout(() => _load().then(_ => _), 30) && count++
+            this.url = avatar_sync(account)
+            console.debug(count, this.url)
+            count < 500 && setTimeout(() => _load().then(_ => _), 1) && count++
           }  // ; reject(err)
         })
       }

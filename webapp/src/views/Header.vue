@@ -134,9 +134,7 @@ watch(model, () => {
   }
 }, { immediate: true })
 
-onMounted(() => {
-  get('/user').then(resp => Object.assign(model, resp.data))
-})
+onMounted(() => get('/user').then(resp => Object.assign(model, resp.data)))
 
 // 退出登录
 const doLogout = () => {
