@@ -1,16 +1,13 @@
 import { defineStore } from 'pinia'
 import { avatar_async, avatar_sync } from "../utils/avatar"
 import { use_user_store } from "./user_store"
-import { jsonBigInt } from "../utils/objects"
 
 export const use_avatar_store = defineStore('avatar', {
   state: () => ({ url: null }),
   getters: {},
   actions: {
     load() {
-      let [user, count] = [use_user_store(), 0]
-      // noinspection JSUnresolvedReference
-      const account = jsonBigInt.parse(localStorage.getItem('subject'))?.account
+      let [account, count] = [use_user_store().account, 0]
       if (!account) return this
       const _load = () => {
         return new Promise((_resolve, _reject) => {
@@ -32,5 +29,5 @@ export const use_avatar_store = defineStore('avatar', {
       // email/links/generate
     }
   },
-  // persist: true,   // 数据持久化, 默认为 localStorage
+  // persist: true,   // blob url 仅在 window 生命期内有效，持久化无用
 })

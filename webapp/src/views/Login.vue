@@ -23,6 +23,7 @@ import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { post } from "../utils/request"
 import { useMessage } from "naive-ui"
+import { use_user_store } from "../store/user_store"
 
 const message = useMessage()
 const router = useRouter()
@@ -34,9 +35,8 @@ const handleInput = () => status.value = 'success'
 const errors = computed(() => status.value === 'success' ? '' : '账号或密码错误')
 
 async function handleSubmit() {
-  // console.log(result.valid, result)
   post('/login', user).then(resp => {
-    localStorage.subject = JSON.stringify(resp.data)
+    Object.assign(use_user_store(), resp.data)
     router.push({ name: 'Home' })
   }).catch(e => {
     status.value = 'error'

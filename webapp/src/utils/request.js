@@ -1,5 +1,6 @@
 import axios from "axios"
 import { jsonBigInt } from "./objects"
+import { use_user_store } from "../store/user_store"
 
 // axios.defaults.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 axios.defaults.headers['Content-Type'] = 'application/json'
@@ -7,8 +8,7 @@ axios.defaults.transformRequest = [data => jsonBigInt.stringify(data)]
 axios.defaults.transformResponse = [data => jsonBigInt.parse(data, null)]
 
 axios.interceptors.request.use(config => {
-  const subject = localStorage.getItem('subject')
-  const token = subject && JSON.parse(subject).token
+  const token = use_user_store().token
   token && (config.headers['Authorization'] = `Bearer ${token}`)
   return config
 }, error => {

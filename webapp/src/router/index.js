@@ -1,11 +1,11 @@
 import { createRouter, createWebHashHistory } from "vue-router"
-import Home from '../views/Home.vue'
+import { use_user_store } from "../store/user_store"
 
 const routes = [
-  { path: '/:path*', name: 'Home', component: Home },
+  { path: '/:path*', name: 'Home', component: () => import('../views/Home.vue') },
   {
     path: '/login', name: 'Login', component: () => import('../views/Login.vue'),
-    beforeEnter: (to, from, next) => localStorage.subject ? next({ name: 'Home' }) : next()
+    beforeEnter: (to, from, next) => use_user_store().account ? next({ name: 'Home' }) : next()
   },
   { path: '/show', name: 'Show', component: () => import('../views/Show.vue') },
   { path: '/edit', name: 'Edit', component: () => import('../views/Show.vue') },
@@ -44,6 +44,6 @@ const router = createRouter({
   history: createWebHashHistory(), routes
 })
 router.beforeEach((to, from, next) => {
-  (localStorage.subject || to.name === 'Login') ? next() : next({ name: 'Login' })
+  (use_user_store().account || to.name === 'Login') ? next() : next({ name: 'Login' })
 })
 export default router

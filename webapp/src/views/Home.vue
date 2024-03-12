@@ -82,23 +82,16 @@ import { computed, reactive, ref } from "vue"
 import { get } from "../utils/request"
 import { useMessage } from "naive-ui"
 import { useRouter } from "vue-router"
-// import { createCache } from "@baikbingo/cache"
-// import JSONBigInt from "json-bigint"
+import { use_user_store } from "../store/user_store"
 
-const account = JSON.parse(localStorage.subject ?? "{}")['account']
+const account = use_user_store()?.username
 
 // 关于 list 相关内容的封装
 const listRelativeEffect = () => {
   const router = useRouter()
   const list = reactive([])
   const q = ref(null)
-  const paths = reactive(JSON.parse('{"'+`${account}/`+'":{"id":0}}'))
-  // const paths = createCache({
-  //   databaseName: "paths",    // 数据库名称
-  //   tableName: "paths", // 表名
-  //   memory: true,   // 内存接管
-  //   version: 1      // 版本号
-  // });paths.set('/', JSONBigInt.stringify({ id: 0 })).then(_ => _)
+  const paths = reactive(JSON.parse('{"' + `${account}/` + '":{"id":0}}'))
   const click = item => {
     if (item.kind === 'Folder') {
       const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()

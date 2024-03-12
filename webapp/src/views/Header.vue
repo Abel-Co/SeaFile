@@ -71,9 +71,8 @@ const headerLeft = ref(true)
 // props.user && watch(props.user, () => Object.assign(model, props.user))
 const avatar = use_avatar_store().load()
 
-const account = JSON.parse(localStorage.getItem('subject'))?.account
 const state = shallowRef({
-  username: account?.slice(0, 4)?.firstUpperCase() || 'Abel',
+  username: use_user_store()?.account?.slice(0, 4)?.firstUpperCase() || 'Abel',
   fullscreenIcon: FullscreenOutlined,
 })
 
@@ -143,7 +142,8 @@ const doLogout = () => {
     positiveText: '确定',
     negativeText: '取消',
     onPositiveClick: () => {
-      localStorage.removeItem('subject')
+      const subject = use_user_store()
+      Object.keys(subject).forEach(key => subject[key] = undefined)
       message.success('成功退出登录')
       router.replace({
         name: 'Login',
