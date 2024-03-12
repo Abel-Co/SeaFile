@@ -8,7 +8,7 @@ export const use_avatar_store = defineStore('avatar', {
   getters: {},
   actions: {
     load() {
-      let [user, count] = [use_user_store(), 0] // 貌似pinia并不会从storage中恢复数据，$hydrate也不行
+      let [user, count] = [use_user_store(), 0]
       // noinspection JSUnresolvedReference
       const account = jsonBigInt.parse(localStorage.getItem('subject'))?.account
       if (!account) return this

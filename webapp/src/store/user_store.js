@@ -7,5 +7,5 @@ export const use_user_store = defineStore('user', {
   }),
   getters: {},
   actions: {},
-  // persist: true,   // 数据持久化, 默认为 localStorage
+  persist: true,   // 数据持久化, 默认为 localStorage
 })

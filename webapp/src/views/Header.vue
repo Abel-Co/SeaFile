@@ -123,8 +123,7 @@ watch(model, () => {
       : model.avatar
   avatar.update(model.username, avatar_url)
 
-  if (model.user_type === 'Admin') {
-    // if (avatarOptions.findIndex(value => value.key === 2) < 0) {
+  if (model.user_type === 'Admin' && avatarOptions.findIndex(value => value.key === 2) < 0) {
     const avatarOptionsAdmin = [
       { type: 'divider', key: 'd1' },
       { label: '管理面板', key: 2, props: { onClick: () => router.push({ name: 'Admin' }) } },

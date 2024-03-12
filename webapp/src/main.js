@@ -12,8 +12,8 @@ import { jsonBigInt } from "./utils/objects"
 
 const pinia = createPinia().use(createPersistedState({
   serializer: {
-    deserialize: jsonBigInt.parse,
-    serialize: jsonBigInt.stringify,
+    serialize: value => jsonBigInt.stringify(value),
+    deserialize: value => Object.assign({}, jsonBigInt.parse(value)), // 必须Object.assign拷贝一下，否则接不到，原因不明
   }
 }))
 createApp(App).use(router).use(directives).use(pinia).use(i18n).mount('#app')
