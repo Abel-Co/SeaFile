@@ -19,7 +19,7 @@
     "json-bigint": "^1.0.0",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
-    "naive-ui": "^2.34.3",
+    "naive-ui": "^2.38.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "rollup-plugin-visualizer": "^5.9.0",

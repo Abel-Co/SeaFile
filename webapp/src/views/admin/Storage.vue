@@ -102,6 +102,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent } from 'echarts/components'
 import VChart, { THEME_KEY } from 'vue-echarts'
 import { get } from '../../utils/request'
+import { objects } from "../../utils/objects"
 import JSONBigInt from "json-bigint"
 
 use([CanvasRenderer, SunburstChart, TitleComponent, TooltipComponent, LegendComponent, ToolboxComponent])
@@ -113,13 +114,13 @@ const { data, option } = sunburstRelativeEffect()
 const { columns, list, sync_table } = datatableRelativeEffect()
 
 get('/daisy/system/0').then(resp => {
-  // console.log(resp.data)
-  data.value = JSON.parse(JSONBigInt.stringify(resp.data))
+  data.value = JSON.parse(JSONBigInt.stringify(resp.data)) // objects.purify(resp.data)
   sync_table({name: 'Abel', value: 12312445678, children: data.value})
 })
 
 // level0: {r0:'10%', r:'10%', itemStyle:{r0:0, r:20, name:'Hello'}}
 const mouseover = ({ data }) => {
+  console.log(data)
   sync_table(data)
 }
 </script>

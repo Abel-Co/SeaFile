@@ -72,7 +72,7 @@ const headerLeft = ref(true)
 const avatar = use_avatar_store().load()
 
 const state = shallowRef({
-  username: use_user_store()?.account?.slice(0, 4)?.firstUpperCase() || 'Abel',
+  username: use_user_store()?.account?.slice(0, 4)?.firstUpperCase(),
   fullscreenIcon: FullscreenOutlined,
 })
 

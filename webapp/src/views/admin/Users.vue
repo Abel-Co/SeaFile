@@ -9,18 +9,18 @@
   <!-- 用户信息模态框 -->
   <n-modal v-model:show="userModal.show" preset="dialog" title="Dialog" :style="{width: 'auto'}"
            :on-after-leave="userModal.afterLeave">
-    <template #header>
-      <div>{{ title }}</div>
+    <template #header :autofocus="false">
+      <div :autofocus="false">{{ title }}</div>
     </template>
     <n-form ref="formRef" :model="model" :rules="rules">
       <n-form-item path="username" first label="账号（大小字母、数字、下划线 3~16 位）" :style="{maxWidth: '320px'}">
-        <n-input v-model:value="model.username" @keydown.enter.prevent :disabled="!!model.id"/>
+        <n-input v-model:value="model.username" @keydown.enter.prevent :disabled="!!model.id" :autofocus="!model.id"/>
       </n-form-item>
       <n-form-item path="password" label="密码（6~24 个字符）" :style="{maxWidth: '320px'}">
         <n-input v-model:value="model.password" type="password" @keydown.enter.prevent placeholder="留空将不更改"/>
       </n-form-item>
       <n-form-item path="phone" label="电话" :style="{maxWidth: '320px'}">
-        <n-input v-model:value="model.phone" @keydown.enter.prevent/>
+        <n-input v-model:value="model.phone" @keydown.enter.prevent :autofocus="!!model.id"/>
       </n-form-item>
       <n-form-item path="email" label="邮箱" :style="{width: '390px'}">
         <n-input v-model:value="model.email" @keydown.enter.prevent/>
@@ -83,10 +83,10 @@ const userListRelativeEffect = () => {
 // 关于 user-modal 相关内容的封装
 const userModalRelativeEffect = () => {
   const title = ref('')
-  const model = ref({ id: 0, email: '', avatar: '' })
+  const model = ref({ id: null, email: '', avatar: '' })
   const formRef = ref(null)
   const avatar_switch = ref('')
-  const user_template = { user_type: 'User', status: 1, usage: 0 }
+  const user_template = { id: null, user_type: 'User', status: 1, usage: 0 }
   const userModal = reactive({
     show: false,
     start: user => {
