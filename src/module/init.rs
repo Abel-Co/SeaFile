@@ -20,11 +20,11 @@ pub async fn daemon() {
 
     // 3.samba服务保活
     thread::spawn(|| {
-        loop {
-            block_on(async {
-                samba::daemon_smb().await;
-            });
-            sleep(Duration::from_secs(56))
+        if cfg!(target_os = "linux") {
+            loop {
+                block_on(async { samba::daemon_smb().await; });
+                sleep(Duration::from_secs(56))
+            }
         }
     });
 }

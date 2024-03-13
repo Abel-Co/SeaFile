@@ -1,6 +1,6 @@
 use actix_web::{Error, FromRequest, HttpMessage, HttpRequest};
 use actix_web::dev::Payload;
-use chrono::{Duration, Utc};
+use chrono::{TimeDelta, Utc};
 use futures::future::{ok, Ready};
 use jsonwebtoken::{Algorithm, decode, DecodingKey, Validation};
 use jsonwebtoken::{encode, EncodingKey, Header};
@@ -36,7 +36,7 @@ impl JwtToken {
     pub fn from_id(subject_id: i64) -> Self {
         JwtToken {
             sub: subject_id,
-            exp: (Utc::now() + Duration::days(30)).timestamp_millis() as usize,
+            exp: (Utc::now() + TimeDelta::try_days(30).unwrap()).timestamp_millis() as usize,
         }
     }
     /*pub fn from_user(user: &Users) -> JwtToken {

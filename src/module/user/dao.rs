@@ -15,7 +15,7 @@ pub async fn list() -> Vec<Users> {
  * Get用户
  */
 pub async fn get(id: i64) -> Option<Users> {
-    Some(RB.fetch_by_column("id", &id).await.unwrap())
+    RB.fetch_by_column("id", &id).await.unwrap()
 }
 
 /**
