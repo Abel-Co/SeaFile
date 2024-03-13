@@ -62,7 +62,7 @@ appenders:
   stdout:
     kind: console
     encoder:
-      pattern: "{d(%Y-%m-%d %H:%M:%S)} {h({l})} [{M:>21}] {({f}:{L}):<29.29} : {m}{n}"
+      pattern: "{d(%Y-%m-%d %H:%M:%S)} {h({l})} [{M}] - {m}{n}"
 root:
   level: trace
   appenders:
