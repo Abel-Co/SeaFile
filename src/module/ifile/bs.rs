@@ -8,8 +8,8 @@ use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
+use crate::boot::{app_env, global};
 use crate::boot::c::HOME;
-use crate::boot::global;
 use crate::module::{auth, filesystem};
 use crate::module::ifile;
 use crate::module::ifile::{dao, Files};
@@ -34,8 +34,11 @@ pub async fn check_path(path: &str) -> Option<Files> {
 pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
     match auth::bs::get_subject(user_id).await {
         Some(subject) => {
-            let (account, home_path) = (subject.username.unwrap(), global().watch_path.as_str());
-            let files = ifile::dao::search(&format!("{}/{}", home_path, account), query).await;
+            let mut path = String::from(HOME.as_str());
+            if app_env().as_str() != "local" {
+                path.push_str(&format!("/{}", subject.username.unwrap()))
+            }
+            let files = ifile::dao::search(path.as_str(), query).await;
             calc_folders(&files).await;
             ifile::desensitize_sort(files).await
         }
@@ -49,7 +52,12 @@ pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
 pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
     match auth::bs::get_subject(user_id).await {
         Some(subject) => {
-            let path = &*format!("{}/{}", HOME.as_str(), subject.username.unwrap());
+            // let mut path = &*format!("{}/{}", HOME.as_str(), subject.username.unwrap());
+            let mut path = String::from(HOME.as_str());
+            if app_env().as_str() != "local" {
+                path.push_str(&format!("/{}", subject.username.unwrap()))
+            }
+            let path = path.as_str();
             let files = if parent == 0 {
                 match dao::get_by_path(path).await {
                     Some(file) => dao::list(path, file.id).await, // path也需限制, 防水平越权
@@ -186,7 +194,7 @@ pub async fn calc_folder(account: &str) {
         block_on(async {
             let path: &str = path.as_str();
             for depth in dao::folder_depth_desc(path).await {
-                let _ = dao::write_folder_size(depth.ids).await;
+                let _ = dao::update_folder_size(depth.ids).await;
             }
         });
     });
@@ -199,7 +207,7 @@ pub async fn calc_folders(folders: &Vec<Files>) {
             let mut folders: Vec<Files> = folders;
             folders.sort_by(|a, b| b.path.len().cmp(&a.path.len()));
             for folder in folders {
-                let _ = dao::write_folder_size(folder.id.to_string()).await;
+                let _ = dao::update_folder_size(folder.id.to_string()).await;
             }
         });
     });

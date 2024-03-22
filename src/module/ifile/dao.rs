@@ -110,11 +110,10 @@ pub async fn folder_depth_desc(path: &str) -> Vec<Depth> {
 }
 
 /// 计算目录大小(子代 Folder + File)
-pub async fn write_folder_size(ids: String) -> u64 {
+pub async fn update_folder_size(ids: String) -> u64 {
     let sql = format!(r#"
         update files p set size =
             coalesce((select sum(size) from files where parent = p.id), p.size)
-        where id in ({});
-    "#, ids);
+        where id in ({});"#, ids);
     RB.exec(sql.as_str(), vec![]).await.unwrap().rows_affected
 }

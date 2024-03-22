@@ -40,6 +40,9 @@ const routes = [
   }
 ]
 
+/* if ('admin' && to.matched.length === 0) {
+    // _todo 追加 admin 路由
+  } */
 const router = createRouter({
   history: createWebHashHistory(), routes
 })

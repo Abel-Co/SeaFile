@@ -122,6 +122,7 @@ const listRelativeEffect = () => {
   const show = (item, query) => {
     (async () => {
       if (item) {
+        console.log(item.id, item.id.toString())
         get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
       } else if (query) {
         get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
@@ -137,13 +138,14 @@ const iconRelativeEffect = () => {
   const icon_template = {
     'txt': '#icon-TXTs', 'htm|html': '#icon-chrome', 'mp4|mkv': '#icon-si-glyph-movie-play',
     'zip|rar|tar|gz|bz2|tgz': '#icon-zip-rar', 'pdf': '#icon-adobepdf', 'doc|docx': '#icon-doc',
-    'xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
-    'ds_store|localized': '#icon-ds_store', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
+    'csv|xls|xlsx': '#icon-xlsx', 'ppt|pptx': '#icon-PPT', 'md': '#icon-socialmarkdown', 'dmg': '#icon-dmg',
+    'ds_store|localized': '#icon-ds_store', 'gif': '#icon-GIF', 'png|jpg|jpeg': '#icon-picture', 'js': '#icon-logo-javascript',
     'rs': '#icon-rust', 'java': '#icon-java', 'yaml|yml': '#icon-suffix-yml', 'pkg|rpm|run': '#icon-rpm',
     'vue': '#icon-Vue', 'img': '#icon-img', 'iso': '#icon-iso', 'reg': '#icon-reg', 'bat': '#icon-bat',
     'swift': '#icon-swift', 'go': '#icon-Goyuyan', 'exe|msi': '#icon-exe', 'dav': '#icon-file_video',
     'idx': '#icon-docindex', 'torrent': '#icon-file_bt', 'conf|config': '#icon-icon-config', 'apk': '#icon-apk',
-    'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
+    'azw3': '#icon-AZW3', 'mobi': '#icon-MOBI', 'epub': '#icon-epub', 'yarn.lock': '#icon-yarn', 'cargo.toml': '#icon-cargo', 'cargo.lock': '#icon-cargo-lock',
+    'crt|csr|cer': '#icon-certificate', 'drawio': '#icon-drawio', 'sketch': '#icon-sketch',
     'gitignore': '#icon-git', 'dockerfile': '#icon-icon_file-dockerfile', 'svg': '#icon-SVG',
     'sh': '#icon-a-kuozhanicon_huaban1fuben33', 'webp': '#icon-webp'
   }
@@ -250,6 +252,7 @@ const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEf
 const { openx11, refresh } = operateRelativeEffect()
 
 onBeforeRouteUpdate(async (to, from) => {
+  console.log('onBeforeRouteUpdate', JSON.stringify(to))
   if (to.query['q']) {
     show(null, to.query["q"])
   } else {
@@ -274,6 +277,7 @@ const backtrace = path => {
 
 onMounted(() => {
   const path = decodeURIComponent(location.hash.split('#').pop())
+  console.log('onMounted', path)
   if (path.startsWith('/?q=')) {
     show(null, path.split('?q=').pop())
   } else {

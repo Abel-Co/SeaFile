@@ -53,8 +53,7 @@ pub async fn init_db_schema() {
     let root_path = ifile::bs::check_path(global().watch_path.as_str()).await;
     if let None = root_path {
         // 3.初始建立索引
-        let watch_path = global().watch_path.as_str();
-        ifile::bs::index(watch_path).await;
+        tokio::spawn(async move { ifile::bs::index(global().watch_path.as_str()).await; });
     }
 }
 
@@ -106,14 +105,6 @@ pub fn is_with_list(req: &ServiceRequest) -> bool {
 /// CTX测试模块
 #[cfg(test)]
 mod ctx_mod_test {
-    use rbatis::crud::CRUD;
-    use rbatis::plugin::page::PageRequest;
-    use rbatis::rbatis::Rbatis;
-
-    use crate::boot::c::rb;
-    use crate::boot::start;
-    use crate::module::user::Users;
-
     /// 测试 - rbatis - 池化
     #[tokio::test]
     async fn test_rbatis_pool() {
