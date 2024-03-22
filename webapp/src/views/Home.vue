@@ -257,7 +257,7 @@ const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEf
 const { openx11, refresh } = operateRelativeEffect()
 
 onBeforeRouteUpdate(async (to, from) => {
-  console.debug('onBeforeRouteUpdate', JSON.stringify(to))
+  console.debug('onBeforeRouteUpdate', to.fullPath)
   if (to.query['q']) {
     show(null, to.query["q"])
   } else {
@@ -290,7 +290,6 @@ onMounted(() => {
   } else {
     const key = account + path
     // paths.get(key).then(item => item ? show(JSONBigInt.parse(item.value)) : backtrace(path))
-    console.debug(JSON.stringify(paths))
     paths[key] ? show(paths[key]) : backtrace(path)
     // show(paths[key] ?? { id: 0 })
   }
