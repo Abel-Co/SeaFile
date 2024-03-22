@@ -1,5 +1,5 @@
 <template>
-  <Header />
+  <Header/>
   <div class="wrapper">
     <a href="#/" @click="q=''">
       <img class="logo" alt="Vue logo" src="../assets/logo.svg"/>
@@ -46,7 +46,8 @@
           </li>
           <li>
             <span class="iconfont" @click="download(item)" v-visible="item.kind === 'File'">&#xe66c;</span>
-            <span class="iconfont" @click="openx11(item)" v-visible="true" style="color: gray; font-size: 17px">&#xe64c;</span>
+            <span class="iconfont" @click="openx11(item)" v-visible="true"
+                  style="color: gray; font-size: 17px">&#xe64c;</span>
             <span class="iconfont" @click="refresh(item)" v-visible="item.kind === 'Folder'">&#xe6e3;</span>
             <span class="iconfont" @click="remove(item)" v-visible="true">&#xe6b4;</span>
           </li>
@@ -83,6 +84,7 @@ import { get } from "../utils/request"
 import { useMessage } from "naive-ui"
 import { useRouter } from "vue-router"
 import { use_user_store } from "../store/user_store"
+import { jsonBigInt } from "../utils/objects"
 
 const account = use_user_store()?.username
 
@@ -94,10 +96,13 @@ const listRelativeEffect = () => {
   const paths = reactive(JSON.parse('{"' + `${account}/` + '":{"id":0}}'))
   const click = item => {
     if (item.kind === 'Folder') {
-      const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
-      const to = `${path}/${item.name}`.replace('//', '/');
+      /* const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
+      const to = `${path}/${item.name}`.replace('//', '/'); */
       /*// paths.set(item.path, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))*/
-      (paths[item.path] = item) && router.push({ path: `${to}` })
+      // paths[item.path] = item
+      let to = `/${item.id}${item.path}`
+      // console.debug('Click to:', to)
+      router.push({ path: `${to}` })
     } else if (item.kind === 'File') {
       // window["item"] = item
       let suffix = item.name.split('.').pop().toLowerCase()
@@ -122,7 +127,7 @@ const listRelativeEffect = () => {
   const show = (item, query) => {
     (async () => {
       if (item) {
-        console.log(item.id, item.id.toString())
+        console.log('show =>', item.id, item.id.toString())
         get(`/list/${item.id}`).then(({ data }) => list.splice(0, 1000, ...data))
       } else if (query) {
         get(`/search/${query}`).then(({ data }) => list.splice(0, 1000, ...data))
@@ -252,15 +257,17 @@ const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEf
 const { openx11, refresh } = operateRelativeEffect()
 
 onBeforeRouteUpdate(async (to, from) => {
-  console.log('onBeforeRouteUpdate', JSON.stringify(to))
+  console.debug('onBeforeRouteUpdate', JSON.stringify(to))
   if (to.query['q']) {
     show(null, to.query["q"])
   } else {
     const path = decodeURIComponent(to.path)
-    const key = account + path
-    // paths.get(key).then(item => item ? show(JSONBigInt.parse(item)) : backtrace(path))
-    paths[key] ? show(paths[key]) : backtrace(path)
-    // show(paths[key] ?? { id: 0 })
+    // console.debug(path.split('/'))
+    show({ id: path.split('/')[1] || 0 })
+    // const key = path
+    // // paths.get(key).then(item => item ? show(JSONBigInt.parse(item)) : backtrace(path))
+    // paths[key] ? show(paths[key]) : backtrace(path)
+    // // show(paths[key] ?? { id: 0 })
   }
 })
 
@@ -283,7 +290,7 @@ onMounted(() => {
   } else {
     const key = account + path
     // paths.get(key).then(item => item ? show(JSONBigInt.parse(item.value)) : backtrace(path))
-    // console.log(JSON.stringify(paths))
+    console.debug(JSON.stringify(paths))
     paths[key] ? show(paths[key]) : backtrace(path)
     // show(paths[key] ?? { id: 0 })
   }

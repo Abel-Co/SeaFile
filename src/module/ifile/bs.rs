@@ -39,8 +39,8 @@ pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
                 path.push_str(&format!("/{}", subject.username.unwrap()))
             }
             let files = ifile::dao::search(path.as_str(), query).await;
-            calc_folders(&files).await;
-            ifile::desensitize_sort(files).await
+            update_folders_size(&files).await;
+            desensitize_and_sort(files, path.as_str()).await
         }
         None => vec![]
     }
@@ -66,11 +66,22 @@ pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
             } else {
                 dao::list(path, parent).await   // path也需限制, 防水平越权
             };
-            calc_folders(&files).await;
-            ifile::desensitize_sort(files).await
+            update_folders_size(&files).await;
+            desensitize_and_sort(files, path).await
         }
         None => vec![]
     }
+}
+
+/**
+ * 巡检、脱敏、排序
+ */
+async fn desensitize_and_sort(mut files: Vec<Files>, path: &str) -> Vec<Files> {
+    filesystem::async_patrol(&files).await; // 巡检, push to queue only
+    let idx = path.len();
+    files.par_iter_mut().for_each(|x| x.path = x.path[idx..].to_string()); // 脱敏
+    files.par_sort_by(|a, b| a.cmp(&b));    // 排序
+    files
 }
 
 /**
@@ -200,7 +211,7 @@ pub async fn calc_folder(account: &str) {
     });
 }
 
-pub async fn calc_folders(folders: &Vec<Files>) {
+pub async fn update_folders_size(folders: &Vec<Files>) {
     let folders = folders.par_iter().filter(|x| x.kind == "Folder").map(|x| x.clone()).collect();
     thread::spawn(move || {
         block_on(async {
