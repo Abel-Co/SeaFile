@@ -93,15 +93,11 @@ const listRelativeEffect = () => {
   const router = useRouter()
   const list = reactive([])
   const q = ref(null)
-  const paths = reactive(JSON.parse('{"' + `${account}/` + '":{"id":0}}'))
+  // const paths = reactive(JSON.parse('{"' + `${account}/` + '":{"id":0}}'))  // paths[item.path] = item
   const click = item => {
     if (item.kind === 'Folder') {
-      /* const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop()
-      const to = `${path}/${item.name}`.replace('//', '/'); */
-      /*// paths.set(item.path, JSONBigInt.stringify(item)).then(_ => router.push({ path: `${to}` }))*/
-      // paths[item.path] = item
-      let to = `/${item.id}${item.path}`
-      // console.debug('Click to:', to)
+      /* const path = location.hash.replace(/\?q=.*?\//, '').split('#').pop(); const to = `${path}/${item.name}`.replace('//', '/'); */
+      let to = `${item.path}/${item.id}`
       router.push({ path: `${to}` })
     } else if (item.kind === 'File') {
       // window["item"] = item
@@ -134,7 +130,7 @@ const listRelativeEffect = () => {
       }
     })()
   }
-  return { list, paths, router, q, click, search, show }
+  return { list, router, q, click, search, show }
 }
 
 // 关于 icon 相关内容的封装
@@ -245,7 +241,7 @@ import { onBeforeRouteUpdate } from "vue-router"
 const count = ref(0)
 
 // 关于 list 相关内容的封装
-const { list, paths, router, q, click, search, show } = listRelativeEffect()
+const { list, router, q, click, search, show } = listRelativeEffect()
 
 // 关于 icon 相关内容的封装
 const { icon } = iconRelativeEffect()
@@ -257,17 +253,20 @@ const { checked, checkedAll, download, downloadAllChecked } = downloadRelativeEf
 const { openx11, refresh } = operateRelativeEffect()
 
 onBeforeRouteUpdate(async (to, from) => {
-  console.debug('onBeforeRouteUpdate', to.fullPath)
   if (to.query['q']) {
     show(null, to.query["q"])
   } else {
-    const path = decodeURIComponent(to.path)
-    // console.debug(path.split('/'))
-    show({ id: path.split('/')[1] || 0 })
-    // const key = path
-    // // paths.get(key).then(item => item ? show(JSONBigInt.parse(item)) : backtrace(path))
-    // paths[key] ? show(paths[key]) : backtrace(path)
-    // // show(paths[key] ?? { id: 0 })
+    const path = decodeURIComponent(to.path).split('/').filter(x => x)
+    console.debug('onBeforeRouteUpdate', path)
+    const id = path.pop();
+    if (/^\d{16,32}$/.test(id)) {
+      show({ id: id })
+    } else {
+      show({ id: 0 })
+    }
+    // show({ id: path.split('/')[1] || 0 })
+    // paths[path] ? show(paths[path]) : backtrace(path)
+    // // show(paths[path] ?? { id: 0 })
   }
 })
 
@@ -290,7 +289,8 @@ onMounted(() => {
   } else {
     const key = account + path
     // paths.get(key).then(item => item ? show(JSONBigInt.parse(item.value)) : backtrace(path))
-    paths[key] ? show(paths[key]) : backtrace(path)
+    // paths[key] ? show(paths[key]) : backtrace(path)
+    show({ id: 0 })
     // show(paths[key] ?? { id: 0 })
   }
 })

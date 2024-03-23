@@ -1,9 +1,8 @@
-use std::{fs, thread};
+use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use futures::executor::block_on;
 use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use rayon::prelude::*;
 use walkdir::WalkDir;
@@ -34,10 +33,7 @@ pub async fn check_path(path: &str) -> Option<Files> {
 pub async fn search(user_id: i64, query: &str) -> Vec<Files> {
     match auth::bs::get_subject(user_id).await {
         Some(subject) => {
-            let mut path = String::from(HOME.as_str());
-            if app_env().as_str() != "local" {
-                path.push_str(&format!("/{}", subject.username.unwrap()))
-            }
+            let path = &get_user_home_path(&subject.username.unwrap());
             let files = ifile::dao::search(path.as_str(), query).await;
             update_folders_size(&files).await;
             desensitize_and_sort(files, path.as_str()).await
@@ -53,11 +49,7 @@ pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
     match auth::bs::get_subject(user_id).await {
         Some(subject) => {
             // let mut path = &*format!("{}/{}", HOME.as_str(), subject.username.unwrap());
-            let mut path = String::from(HOME.as_str());
-            if app_env().as_str() != "local" {
-                path.push_str(&format!("/{}", subject.username.unwrap()))
-            }
-            let path = path.as_str();
+            let path = &get_user_home_path(&subject.username.unwrap());
             let files = if parent == 0 {
                 match dao::get_by_path(path).await {
                     Some(file) => dao::list(path, file.id).await, // path也需限制, 防水平越权
@@ -71,6 +63,14 @@ pub async fn list(user_id: i64, parent: i64) -> Vec<Files> {
         }
         None => vec![]
     }
+}
+
+fn get_user_home_path(username: &str) -> String {
+    let mut path = String::from(HOME.as_str());
+    if app_env().as_str() != "local" {
+        path.push_str(&format!("/{}", username))
+    }
+    path
 }
 
 /**
@@ -196,30 +196,26 @@ pub async fn backtrace(username: &str, trace: Vec<String>) -> Option<Files> {
 }
 
 /**
- * 校正目录(size)
+ * 校正目录size
  * 建议在：进入 登录、个人中心 后，预热触发
  */
 pub async fn calc_folder(account: &str) {
-    let path = format!("{}/{}", HOME.as_str(), account);
-    thread::spawn(move || {
-        block_on(async {
-            let path: &str = path.as_str();
-            for depth in dao::folder_depth_desc(path).await {
-                let _ = dao::update_folder_size(depth.ids).await;
-            }
-        });
+    let path = get_user_home_path(account);
+    tokio::spawn(async move {
+        for depth in dao::folder_depth_desc(path.as_str()).await {
+            let _ = dao::update_folder_size(depth.ids).await;
+        }
     });
 }
 
 pub async fn update_folders_size(folders: &Vec<Files>) {
-    let folders = folders.par_iter().filter(|x| x.kind == "Folder").map(|x| x.clone()).collect();
-    thread::spawn(move || {
-        block_on(async {
-            let mut folders: Vec<Files> = folders;
-            folders.sort_by(|a, b| b.path.len().cmp(&a.path.len()));
-            for folder in folders {
-                let _ = dao::update_folder_size(folder.id.to_string()).await;
-            }
-        });
+    let folders = folders.par_iter().filter(|x| x.kind == "Folder").map(|x| x.to_owned()).collect();
+    tokio::spawn(async move {
+        let mut folders: Vec<Files> = folders;
+        folders.sort_by(|a, b| b.path.len().cmp(&a.path.len()));    // 倒序、长的在前
+        let ids = folders.iter().map(|x| x.id.to_string()).collect::<Vec<_>>();
+        for x in ids.chunks(100) {  // 分组，100条一批
+            let _ = dao::update_folder_size(x.join(",")).await;
+        }
     });
 }
