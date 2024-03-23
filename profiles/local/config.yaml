@@ -1,7 +1,7 @@
 server:
   port: 8080
 postgres:
-  dsn: postgres://seafile_rw:agYx0DzkYsRASuQT@172.26.16.147:30432/seafile
+  dsn: postgres://postgres:postgres@172.17.16.109:5432/postgres
   min: 3
   max: 10
 watch_path: /Users/Abel/Downloads

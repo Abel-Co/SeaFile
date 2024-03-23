@@ -23,7 +23,7 @@ pub async fn get(id: i64) -> Option<Files> {
     }
 }
 
-pub async fn check_path(path: &str) -> Option<Files> {
+pub async fn get_by_path(path: &str) -> Option<Files> {
     dao::get_by_path(path).await
 }
 

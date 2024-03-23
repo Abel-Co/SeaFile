@@ -30,7 +30,7 @@ pub async fn daisy_base(id: i64, home: &str) -> (Option<Files>, isize) {
     let file = if file.is_some() && file.as_ref().unwrap().path.starts_with(home) {
         Some(file.unwrap())
     } else {
-        ifile::bs::check_path(home).await
+        ifile::bs::get_by_path(home).await
     };
     let level = match &file {
         Some(file) => (file.path.replace(home, "").split("/").collect::<Vec<_>>().len() - 1) as isize,

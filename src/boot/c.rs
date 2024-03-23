@@ -44,15 +44,10 @@ pub async fn init_db_schema() {
         // 1.建表
         let sql = std::fs::read_to_string("scripts/create.sql").unwrap();
         let _ = RB.exec(sql.as_str(), vec![]).await;
-        // 2.记录管理路径
-        let watch_path = global().watch_path.as_str();
-        ifile::bs::create(CreateKind::Folder, watch_path).await;
     }
-    // let files: i64 = RB.fetch("select count(*) from files;", vec![]).await.unwrap();
-    // if files < 2 {
-    let root_path = ifile::bs::check_path(global().watch_path.as_str()).await;
+    let root_path = ifile::bs::get_by_path(global().watch_path.as_str()).await;
     if let None = root_path {
-        // 3.初始建立索引
+        // 2.初始建立索引
         tokio::spawn(async move { ifile::bs::index(global().watch_path.as_str()).await; });
     }
 }

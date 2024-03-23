@@ -7,4 +7,4 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 - [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
 ## 待扩充图标
-- 7z,efi,plist,aml,kext
+- 7z,efi,plist,aml,kext,json
