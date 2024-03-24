@@ -35,13 +35,12 @@ impl Files {
             _name.to_str().unwrap() } else { "/" };
         Files {
             id: new_snowflake_id(),
-            path: path.to_string(),
-            name: _file_name.to_string(),
+            path: path.to_owned(),
+            name: _file_name.to_owned(),
             parent: dao::get_by_path(parent_path).await.map_or(0, |p_file| p_file.id),
             size: fs::metadata(path).map_or(0, |meta| meta.len()),
-            kind,
             crc: crc_utils::crc_i64(path),
-            updated_at: Some(TimestampZ::now()),
+            kind,
             ..Default::default()
         }
     }

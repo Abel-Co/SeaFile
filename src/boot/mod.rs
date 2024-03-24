@@ -16,7 +16,7 @@ pub mod middleware;
 pub fn app_env<'a>() -> &'a Arc<String> {
     static ENV: OnceCell<Arc<String>> = OnceCell::new();
     ENV.get_or_init(|| {
-        Arc::new(env::var("APP_ENV").unwrap())  // 不unwrap_or，这里必须要供给个标识
+        Arc::new(env::var("APP_ENV").unwrap_or("".to_owned()))  // unwrap_or
     })
 }
 

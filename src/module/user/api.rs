@@ -17,7 +17,7 @@ pub async fn get(jwt: JwtToken) -> impl Responder {
         user.password = None;
         return HttpResponse::Ok().json(user);
     }
-    HttpResponse::Ok().json("none")
+    HttpResponse::BadRequest().json("invalid token")
 }
 
 /**
@@ -49,7 +49,7 @@ pub async fn list(jwt: JwtToken) -> impl Responder {
             return HttpResponse::Ok().json(users);
         }
     }
-    HttpResponse::BadRequest().json("权限不足")
+    HttpResponse::Unauthorized().json("权限不足")
 }
 
 /**
@@ -57,7 +57,6 @@ pub async fn list(jwt: JwtToken) -> impl Responder {
  */
 #[post("/user")]
 pub async fn create(user: Json<Users>, jwt: JwtToken) -> impl Responder {
-    // log::info!(">>> {:?} => {:?}", jwt.sub, user);
     if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
         if subject.user_type == UserType::Admin {   // 验证管理员权限
             let _ = user::bs::create(user.0).await;

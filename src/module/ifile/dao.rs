@@ -53,8 +53,8 @@ pub async fn save(files: Files) -> u64 {
 /**
  * 改-档案
  */
-pub async fn update(id: i64, ifile: Files) -> u64 {
-    RB.update_by_wrapper(&ifile, RB.new_wrapper()
+pub async fn update(id: i64, i_file: Files) -> u64 {
+    RB.update_by_wrapper(&i_file, RB.new_wrapper()
         .eq("id", id), &[Skip::Column("id"), Skip::Value(Bson::Null)],
     ).await.unwrap()
 }

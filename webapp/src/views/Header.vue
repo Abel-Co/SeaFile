@@ -59,6 +59,7 @@ import { get } from "../utils/request"
 import md5 from "md5"
 import { use_avatar_store } from "../store/avatar_store"
 import { use_user_store } from "../store/user_store"
+import { doLogout } from "../api/auth"
 
 const message = useMessage()
 const dialog = useDialog()
@@ -113,7 +114,7 @@ const iconList = [
 // 头像下拉菜单, 需去除：@select="avatarOptions"
 const avatarOptions = reactive([
   { label: '个人中心', key: 1, props: { onClick: () => router.push({ name: 'Personal' }) } },
-  { label: '退出登录', key: 3, props: { onClick: () => doLogout() } },
+  { label: '退出登录', key: 3, props: { onClick: () => logout() } },
 ])
 
 watch(model, () => {
@@ -135,25 +136,24 @@ watch(model, () => {
 onMounted(() => get('/user').then(resp => Object.assign(model, resp.data)))
 
 // 退出登录
-const doLogout = () => {
+const logout = () => {
   let dia = dialog.warning({
     title: '提示',
     content: '您确定要退出登录吗',
     positiveText: '确定',
     negativeText: '取消',
     onPositiveClick: () => {
-      const subject = use_user_store()
-      Object.keys(subject).forEach(key => subject[key] = undefined)
-      message.success('成功退出登录')
-      router.replace({
-        name: 'Login',
-        query: {
-          redirect: route.fullPath,
-        },
-      }).finally(() => location.reload())
+      doLogout().then(_ => {
+        message.success('成功退出登录')
+        router.replace({
+          name: 'Login',
+          query: {
+            redirect: route.fullPath,
+          },
+        }).finally(() => location.reload())
+      })
     },
-    onNegativeClick: () => {
-    },
+    onNegativeClick: () => _,
   })
   document.addEventListener("keydown", e => e.key === 'Enter' && dia.onPositiveClick())
 }

@@ -7,7 +7,7 @@ use notify::event::{CreateKind, ModifyKind, RemoveKind};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
-use crate::boot::{app_env, global};
+use crate::boot::app_env;
 use crate::boot::c::HOME;
 use crate::module::{auth, filesystem};
 use crate::module::ifile;
@@ -141,7 +141,7 @@ pub async fn index(path: &str) {
         // // 不能采用删老记录的方案，因为离线保存的，基于url的资源地址将失效。
         // let _ = ifile::dao::delete_children(path.as_str()).await;
         // 1.发现数据
-        for entry in WalkDir::new(path.clone()) {
+        for entry in WalkDir::new(path.as_str()) {
             if let Ok(entry) = entry {
                 match entry.file_type() {
                     file_type if file_type.is_file() => {
@@ -172,8 +172,7 @@ pub async fn index(path: &str) {
 pub async fn reindex(user_id: i64, id: i64) {
     if let Some(_file) = ifile::dao::get(id).await {
         let account = auth::bs::get_subject(user_id).await.unwrap().username.unwrap();
-        let home_path = global().watch_path.as_str();
-        let path = &format!("{}/{}", home_path, account);
+        let path = &get_user_home_path(&account);
         if _file.path.starts_with(path) {
             index(_file.path.as_str()).await
         }

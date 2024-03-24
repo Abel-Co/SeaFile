@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use actix_web::dev::ServiceRequest;
-use notify::event::CreateKind;
 use once_cell::sync::OnceCell;
 use rbatis::core::db::DBPoolOptions;
 use rbatis::rbatis::Rbatis;
@@ -41,7 +40,7 @@ pub async fn init_rbatis() {
 pub async fn init_db_schema() {
     let tables: i64 = RB.fetch("select count(*) from pg_tables where tablename = 'files';", vec![]).await.unwrap();
     if tables == 0 {
-        // 1.建表
+        // 1.初始建表
         let sql = std::fs::read_to_string("scripts/create.sql").unwrap();
         let _ = RB.exec(sql.as_str(), vec![]).await;
     }

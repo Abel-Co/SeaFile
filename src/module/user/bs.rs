@@ -22,17 +22,16 @@ pub async fn list() -> Vec<Users> {
  * 创建用户
  */
 pub async fn create(mut user: Users) -> Result<u64, String> {
+    let (username, password) = (user.username.as_ref().unwrap(), user.password);
     user.id = Some(new_snowflake_id());
-    let password = user.password.clone();
-    if let Some(_password) = &password {
-        user.password = Some(auth::passaes(&_password));
+    user.password = Some(auth::passaes(password.as_ref().unwrap()));
+    if let Ok(result) = user::dao::save(&user).await {
+        if let Err(e) = samba::create(username, password).await {
+            return Err(e.to_string());
+        }
+        return Ok(result.rows_affected);
     }
-    let rows_affected = user::dao::save(&user).await;
-    let account = user.username.as_ref().unwrap();
-    if let Err(e) = samba::create(account, password).await {
-        return Err(e.to_string());
-    }
-    Ok(rows_affected)
+    Ok(0)
 }
 
 pub async fn create_root() -> u64 {
@@ -44,7 +43,7 @@ pub async fn create_root() -> u64 {
         status: Some(1),
         ..Default::default()
     };
-    user::dao::save(&user).await
+    user::dao::save(&user).await.unwrap().rows_affected
 }
 
 /**

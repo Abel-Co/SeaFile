@@ -1,6 +1,8 @@
 import axios from "axios"
 import { jsonBigInt } from "./objects"
 import { use_user_store } from "../store/user_store"
+import router from "../router"
+import { doLogout } from "../api/auth"
 
 // axios.defaults.headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 axios.defaults.headers['Content-Type'] = 'application/json'
@@ -19,9 +21,14 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
   return response
 }, error => {
-  if (error?.response?.status === 401) {  // 401 未登录。
-    // router.push('/login').then(r => {});
-  } else if (error?.response?.status === 403) { // 403 权限不足。
+  if ([401, 403, 423].includes(error?.response?.status)) {
+    // 401 未登录 // 403 权限不足  // 423 待激活
+    switch (error?.response?.status) {
+      case 401:
+        doLogout().then(router.push('/login'))
+        break
+    }
+    return error?.response
   }
   return Promise.reject(error)
 })

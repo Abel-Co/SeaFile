@@ -69,6 +69,7 @@ pub async fn create(account: &str, password: Option<String>) -> Result<(), Strin
                     return Err(err.to_string());
                 }
             }
+            // chmod -R 700 /home/{account}
         }
     }
     Ok(())
