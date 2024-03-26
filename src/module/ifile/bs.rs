@@ -101,9 +101,10 @@ pub async fn show(id: i64) -> String {
 }
 
 pub async fn create(kind: CreateKind, path: &str) {
+    let i_file = Files::new(format!("{:?}", kind), path).await;
     match dao::get_by_path(path).await {
-        Some(file) => dao::update(file.id, Files::new(format!("{:?}", kind), path).await).await,
-        None => dao::save(Files::new(format!("{:?}", kind), path).await).await
+        Some(file) => dao::update(file.id, i_file).await,
+        None => dao::save(i_file).await
     };
 }
 
@@ -143,17 +144,13 @@ pub async fn index(path: &str) {
         // 1.发现数据
         for entry in WalkDir::new(path.as_str()) {
             if let Ok(entry) = entry {
-                match entry.file_type() {
-                    file_type if file_type.is_file() => {
-                        create(CreateKind::File, entry.path().to_str().unwrap()).await;
-                    }
-                    file_type if file_type.is_dir() => {
-                        create(CreateKind::Folder, entry.path().to_str().unwrap()).await;
-                    }
-                    file_type if file_type.is_symlink() => {
-                        create(CreateKind::File, entry.path().to_str().unwrap()).await;
-                    }
-                    _ => {}
+                if let Some(kind) = match entry.file_type() {
+                    file_type if file_type.is_file() => { Some(CreateKind::File) }
+                    file_type if file_type.is_symlink() => { Some(CreateKind::File) }
+                    file_type if file_type.is_dir() => { Some(CreateKind::Folder) }
+                    _ => None
+                } {
+                    create(kind, entry.path().to_str().unwrap()).await;
                 }
             }
         }
@@ -163,6 +160,8 @@ pub async fn index(path: &str) {
                 let _ = ifile::dao::delete(vec![x.id]).await;
             }
         }
+        // 3.度量目录
+        dao::update_folder_size_all_in_sql(path.as_str()).await;
     });
 }
 
@@ -201,17 +200,23 @@ pub async fn backtrace(username: &str, trace: Vec<String>) -> Option<Files> {
 pub async fn calc_folder(account: &str) {
     let path = get_user_home_path(account);
     tokio::spawn(async move {
-        for depth in dao::folder_depth_desc(path.as_str()).await {
-            let _ = dao::update_folder_size(depth.ids).await;
+        // method-1.分步统计
+        // 1.1.查找path后代目录, 按长度: 分组 & 降续
+        for depth in dao::fetch_folder_group_by_depth_desc(path.as_str()).await {
+            // 1.2.从底层向上, 逐层级（不一定在同一棵树上）更新目录体积.
+            dao::update_folder_size(depth.ids).await;
         }
+        // method-2.一条sql搞定（巨型存储，可能卡住DB）
+        // dao::update_folder_size_all_in_sql(path.as_str()).await
     });
 }
 
+/// **同一层级**目录 更新体积
 pub async fn update_folders_size(folders: &Vec<Files>) {
     let folders = folders.par_iter().filter(|x| x.kind == "Folder").map(|x| x.to_owned()).collect();
     tokio::spawn(async move {
-        let mut folders: Vec<Files> = folders;
-        folders.sort_by(|a, b| b.path.len().cmp(&a.path.len()));    // 倒序、长的在前
+        let folders: Vec<Files> = folders;
+        // folders.sort_by(|a, b| b.path.len().cmp(&a.path.len())); // 倒序、长的在前.(都是同棵树，同层级，没必要排序了)
         let ids = folders.iter().map(|x| x.id.to_string()).collect::<Vec<_>>();
         for x in ids.chunks(100) {  // 分组，100条一批
             let _ = dao::update_folder_size(x.join(",")).await;

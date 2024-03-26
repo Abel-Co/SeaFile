@@ -70,7 +70,6 @@ pub async fn create(user: Json<Users>, jwt: JwtToken) -> impl Responder {
  */
 #[put("/user/{id}")]
 pub async fn update(id: Path<i64>, user: Json<Users>, jwt: JwtToken) -> impl Responder {
-    // log::info!(">>> {:?} => {:?}: {:?}", jwt.sub, id.0, user.0);
     if Some(id.0) == user.id {
         if let Some(subject) = auth::bs::get_subject(jwt.sub).await {
             if subject.user_type == UserType::Admin {   // 验证管理员权限

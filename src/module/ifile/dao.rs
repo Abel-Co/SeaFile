@@ -95,13 +95,13 @@ pub async fn find_posterity(path: &str) -> Vec<Files> {
  * 路径回溯
  */
 pub async fn backtrace(trace: Vec<String>) -> Option<Files> {
-   RB.fetch_by_wrapper(
-       RB.new_wrapper().r#in("path", &trace).order_by(false, &["length(path)"]).limit(1)
-   ).await.unwrap()
+    RB.fetch_by_wrapper(
+        RB.new_wrapper().r#in("path", &trace).order_by(false, &["length(path)"]).limit(1)
+    ).await.unwrap()
 }
 
-/// 查找path后代目录, 按长度降续
-pub async fn folder_depth_desc(path: &str) -> Vec<Depth> {
+/// 查找path后代目录, 按长度: 分组 & 降续
+pub async fn fetch_folder_group_by_depth_desc(path: &str) -> Vec<Depth> {
     let sql = r#"
         select length(path) len, count(*) cnt, string_agg(cast(id as varchar), ',') ids from files
             where kind = 'Folder' and path like $1 group by length(path) order by length(path) desc;
@@ -109,11 +109,26 @@ pub async fn folder_depth_desc(path: &str) -> Vec<Depth> {
     RB.fetch(sql, vec![Bson::String(format!("{}/%", path))]).await.unwrap()
 }
 
-/// 计算目录大小(子代 Folder + File)
+/// 计算'子代'目录大小(仅子代: Folder + File)
 pub async fn update_folder_size(ids: String) -> u64 {
     let sql = format!(r#"
         update files p set size =
             coalesce((select sum(size) from files where parent = p.id), p.size)
         where id in ({});"#, ids);
     RB.exec(sql.as_str(), vec![]).await.unwrap().rows_affected
+}
+
+/// 计算'后代'目录大小(全部后代: Folder = sum(后代File) )
+/// All_in_sql方案问题：目录树越到顶层，对后代的重复计算量越大，遇到巨型存储/目录，可能卡住整个DB. 36G 存储 PG 39%.
+pub async fn update_folder_size_all_in_sql(path: &str) -> u64 {
+    let sql = r#"
+        update files p set size =
+            coalesce(
+                   (select sum(size) from files where kind = 'File' and (select strpos(path, concat(p.path, '/'))) > 0)
+               , p.size
+            )
+        where kind = 'Folder' and path like $1;
+    "#;
+    let like_path = format!("{}/%", path).replace("//", "/");
+    RB.exec(sql, vec![Bson::String(like_path)]).await.unwrap().rows_affected
 }
