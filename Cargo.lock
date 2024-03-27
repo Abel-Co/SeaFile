@@ -2453,6 +2453,7 @@ dependencies = [
  "log4rs",
  "notify",
  "once_cell",
+ "parking_lot 0.12.1",
  "rand",
  "rayon",
  "rbatis",

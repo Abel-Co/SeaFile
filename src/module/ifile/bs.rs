@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use notify::event::{CreateKind, ModifyKind, RemoveKind};
+use notify::event::{CreateKind, RemoveKind};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
@@ -108,17 +108,17 @@ pub async fn create(kind: CreateKind, path: &str) {
     };
 }
 
-pub async fn update(_kind: ModifyKind, path: &str) {
+pub async fn update(path: &str) {
     let _file = Path::new(path);
     if _file.exists() {
-        let kind = if _file.is_file() {
-            CreateKind::File
-        } else if _file.is_dir() {
-            CreateKind::Folder
-        } else {
-            CreateKind::Other
-        };
-        create(kind, path).await;
+        if let Some(kind) = match _file {
+            _file if _file.is_file() => { Some(CreateKind::File) }
+            _file if _file.is_symlink() => { Some(CreateKind::File) }
+            _file if _file.is_dir() => { Some(CreateKind::Folder) }
+            _ => None
+        } {
+            create(kind, path).await;
+        }
     } else {
         ifile::dao::delete_by_path(path).await;
     }
